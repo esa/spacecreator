@@ -12,6 +12,7 @@ set(SOURCES
   channelrecv.cpp
   channelsend.cpp
   conditional.cpp
+  conditionaldeclaration.cpp
   constant.cpp
   datatype.cpp
   declaration.cpp
@@ -54,6 +55,7 @@ set(INCLUDES
   channelrecv.h
   channelsend.h
   conditional.h
+  conditionaldeclaration.h
   constant.h
   datatype.h
   declaration.h

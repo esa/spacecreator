@@ -323,18 +323,20 @@ void tst_Asn1ToPromelaTranslator::testVariableBitString()
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 2);
 
-    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+    const Declaration *expectedArray = findUtypeField(expectedUtype, 0);
 
-    QCOMPARE(expectedArray.getName(), "data");
-    QVERIFY(expectedArray.getType().isArrayType());
-    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
-    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
-    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BIT);
+    QVERIFY(expectedArray);
+    QCOMPARE(expectedArray->getName(), "data");
+    QVERIFY(expectedArray->getType().isArrayType());
+    QCOMPARE(expectedArray->getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray->getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray->getType().getArrayType().getType()), BasicType::BIT);
 
-    const Declaration expectedLength = expectedUtype.getFields().at(1);
-    QCOMPARE(expectedLength.getName(), "length");
-    QVERIFY(expectedLength.getType().isBasicType());
-    QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
+    const Declaration *expectedLength = findUtypeField(expectedUtype, 1);
+    QVERIFY(expectedLength);
+    QCOMPARE(expectedLength->getName(), "length");
+    QVERIFY(expectedLength->getType().isBasicType());
+    QCOMPARE(expectedLength->getType().getBasicType(), BasicType::INT);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
@@ -421,13 +423,14 @@ void tst_Asn1ToPromelaTranslator::testFixedBitString()
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 1);
 
-    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+    const Declaration *expectedArray = findUtypeField(expectedUtype, 0);
 
-    QCOMPARE(expectedArray.getName(), "data");
-    QVERIFY(expectedArray.getType().isArrayType());
-    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
-    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
-    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BIT);
+    QVERIFY(expectedArray);
+    QCOMPARE(expectedArray->getName(), "data");
+    QVERIFY(expectedArray->getType().isArrayType());
+    QCOMPARE(expectedArray->getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray->getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray->getType().getArrayType().getType()), BasicType::BIT);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 1);
     {
@@ -474,18 +477,20 @@ void tst_Asn1ToPromelaTranslator::testVariableOctetString()
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 2);
 
-    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+    const Declaration *expectedArray = findUtypeField(expectedUtype, 0);
 
-    QCOMPARE(expectedArray.getName(), "data");
-    QVERIFY(expectedArray.getType().isArrayType());
-    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
-    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
-    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BYTE);
+    QVERIFY(expectedArray);
+    QCOMPARE(expectedArray->getName(), "data");
+    QVERIFY(expectedArray->getType().isArrayType());
+    QCOMPARE(expectedArray->getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray->getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray->getType().getArrayType().getType()), BasicType::BYTE);
 
-    const Declaration expectedLength = expectedUtype.getFields().at(1);
-    QCOMPARE(expectedLength.getName(), "length");
-    QVERIFY(expectedLength.getType().isBasicType());
-    QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
+    const Declaration *expectedLength = findUtypeField(expectedUtype, 1);
+    QVERIFY(expectedLength);
+    QCOMPARE(expectedLength->getName(), "length");
+    QVERIFY(expectedLength->getType().isBasicType());
+    QCOMPARE(expectedLength->getType().getBasicType(), BasicType::INT);
     QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
         const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
@@ -571,13 +576,14 @@ void tst_Asn1ToPromelaTranslator::testFixedOctetString()
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 1);
 
-    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+    const Declaration *expectedArray = findUtypeField(expectedUtype, 0);
 
-    QCOMPARE(expectedArray.getName(), "data");
-    QVERIFY(expectedArray.getType().isArrayType());
-    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
-    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
-    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BYTE);
+    QVERIFY(expectedArray);
+    QCOMPARE(expectedArray->getName(), "data");
+    QVERIFY(expectedArray->getType().isArrayType());
+    QCOMPARE(expectedArray->getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray->getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray->getType().getArrayType().getType()), BasicType::BYTE);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 1);
     {
@@ -624,18 +630,21 @@ void tst_Asn1ToPromelaTranslator::testVariableIA5String()
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 2);
 
-    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+    const Declaration *expectedArray = findUtypeField(expectedUtype, 0);
 
-    QCOMPARE(expectedArray.getName(), "data");
-    QVERIFY(expectedArray.getType().isArrayType());
-    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
-    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
-    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BYTE);
+    QVERIFY(expectedArray);
+    QVERIFY(expectedArray);
+    QCOMPARE(expectedArray->getName(), "data");
+    QVERIFY(expectedArray->getType().isArrayType());
+    QCOMPARE(expectedArray->getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray->getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray->getType().getArrayType().getType()), BasicType::BYTE);
 
-    const Declaration expectedLength = expectedUtype.getFields().at(1);
-    QCOMPARE(expectedLength.getName(), "length");
-    QVERIFY(expectedLength.getType().isBasicType());
-    QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
+    const Declaration *expectedLength = findUtypeField(expectedUtype, 1);
+    QVERIFY(expectedLength);
+    QCOMPARE(expectedLength->getName(), "length");
+    QVERIFY(expectedLength->getType().isBasicType());
+    QCOMPARE(expectedLength->getType().getBasicType(), BasicType::INT);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 2);
     {
@@ -722,13 +731,14 @@ void tst_Asn1ToPromelaTranslator::testFixedIA5String()
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 1);
 
-    const Declaration &expectedArray = expectedUtype.getFields().at(0);
+    const Declaration *expectedArray = findUtypeField(expectedUtype, 0);
 
-    QCOMPARE(expectedArray.getName(), "data");
-    QVERIFY(expectedArray.getType().isArrayType());
-    QCOMPARE(expectedArray.getType().getArrayType().getSize(), EXPECTED_SIZE);
-    QVERIFY(std::holds_alternative<BasicType>(expectedArray.getType().getArrayType().getType()));
-    QCOMPARE(std::get<BasicType>(expectedArray.getType().getArrayType().getType()), BasicType::BYTE);
+    QVERIFY(expectedArray);
+    QCOMPARE(expectedArray->getName(), "data");
+    QVERIFY(expectedArray->getType().isArrayType());
+    QCOMPARE(expectedArray->getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<BasicType>(expectedArray->getType().getArrayType().getType()));
+    QCOMPARE(std::get<BasicType>(expectedArray->getType().getArrayType().getType()), BasicType::BYTE);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 1);
     {
@@ -780,25 +790,35 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 2);
 
-    QCOMPARE(expectedUtype.getFields().at(0).getName(), "data");
-    QVERIFY(expectedUtype.getFields().at(0).getType().isUtypeReference());
-    QCOMPARE(expectedUtype.getFields().at(0).getType().getUtypeReference().getName(), "MyType_data");
+    const Declaration *expectedData = findUtypeField(expectedUtype, 0);
+    QVERIFY(expectedData);
+    QCOMPARE(expectedData->getName(), "data");
+    QVERIFY(expectedData->getType().isUtypeReference());
+    QCOMPARE(expectedData->getType().getUtypeReference().getName(), "MyType_data");
 
-    QCOMPARE(expectedUtype.getFields().at(1).getName(), "selection");
-    QVERIFY(expectedUtype.getFields().at(1).getType().isBasicType());
-    QCOMPARE(expectedUtype.getFields().at(1).getType().getBasicType(), BasicType::INT);
+    const Declaration *expectedSelection = findUtypeField(expectedUtype, 1);
+    QVERIFY(expectedSelection);
+    QCOMPARE(expectedSelection->getName(), "selection");
+    QVERIFY(expectedSelection->getType().isBasicType());
+    QCOMPARE(expectedSelection->getType().getBasicType(), BasicType::INT);
 
     const Utype &expectedDataUtype = promelaModel.getUtypes().at(1);
     QCOMPARE(expectedDataUtype.getName(), "MyType_data");
     QVERIFY(expectedDataUtype.isUnionType());
 
     QCOMPARE(expectedDataUtype.getFields().size(), 2);
-    QCOMPARE(expectedDataUtype.getFields().at(0).getName(), "ch1");
-    QVERIFY(expectedDataUtype.getFields().at(0).getType().isUtypeReference());
-    QCOMPARE(expectedDataUtype.getFields().at(0).getType().getUtypeReference().getName(), "MyType__ch1");
-    QCOMPARE(expectedDataUtype.getFields().at(1).getName(), "ch2");
-    QVERIFY(expectedDataUtype.getFields().at(1).getType().isUtypeReference());
-    QCOMPARE(expectedDataUtype.getFields().at(1).getType().getUtypeReference().getName(), "MyType__ch2");
+
+    const Declaration *expectedField1 = findUtypeField(expectedDataUtype, 0);
+    QVERIFY(expectedField1);
+    QCOMPARE(expectedField1->getName(), "ch1");
+    QVERIFY(expectedField1->getType().isUtypeReference());
+    QCOMPARE(expectedField1->getType().getUtypeReference().getName(), "MyType__ch1");
+
+    const Declaration *expectedField2 = findUtypeField(expectedDataUtype, 1);
+    QVERIFY(expectedField2);
+    QCOMPARE(expectedField2->getName(), "ch2");
+    QVERIFY(expectedField2->getType().isUtypeReference());
+    QCOMPARE(expectedField2->getType().getUtypeReference().getName(), "MyType__ch2");
 
     QCOMPARE(promelaModel.getValueDefinitions().at(0).getName(), "MyType_NONE");
     QCOMPARE(promelaModel.getValueDefinitions().at(0).getValue(), 0);
@@ -898,15 +918,17 @@ void tst_Asn1ToPromelaTranslator::testSequence()
     QCOMPARE(expectedUtype.getName(), "MyType");
     QCOMPARE(expectedUtype.getFields().size(), 2);
 
-    const Declaration &decl1 = expectedUtype.getFields().at(0);
-    QCOMPARE("field1", decl1.getName());
-    QVERIFY(decl1.getType().isUtypeReference());
-    QCOMPARE(decl1.getType().getUtypeReference().getName(), "MyType__field1");
+    const Declaration *decl1 = findUtypeField(expectedUtype, 0);
+    QVERIFY(decl1);
+    QCOMPARE("field1", decl1->getName());
+    QVERIFY(decl1->getType().isUtypeReference());
+    QCOMPARE(decl1->getType().getUtypeReference().getName(), "MyType__field1");
 
-    const Declaration &decl2 = expectedUtype.getFields().at(1);
-    QCOMPARE("field2", decl2.getName());
-    QVERIFY(decl2.getType().isUtypeReference());
-    QCOMPARE(decl2.getType().getUtypeReference().getName(), "MyType__field2");
+    const Declaration *decl2 = findUtypeField(expectedUtype, 1);
+    QVERIFY(decl2);
+    QCOMPARE("field2", decl2->getName());
+    QVERIFY(decl2->getType().isUtypeReference());
+    QCOMPARE(decl2->getType().getUtypeReference().getName(), "MyType__field2");
 
     const TypeAlias &expectedAlias1 = promelaModel.getTypeAliases().at(0);
     QCOMPARE(expectedAlias1.getName(), "MyType__field1");
@@ -992,32 +1014,42 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     QCOMPARE(expectedExistUtype.getName(), "MyType_exist");
     QCOMPARE(expectedExistUtype.isUnionType(), false);
     QCOMPARE(expectedExistUtype.getFields().size(), 2);
-    QCOMPARE(expectedExistUtype.getFields().at(0).getName(), "field1");
-    QVERIFY(expectedExistUtype.getFields().at(0).getType().isBasicType());
-    QCOMPARE(expectedExistUtype.getFields().at(0).getType().getBasicType(), BasicType::BOOLEAN);
-    QCOMPARE(expectedExistUtype.getFields().at(1).getName(), "field2");
-    QVERIFY(expectedExistUtype.getFields().at(1).getType().isBasicType());
-    QCOMPARE(expectedExistUtype.getFields().at(1).getType().getBasicType(), BasicType::BOOLEAN);
+
+    const Declaration *expectedField1 = findUtypeField(expectedExistUtype, 0);
+    QVERIFY(expectedField1);
+    QCOMPARE(expectedField1->getName(), "field1");
+    QVERIFY(expectedField1->getType().isBasicType());
+    QCOMPARE(expectedField1->getType().getBasicType(), BasicType::BOOLEAN);
+
+    const Declaration *expectedField2 = findUtypeField(expectedExistUtype, 1);
+    QVERIFY(expectedField2);
+
+    QCOMPARE(expectedField2->getName(), "field2");
+    QVERIFY(expectedField2->getType().isBasicType());
+    QCOMPARE(expectedField2->getType().getBasicType(), BasicType::BOOLEAN);
 
     const Utype &expectedUtype = promelaModel.getUtypes().at(1);
     QCOMPARE(expectedUtype.isUnionType(), false);
     QCOMPARE(expectedUtype.getName(), "MyType");
     QCOMPARE(expectedUtype.getFields().size(), 3);
 
-    const Declaration &decl1 = expectedUtype.getFields().at(0);
-    QCOMPARE("field1", decl1.getName());
-    QVERIFY(decl1.getType().isUtypeReference());
-    QCOMPARE(decl1.getType().getUtypeReference().getName(), "MyType__field1");
+    const Declaration *decl1 = findUtypeField(expectedUtype, 0);
+    QVERIFY(decl1);
+    QCOMPARE("field1", decl1->getName());
+    QVERIFY(decl1->getType().isUtypeReference());
+    QCOMPARE(decl1->getType().getUtypeReference().getName(), "MyType__field1");
 
-    const Declaration &decl2 = expectedUtype.getFields().at(1);
-    QCOMPARE("field2", decl2.getName());
-    QVERIFY(decl2.getType().isUtypeReference());
-    QCOMPARE(decl2.getType().getUtypeReference().getName(), "MyType__field2");
+    const Declaration *decl2 = findUtypeField(expectedUtype, 1);
+    QVERIFY(decl2);
+    QCOMPARE("field2", decl2->getName());
+    QVERIFY(decl2->getType().isUtypeReference());
+    QCOMPARE(decl2->getType().getUtypeReference().getName(), "MyType__field2");
 
-    const Declaration &decl3 = expectedUtype.getFields().at(2);
-    QCOMPARE("exist", decl3.getName());
-    QVERIFY(decl3.getType().isUtypeReference());
-    QCOMPARE(decl3.getType().getUtypeReference().getName(), "MyType_exist");
+    const Declaration *decl3 = findUtypeField(expectedUtype, 2);
+    QVERIFY(decl3);
+    QCOMPARE("exist", decl3->getName());
+    QVERIFY(decl3->getType().isUtypeReference());
+    QCOMPARE(decl3->getType().getUtypeReference().getName(), "MyType_exist");
 
     const TypeAlias &expectedAlias1 = promelaModel.getTypeAliases().at(0);
     QCOMPARE(expectedAlias1.getName(), "MyType__field1");
@@ -1176,10 +1208,11 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
         QCOMPARE(expectedLevel2.isUnionType(), false);
         QCOMPARE(expectedLevel2.getName(), "Level0__level1__level2");
         QCOMPARE(expectedLevel2.getFields().size(), 1);
-        const Declaration &expectedLevel2Field = expectedLevel2.getFields().front();
-        QCOMPARE(expectedLevel2Field.getName(), "field");
-        QVERIFY(expectedLevel2Field.getType().isUtypeReference());
-        QCOMPARE(expectedLevel2Field.getType().getUtypeReference().getName(), "Level0__level1__level2__field");
+        const Declaration *expectedLevel2Field = findUtypeField(expectedLevel2, 0);
+        QVERIFY(expectedLevel2Field);
+        QCOMPARE(expectedLevel2Field->getName(), "field");
+        QVERIFY(expectedLevel2Field->getType().isUtypeReference());
+        QCOMPARE(expectedLevel2Field->getType().getUtypeReference().getName(), "Level0__level1__level2__field");
     }
 
     {
@@ -1187,10 +1220,11 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
         QCOMPARE(expectedLevel1.isUnionType(), false);
         QCOMPARE(expectedLevel1.getName(), "Level0__level1");
         QCOMPARE(expectedLevel1.getFields().size(), 1);
-        const Declaration &expectedLevel1Field = expectedLevel1.getFields().front();
-        QCOMPARE(expectedLevel1Field.getName(), "level2");
-        QVERIFY(expectedLevel1Field.getType().isUtypeReference());
-        QCOMPARE(expectedLevel1Field.getType().getUtypeReference().getName(), "Level0__level1__level2");
+        const Declaration *expectedLevel1Field = findUtypeField(expectedLevel1, 0);
+        QVERIFY(expectedLevel1Field);
+        QCOMPARE(expectedLevel1Field->getName(), "level2");
+        QVERIFY(expectedLevel1Field->getType().isUtypeReference());
+        QCOMPARE(expectedLevel1Field->getType().getUtypeReference().getName(), "Level0__level1__level2");
     }
 
     {
@@ -1198,11 +1232,11 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
         QCOMPARE(expectedLevel0.isUnionType(), false);
         QCOMPARE(expectedLevel0.getName(), "Level0");
         QCOMPARE(expectedLevel0.getFields().size(), 1);
-        const Declaration &expectedLevel0Field = expectedLevel0.getFields().front();
-        QCOMPARE(expectedLevel0Field.getName(), "level1");
-        ;
-        QVERIFY(expectedLevel0Field.getType().isUtypeReference());
-        QCOMPARE(expectedLevel0Field.getType().getUtypeReference().getName(), "Level0__level1");
+        const Declaration *expectedLevel0Field = findUtypeField(expectedLevel0, 0);
+        QVERIFY(expectedLevel0Field);
+        QCOMPARE(expectedLevel0Field->getName(), "level1");
+        QVERIFY(expectedLevel0Field->getType().isUtypeReference());
+        QCOMPARE(expectedLevel0Field->getType().getUtypeReference().getName(), "Level0__level1");
     }
 
     const TypeAlias &expectedAlias = promelaModel.getTypeAliases().at(0);
@@ -1277,18 +1311,21 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 2);
 
-    const Declaration &expectedData = expectedUtype.getFields().at(0);
-    QCOMPARE(expectedData.getName(), "data");
-    QVERIFY(expectedData.getType().isArrayType());
-    QCOMPARE(expectedData.getType().getArrayType().getSize(), EXPECTED_SIZE);
-    QVERIFY(std::holds_alternative<UtypeRef>(expectedData.getType().getArrayType().getType()));
-    const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData.getType().getArrayType().getType());
+    const Declaration *expectedData = findUtypeField(expectedUtype, 0);
+    QVERIFY(expectedData);
+    QCOMPARE(expectedData->getName(), "data");
+    QVERIFY(expectedData->getType().isArrayType());
+    QCOMPARE(expectedData->getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<UtypeRef>(expectedData->getType().getArrayType().getType()));
+    const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData->getType().getArrayType().getType());
     QCOMPARE(expectedRef.getName(), "MyType__elem");
 
-    const Declaration expectedLength = expectedUtype.getFields().at(1);
-    QCOMPARE(expectedLength.getName(), "length");
-    QVERIFY(expectedLength.getType().isBasicType());
-    QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
+    const Declaration *expectedLength = findUtypeField(expectedUtype, 1);
+    QVERIFY(expectedLength);
+
+    QCOMPARE(expectedLength->getName(), "length");
+    QVERIFY(expectedLength->getType().isBasicType());
+    QCOMPARE(expectedLength->getType().getBasicType(), BasicType::INT);
 
     QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType__elem");
     QVERIFY(std::holds_alternative<BasicType>(promelaModel.getTypeAliases().at(0).getType()));
@@ -1382,12 +1419,14 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
     QVERIFY(!expectedUtype.isUnionType());
     QCOMPARE(expectedUtype.getFields().size(), 1);
 
-    const Declaration &expectedData = expectedUtype.getFields().at(0);
-    QCOMPARE(expectedData.getName(), "data");
-    QVERIFY(expectedData.getType().isArrayType());
-    QCOMPARE(expectedData.getType().getArrayType().getSize(), EXPECTED_SIZE);
-    QVERIFY(std::holds_alternative<UtypeRef>(expectedData.getType().getArrayType().getType()));
-    const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData.getType().getArrayType().getType());
+    const Declaration *expectedData = findUtypeField(expectedUtype, 0);
+    QVERIFY(expectedData);
+
+    QCOMPARE(expectedData->getName(), "data");
+    QVERIFY(expectedData->getType().isArrayType());
+    QCOMPARE(expectedData->getType().getArrayType().getSize(), EXPECTED_SIZE);
+    QVERIFY(std::holds_alternative<UtypeRef>(expectedData->getType().getArrayType().getType()));
+    const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData->getType().getArrayType().getType());
     QCOMPARE(expectedRef.getName(), "MyType__elem");
 
     QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType__elem");
@@ -1578,6 +1617,23 @@ const InlineDef *tst_Asn1ToPromelaTranslator::findInline(
         return nullptr;
     }
     return iter->get();
+}
+
+const ::promela::model::Declaration *tst_Asn1ToPromelaTranslator::findUtypeField(
+        const ::promela::model::Utype &utype, int index)
+{
+    int current = 0;
+    for (const Utype::Element &field : utype.getFields()) {
+        if (current == index) {
+            if (std::holds_alternative<Declaration>(field)) {
+                return &std::get<Declaration>(field);
+            } else {
+                return nullptr;
+            }
+        }
+        ++current;
+    }
+    return nullptr;
 }
 
 template<typename T>

@@ -41,7 +41,12 @@ void Utype::addField(const Declaration &field)
     m_fields.append(field);
 }
 
-const QList<Declaration> &Utype::getFields() const noexcept
+void Utype::addField(const ConditionalDeclaration &field)
+{
+    m_fields.append(field);
+}
+
+const QList<Utype::Element> &Utype::getFields() const noexcept
 {
     return m_fields;
 }

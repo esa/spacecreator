@@ -45,6 +45,10 @@ public:
      */
     void visit(const model::Utype &utype);
 
+    void operator()(const model::Declaration &declaration);
+
+    void operator()(const model::ConditionalDeclaration &declaration);
+
 private:
     QTextStream &m_stream;
     const QString m_indent;

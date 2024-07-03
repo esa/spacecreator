@@ -105,6 +105,7 @@ private:
             std::unique_ptr<ivm::IVModel> ivModel, const conversion::Options &options);
 
     const Declaration *findDeclaration(const QList<Declaration> &list, const QString &name);
+    const Declaration *findDeclaration(const Utype &utype, const QString &name);
     const InlineDef *findInline(const std::list<std::unique_ptr<InlineDef>> &list, const QString &name);
     const Proctype *findProctype(const std::list<std::unique_ptr<Proctype>> &list, const QString &name);
     const Utype *findUtype(const PromelaModel &model, const QString &name);
@@ -147,21 +148,21 @@ void tst_IvToPromelaTranslator::testSimple()
     QCOMPARE(systemState->isUnionType(), false);
     QCOMPARE(systemState->getFields().size(), 3);
     {
-        const Declaration *controller = findDeclaration(systemState->getFields(), "controller");
+        const Declaration *controller = findDeclaration(*systemState, "controller");
         QVERIFY(controller != nullptr);
         QVERIFY(controller->getType().isUtypeReference());
         QCOMPARE(controller->getType().getUtypeReference().getName(), "Controller_Context");
         QCOMPARE(controller->getVisibility(), Declaration::Visibility::NORMAL);
     }
     {
-        const Declaration *actuator = findDeclaration(systemState->getFields(), "actuator");
+        const Declaration *actuator = findDeclaration(*systemState, "actuator");
         QVERIFY(actuator != nullptr);
         QVERIFY(actuator->getType().isUtypeReference());
         QCOMPARE(actuator->getType().getUtypeReference().getName(), "Actuator_Context");
         QCOMPARE(actuator->getVisibility(), Declaration::Visibility::NORMAL);
     }
     {
-        const Declaration *timers = findDeclaration(systemState->getFields(), "timers");
+        const Declaration *timers = findDeclaration(*systemState, "timers");
         QVERIFY(timers != nullptr);
         QVERIFY(timers->getType().isUtypeReference());
         QCOMPARE(timers->getType().getUtypeReference().getName(), "AggregateTimerData");
@@ -358,21 +359,21 @@ void tst_IvToPromelaTranslator::testParameters()
     QCOMPARE(systemState->isUnionType(), false);
     QCOMPARE(systemState->getFields().size(), 3);
     {
-        const Declaration *controller = findDeclaration(systemState->getFields(), "controller");
+        const Declaration *controller = findDeclaration(*systemState, "controller");
         QVERIFY(controller != nullptr);
         QVERIFY(controller->getType().isUtypeReference());
         QCOMPARE(controller->getType().getUtypeReference().getName(), "Controller_Context");
         QCOMPARE(controller->getVisibility(), Declaration::Visibility::NORMAL);
     }
     {
-        const Declaration *actuator = findDeclaration(systemState->getFields(), "actuator");
+        const Declaration *actuator = findDeclaration(*systemState, "actuator");
         QVERIFY(actuator != nullptr);
         QVERIFY(actuator->getType().isUtypeReference());
         QCOMPARE(actuator->getType().getUtypeReference().getName(), "Actuator_Context");
         QCOMPARE(actuator->getVisibility(), Declaration::Visibility::NORMAL);
     }
     {
-        const Declaration *timers = findDeclaration(systemState->getFields(), "timers");
+        const Declaration *timers = findDeclaration(*systemState, "timers");
         QVERIFY(timers != nullptr);
         QVERIFY(timers->getType().isUtypeReference());
         QCOMPARE(timers->getType().getUtypeReference().getName(), "AggregateTimerData");
@@ -609,28 +610,28 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     QCOMPARE(systemState->isUnionType(), false);
     QCOMPARE(systemState->getFields().size(), 4);
     {
-        const Declaration *controller = findDeclaration(systemState->getFields(), "controller");
+        const Declaration *controller = findDeclaration(*systemState, "controller");
         QVERIFY(controller != nullptr);
         QVERIFY(controller->getType().isUtypeReference());
         QCOMPARE(controller->getType().getUtypeReference().getName(), "Controller_Context");
         QCOMPARE(controller->getVisibility(), Declaration::Visibility::NORMAL);
     }
     {
-        const Declaration *actuator = findDeclaration(systemState->getFields(), "down");
+        const Declaration *actuator = findDeclaration(*systemState, "down");
         QVERIFY(actuator != nullptr);
         QVERIFY(actuator->getType().isUtypeReference());
         QCOMPARE(actuator->getType().getUtypeReference().getName(), "Actuator_Context");
         QCOMPARE(actuator->getVisibility(), Declaration::Visibility::NORMAL);
     }
     {
-        const Declaration *actuator = findDeclaration(systemState->getFields(), "up");
+        const Declaration *actuator = findDeclaration(*systemState, "up");
         QVERIFY(actuator != nullptr);
         QVERIFY(actuator->getType().isUtypeReference());
         QCOMPARE(actuator->getType().getUtypeReference().getName(), "Actuator_Context");
         QCOMPARE(actuator->getVisibility(), Declaration::Visibility::NORMAL);
     }
     {
-        const Declaration *timers = findDeclaration(systemState->getFields(), "timers");
+        const Declaration *timers = findDeclaration(*systemState, "timers");
         QVERIFY(timers != nullptr);
         QVERIFY(timers->getType().isUtypeReference());
         QCOMPARE(timers->getType().getUtypeReference().getName(), "AggregateTimerData");
@@ -1695,6 +1696,19 @@ const Declaration *tst_IvToPromelaTranslator::findDeclaration(const QList<Declar
         return nullptr;
     }
     return &(*iter);
+}
+
+const Declaration *tst_IvToPromelaTranslator::findDeclaration(const Utype &utype, const QString &name)
+{
+    for (const Utype::Element &field : utype.getFields()) {
+        if (std::holds_alternative<Declaration>(field)) {
+            if (std::get<Declaration>(field).getName() == name) {
+                return &std::get<Declaration>(field);
+            }
+        }
+    }
+
+    return nullptr;
 }
 
 const InlineDef *tst_IvToPromelaTranslator::findInline(

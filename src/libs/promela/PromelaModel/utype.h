@@ -19,10 +19,12 @@
 
 #pragma once
 
+#include "conditionaldeclaration.h"
 #include "declaration.h"
 
 #include <QList>
 #include <QString>
+#include <variant>
 
 namespace promela::model {
 /**
@@ -33,6 +35,7 @@ namespace promela::model {
 class Utype final
 {
 public:
+    using Element = std::variant<Declaration, ConditionalDeclaration>;
     /**
      * @brief Constructor.
      *
@@ -62,16 +65,18 @@ public:
      */
     void addField(const Declaration &field);
 
+    void addField(const ConditionalDeclaration &field);
+
     /**
      * @brief Getter for all fields from user defined type
      *
      * @return the reference to the list with all fields from user defined type
      */
-    const QList<Declaration> &getFields() const noexcept;
+    const QList<Element> &getFields() const noexcept;
 
 private:
     QString m_name;
     bool m_unionType;
-    QList<Declaration> m_fields;
+    QList<Element> m_fields;
 };
 }

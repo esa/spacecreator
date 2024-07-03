@@ -42,6 +42,7 @@ using promela::model::ChannelInit;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
 using promela::model::Conditional;
+using promela::model::ConditionalDeclaration;
 using promela::model::Constant;
 using promela::model::DataType;
 using promela::model::Declaration;
@@ -131,10 +132,18 @@ void IvToPromelaGenerator::createMessageTypes()
         QString sizeConstantName =
                 QString("asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING").arg(Escaper::escapeCName(messageType));
 
+        QString zeroSizeExpression = QString("%1 == 0").arg(sizeConstantName);
+
         Utype bufferType(std::move(bufferTypeName));
+
+        DataType arrayTypeForZeroSize = DataType(ArrayType(1, BasicType::BYTE));
+        Declaration arrayDeclarationForZeroSize = Declaration(std::move(arrayTypeForZeroSize), "data");
+
         DataType arrayType = DataType(ArrayType(std::move(sizeConstantName), BasicType::BYTE));
         Declaration arrayDeclaration = Declaration(std::move(arrayType), "data");
-        bufferType.addField(std::move(arrayDeclaration));
+
+        bufferType.addField(ConditionalDeclaration(
+                zeroSizeExpression, std::move(arrayDeclarationForZeroSize), std::move(arrayDeclaration)));
 
         m_context.model()->addUtype(bufferType);
     }
@@ -793,6 +802,9 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
     for (auto targetIter = info.m_targets.begin(); targetIter != info.m_targets.end(); ++targetIter) {
         const RequiredCallInfo::TargetInfo &targetInfo = targetIter->second;
         const QString channelName = targetInfo.m_providedQueueName;
+
+        sequence.appendElement(ChannelSend(VariableRef(channelName), sendArguments));
+
         if (temporaryVariableName.isEmpty()) {
             QList<Expression> arguments;
             arguments.append(Expression(
@@ -805,7 +817,6 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
                 sequence.appendElement(statements.takeFirst());
             }
         }
-        sequence.appendElement(ChannelSend(VariableRef(channelName), sendArguments));
     }
 
     if (sequence.getContent().size() == 0) {
@@ -1140,6 +1151,13 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers()
                     sendParams.append(Expression(VariableRef(messageVariableName)));
                     m_ccodeGenerator.generateConversionFromParameterToBuffer(
                             sequence, name, parameterType, temporaryVariableName, messageVariableName);
+                } else {
+                    sendParams.append(Expression(Constant(1)));
+                }
+
+                sequence.appendElement(ChannelSend(VariableRef(channelName), sendParams));
+
+                if (!parameterType.isEmpty()) {
                     QList<PrintfStatement> statements =
                             m_ccodeGenerator.printfStatements(parameterType, temporaryVariableName,
                                     QString("%1 %2: ").arg(PromelaConstants::channelSendMessage, channelName));
@@ -1147,15 +1165,11 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers()
                         sequence.appendElement(statements.takeFirst());
                     }
                 } else {
-                    sendParams.append(Expression(Constant(1)));
-
                     QList<Expression> printfArguments;
                     printfArguments.append(Expression(StringConstant(
                             QString("%1 %2: 0").arg(PromelaConstants::channelSendMessage, channelName))));
                     sequence.appendElement(PrintfStatement(std::move(printfArguments)));
                 }
-
-                sequence.appendElement(ChannelSend(VariableRef(channelName), sendParams));
 
                 m_context.model()->addInlineDef(
                         std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence)));

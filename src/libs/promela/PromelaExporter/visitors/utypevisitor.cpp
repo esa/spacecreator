@@ -40,10 +40,26 @@ void UtypeVisitor::visit(const Utype &utype)
         m_stream << "typedef ";
     }
     m_stream << utype.getName() << " {\n";
-    for (const Declaration &declaration : utype.getFields()) {
-        DeclarationVisitor visitor(m_stream, m_indent);
-        visitor.visit(declaration);
+    for (const Utype::Element &declaration : utype.getFields()) {
+        std::visit(*this, declaration);
     }
     m_stream << "}\n\n";
 }
+
+void UtypeVisitor::operator()(const model::Declaration &declaration)
+{
+    DeclarationVisitor visitor(m_stream, m_indent);
+    visitor.visit(declaration);
+}
+
+void UtypeVisitor::operator()(const model::ConditionalDeclaration &declaration)
+{
+    m_stream << "#if " << declaration.getConditionalExpression() << "\n";
+    DeclarationVisitor visitor(m_stream, m_indent);
+    visitor.visit(declaration.getDeclIfTrue());
+    m_stream << "#else\n";
+    visitor.visit(declaration.getDeclIfFalse());
+    m_stream << "#endif\n";
+}
+
 }

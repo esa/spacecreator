@@ -22,6 +22,7 @@
 #include <conversion/common/translation/exceptions.h>
 
 using conversion::translator::TranslationException;
+using promela::model::ConditionalDeclaration;
 using promela::model::Declaration;
 using promela::model::PromelaModel;
 using promela::model::TypeAlias;
@@ -94,35 +95,64 @@ std::map<QString, QString> PromelaTypeSorter::getTypeAliasMap(const PromelaModel
     return typeAliasMap;
 }
 
+namespace {
+struct DeclarationVisitor {
+    DeclarationVisitor(const Utype &utype, const std::map<QString, QString> &typeAliasMap,
+            std::map<QString, std::set<QString>> &dependencies)
+        : m_utype(utype)
+        , m_typeAliasMap(typeAliasMap)
+        , m_dependencies(dependencies)
+    {
+    }
+
+    void operator()(const Declaration &declaration)
+    {
+        QString name;
+        if (declaration.getType().isUtypeReference()) {
+            // if field is another utype: add it to the dependencies set
+            name = declaration.getType().getUtypeReference().getName();
+        } else if (declaration.getType().isArrayType()) {
+            if (!std::holds_alternative<UtypeRef>(declaration.getType().getArrayType().getType())) {
+                return;
+            }
+            name = std::get<UtypeRef>(declaration.getType().getArrayType().getType()).getName();
+        }
+        if (name.isEmpty()) {
+            return;
+        }
+        if (m_dependencies.find(name) != m_dependencies.end()) {
+            m_dependencies[m_utype.getName()].insert(name);
+        } else if (m_typeAliasMap.count(name)) {
+            // if field is a type alias which refers to utype, add it to dependencies set
+            const QString &targetType = m_typeAliasMap.at(name);
+            if (m_dependencies.find(targetType) != m_dependencies.end()) {
+                m_dependencies[m_utype.getName()].insert(targetType);
+            }
+        }
+    }
+
+    void operator()(const ConditionalDeclaration &declaration)
+    {
+        operator()(declaration.getDeclIfTrue());
+        operator()(declaration.getDeclIfFalse());
+    }
+
+private:
+    const Utype &m_utype;
+    const std::map<QString, QString> &m_typeAliasMap;
+    std::map<QString, std::set<QString>> &m_dependencies;
+};
+}
+
 void PromelaTypeSorter::populateTypeDependencies(const PromelaModel &promelaModel,
         const std::map<QString, QString> &typeAliasMap, std::map<QString, std::set<QString>> &dependencies) const
 {
     // populate dependencies
     // this is required, because dependencies might be other objects
     for (const Utype &utype : promelaModel.getUtypes()) {
-        for (const Declaration &declaration : utype.getFields()) {
-            QString name;
-            if (declaration.getType().isUtypeReference()) {
-                // if field is another utype: add it to the dependencies set
-                name = declaration.getType().getUtypeReference().getName();
-            } else if (declaration.getType().isArrayType()) {
-                if (!std::holds_alternative<UtypeRef>(declaration.getType().getArrayType().getType())) {
-                    continue;
-                }
-                name = std::get<UtypeRef>(declaration.getType().getArrayType().getType()).getName();
-            }
-            if (name.isEmpty()) {
-                continue;
-            }
-            if (dependencies.find(name) != dependencies.end()) {
-                dependencies[utype.getName()].insert(name);
-            } else if (typeAliasMap.count(name)) {
-                // if field is a type alias which refers to utype, add it to dependencies set
-                const QString &targetType = typeAliasMap.at(name);
-                if (dependencies.find(targetType) != dependencies.end()) {
-                    dependencies[utype.getName()].insert(targetType);
-                }
-            }
+        DeclarationVisitor visitor(utype, typeAliasMap, dependencies);
+        for (const Utype::Element &declaration : utype.getFields()) {
+            std::visit(visitor, declaration);
         }
     }
 }
