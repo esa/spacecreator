@@ -23,10 +23,12 @@
 
 #include <QDebug>
 #include <asn1library/asn1/asnsequencecomponent.h>
+#include <conversion/common/escaper/escaper.h>
 #include <promela/PromelaCommon/namehelper.h>
 
 namespace promela::translator {
 
+using conversion::Escaper;
 using promela::common::PromelaNameHelper;
 
 SequenceComponentVisitor::SequenceComponentVisitor(Operation operation, const Asn1Acn::Asn1Model *asn1Model,
@@ -45,20 +47,20 @@ SequenceComponentVisitor::SequenceComponentVisitor(Operation operation, const As
 void SequenceComponentVisitor::visit(const Asn1Acn::AsnSequenceComponent &component)
 {
     m_componentVisited = true;
-    m_componentName = component.name();
+    m_componentName = Escaper::escapeCName(component.name());
     m_isOptional = component.isOptional();
 
     // TODO escape
-    Helper helper(m_asn1Model, m_target + "." + component.name(), m_source + "." + component.name());
+    Helper helper(m_asn1Model, m_target + "." + m_componentName, m_source + "." + m_componentName);
 
     switch (m_operation) {
     case Operation::FROM_PROMELA_TO_C:
         m_content = helper.createAssignmentTemplateFromPromelaToC(
-                PromelaNameHelper::createChildTypeNameForCCode(m_sequenceName, component.name()), component.type());
+                PromelaNameHelper::createChildTypeNameForCCode(m_sequenceName, m_componentName), component.type());
         break;
     case Operation::FROM_C_TO_PROMELA:
         m_content = helper.createAssignmentTemplateFromCToPromela(
-                PromelaNameHelper::createChildTypeNameForCCode(m_sequenceName, component.name()), component.type());
+                PromelaNameHelper::createChildTypeNameForCCode(m_sequenceName, m_componentName), component.type());
         break;
     case Operation::LIST_PROMELA_FIELDS: {
         Helper fieldHelper(m_asn1Model, m_target, "");

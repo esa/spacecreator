@@ -29,6 +29,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/sizeconstraintvisitor.h>
 #include <promela/PromelaCommon/constants.h>
@@ -38,6 +39,7 @@
 using Asn1Acn::IntegerValue;
 using Asn1Acn::OctetStringValue;
 using Asn1Acn::StringValue;
+using conversion::Escaper;
 using conversion::translator::TranslationException;
 using promela::common::PromelaConstants;
 using promela::common::PromelaNameHelper;
@@ -285,8 +287,9 @@ QString Helper::choiceAssignmentFromPromelaToC(const QString &cTypeName, const A
     int32_t index = 1;
 
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
-        QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, component->name());
-        Helper helper(m_asn1Model, m_target + ".u." + component->name(), m_source + ".data." + component->name());
+        QString componentName = Escaper::escapeCName(component->name());
+        QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, componentName);
+        Helper helper(m_asn1Model, m_target + ".u." + componentName, m_source + ".data." + componentName);
         QString assignment = addIndent(helper.createAssignmentTemplateFromPromelaToC(elementType, component->type()));
         QString prefix = index == 1 ? "" : "else ";
         result += QString("%1if(%3.selection == %4_%5_PRESENT)\n"
@@ -294,10 +297,7 @@ QString Helper::choiceAssignmentFromPromelaToC(const QString &cTypeName, const A
                           "%6"
                           "    %2.kind = %4_%5_PRESENT;\n"
                           "}\n")
-                          .arg(prefix, m_target, m_source, cTypeName, component->name(), assignment);
-
-        component->name();
-        component->type();
+                          .arg(prefix, m_target, m_source, cTypeName, componentName, assignment);
         ++index;
     }
 
@@ -402,8 +402,9 @@ QString Helper::choiceAssignmentFromCToPromela(const QString &cTypeName, const A
     int32_t index = 1;
 
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
-        QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, component->name());
-        Helper helper(m_asn1Model, m_target + ".data." + component->name(), m_source + ".u." + component->name());
+        QString componentName = Escaper::escapeCName(component->name());
+        QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, componentName);
+        Helper helper(m_asn1Model, m_target + ".data." + componentName, m_source + ".u." + componentName);
         QString assignment = addIndent(helper.createAssignmentTemplateFromCToPromela(elementType, component->type()));
         QString prefix = index == 1 ? "" : " else ";
         result += QString("%1if(%3.kind == %4_%5_PRESENT)\n"
@@ -411,7 +412,7 @@ QString Helper::choiceAssignmentFromCToPromela(const QString &cTypeName, const A
                           "%6"
                           "    %2.selection = %4_%5_PRESENT;\n"
                           "}\n")
-                          .arg(prefix, m_target, m_source, cTypeName, component->name(), assignment);
+                          .arg(prefix, m_target, m_source, cTypeName, componentName, assignment);
         ++index;
     }
 
@@ -464,8 +465,9 @@ QList<VariableRef> Helper::sequenceListOfFields(const Asn1Acn::Types::Sequence *
     QList<VariableRef> result;
     QList<QString> optionalFields;
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type->components()) {
+        QString componentName = Escaper::escapePromelaName(component->name());
         SequenceComponentVisitor visitor(
-                SequenceComponentVisitor::Operation::LIST_PROMELA_FIELDS, m_asn1Model, component->name(), "", "");
+                SequenceComponentVisitor::Operation::LIST_PROMELA_FIELDS, m_asn1Model, componentName, "", "");
         component->accept(visitor);
         if (visitor.hasComponent()) {
             QList<VariableRef> fieldsOfElement = visitor.takeListOfFields();
@@ -525,7 +527,8 @@ QList<VariableRef> Helper::choiceListOfFields(const Asn1Acn::Types::Choice *type
 {
     QList<VariableRef> result;
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
-        Helper helper(m_asn1Model, component->name(), "");
+        QString componentName = Escaper::escapePromelaName(component->name());
+        Helper helper(m_asn1Model, componentName, "");
         QList<VariableRef> fieldsOfElement = helper.generateListOfFields(component->type());
 
         while (!fieldsOfElement.empty()) {
