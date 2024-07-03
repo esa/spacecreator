@@ -5,6 +5,7 @@ set -euo pipefail
 TMC=$SPACECREATOR_BUILD_DIR/bin/tmc
 SPIN=spin
 CC=gcc
+ASN1SCC=asn1scc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
@@ -22,6 +23,8 @@ mkdir $TEST_OUTPUT_DIR
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -o $TEST_OUTPUT_DIR \
     -mos $PROPERTIES_DIR/MscObserver/MscObserver.msc
+
+$ASN1SCC -uPER -typePrefix asn1Scc -renamePolicy 3 -c -o "${TEST_OUTPUT_DIR}" "${RESOURCE_DIR}/work/dataview/dataview-uniq.asn"
 
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \

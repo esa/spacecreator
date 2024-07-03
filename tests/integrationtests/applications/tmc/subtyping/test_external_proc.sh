@@ -5,6 +5,7 @@ set -euo pipefail
 TMC=$SPACECREATOR_BUILD_DIR/bin/tmc
 SPIN=spin
 CC=gcc
+ASN1SCC=asn1scc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
@@ -24,10 +25,12 @@ $TMC -iv $RESOURCES_DIR/interfaceview.xml \
     -sub $SUBTYPES_DIR/subtyping.asn \
     -scl $PROPERTIES_DIR/properties/properties.scl
 
+$ASN1SCC -uPER -typePrefix asn1Scc -renamePolicy 3 -c -o "${TEST_OUTPUT_DIR}" "${RESOURCES_DIR}/work/dataview/dataview-uniq.asn"
+
 cd $TEST_OUTPUT_DIR \
-    && $SPIN -a -run -bfspar -n system.pml > system.output \
+    && $SPIN -a system.pml \
+    && $CC -DBFS_PAR -DSAFETY -o system.out *.c \
+	&& ./system.out -m1000000 -n > system.output \
     && grep -q "errors: 0" system.output \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR
-
-

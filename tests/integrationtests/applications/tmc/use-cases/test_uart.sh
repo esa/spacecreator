@@ -5,6 +5,7 @@ set -euo pipefail
 TMC=$SPACECREATOR_BUILD_DIR/bin/tmc
 SPIN=spin
 CC=gcc
+ASN1SCC=asn1scc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
@@ -29,6 +30,8 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -os ${PROPERTIES_DIR}/OutputObserver/OutputObserver.pr \
     -os ${PROPERTIES_DIR}/InputObserver/InputObserver.pr
 
+$ASN1SCC -uPER -typePrefix asn1Scc -renamePolicy 3 -c -o "${TEST_OUTPUT_DIR}" "${RESOURCE_DIR}/work/dataview/dataview-uniq.asn"
+
 # Compile the actual Spin model checker. This tests
 # whether all the features are supported, and that
 # one feature does not interfere with another.
@@ -38,6 +41,6 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
 # are implemented.
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
-    && $CC -DVECTORSZ=65536 -o system.out pan.c \
+    && $CC -DVECTORSZ=65536 -o system.out *.c \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR

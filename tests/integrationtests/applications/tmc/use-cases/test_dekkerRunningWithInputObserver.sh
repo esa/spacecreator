@@ -5,6 +5,7 @@ set -euo pipefail
 TMC=$SPACECREATOR_BUILD_DIR/bin/tmc
 SPIN=spin
 CC=gcc
+ASN1SCC=asn1scc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
@@ -27,6 +28,8 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -os ${PROPERTIES_DIR}/InputObserver/InputObserver.pr \
     -o $TEST_OUTPUT_DIR
 
+$ASN1SCC -uPER -typePrefix asn1Scc -renamePolicy 3 -c -o "${TEST_OUTPUT_DIR}" "${RESOURCE_DIR}/work/dataview/dataview-uniq.asn"
+
 # Compile the actual Spin model checker.
 # Run the model and expect an error.
 # This way the working of a condition is confirmed in
@@ -34,7 +37,7 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
 # State number comparison is discarded, as state numbering is not stable
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
-    && $CC -DVECTORSZ=65536 -o system.out pan.c \
+    && $CC -DVECTORSZ=65536 -o system.out *.c \
     && ./system.out > system.log \
     && grep -q "errors: 1" system.log \
     && grep -q "assertion violated  !((global_state.inputobserver.state" system.log \
