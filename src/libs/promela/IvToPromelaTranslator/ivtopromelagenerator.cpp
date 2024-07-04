@@ -406,44 +406,8 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::generateProcessMessageBlo
 
     // print receive info
     const QString senderVariableName = QString("%1_sender").arg(Escaper::escapePromelaField(modelFunctionName));
-    generateMessagePrintf(*processMessageSeq,
-                          PromelaConstants::channelRecvMessage,
-                          parameterName,
-                          parameterType,
-                          channelName,
-                          senderVariableName);
-    // QList<PrintfStatement> statements;
-    // if (m_context.isMulticastSupported()) {
-    //     const QString senderVariableName = QString("%1_sender").arg(Escaper::escapePromelaField(modelFunctionName));
-
-    //     if (parameterType.isEmpty()) {
-    //         QString fmt = QString("%1 %2: %d\\n").arg(PromelaConstants::channelRecvMessage, channelName);
-    //         QList<Expression> arguments = QList<Expression>()
-    //                 << Expression(StringConstant(std::move(fmt))) << Expression(VariableRef(senderVariableName));
-
-    //         statements.append(PrintfStatement(std::move(arguments)));
-    //     } else {
-    //         QString fmt = QString("%1 %2: %d, ").arg(PromelaConstants::channelRecvMessage, channelName);
-    //         QList<Expression> arguments = QList<Expression>()
-    //                 << Expression(StringConstant(std::move(fmt))) << Expression(VariableRef(senderVariableName));
-    //         statements.append(PrintfStatement(std::move(arguments)));
-    //         statements.append(m_ccodeGenerator.printfStatements(parameterType, parameterName, QString("")));
-    //     }
-    // } else {
-    //     if (parameterType.isEmpty()) {
-    //         QString fmt = QString("%1 %2: 1\\n").arg(PromelaConstants::channelRecvMessage, channelName);
-    //         QList<Expression> arguments;
-    //         arguments.append(Expression(StringConstant(std::move(fmt))));
-    //         statements.append(PrintfStatement(std::move(arguments)));
-    //     } else {
-    //         QString fmt = QString("%1 %2: ").arg(PromelaConstants::channelRecvMessage, channelName);
-    //         statements = m_ccodeGenerator.printfStatements(parameterType, parameterName, std::move(fmt));
-    //     }
-    // }
-
-    // while (!statements.empty()) {
-    //     processMessageSeq->appendElement(statements.takeFirst());
-    // }
+    generateMessagePrintf(*processMessageSeq, PromelaConstants::channelRecvMessage, parameterName, parameterType,
+            channelName, senderVariableName);
 
     // append preprocessing elements
     while (!preProcessingElements.empty()) {
@@ -836,46 +800,8 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
         sequence.appendElement(ChannelSend(VariableRef(channelName), sendArguments));
 
         const QString pidName = QString("PID_%1").arg(Escaper::escapePromelaField(functionName));
-        generateMessagePrintf(sequence,
-                              PromelaConstants::channelSendMessage,
-                              temporaryVariableName,
-                              temporaryVariableType,
-                              channelName,
-                              pidName);
-        // QList<PrintfStatement> statements;
-        // if (m_context.isMulticastSupported()) {
-        //     const QString pidName = QString("PID_%1").arg(Escaper::escapePromelaField(functionName));
-
-        //     if (temporaryVariableName.isEmpty()) {
-        //         QString fmt = QString("%1 %2: %d\\n").arg(PromelaConstants::channelSendMessage, channelName);
-        //         QList<Expression> arguments = QList<Expression>()
-        //                 << Expression(StringConstant(std::move(fmt))) << Expression(VariableRef(pidName));
-
-        //         statements.append(PrintfStatement(std::move(arguments)));
-        //     } else {
-        //         QString fmt = QString("%1 %2: %d, ").arg(PromelaConstants::channelSendMessage, channelName);
-        //         QList<Expression> arguments = QList<Expression>()
-        //                 << Expression(StringConstant(std::move(fmt))) << Expression(VariableRef(pidName));
-        //         statements.append(PrintfStatement(std::move(arguments)));
-        //         statements.append(
-        //                 m_ccodeGenerator.printfStatements(temporaryVariableType, temporaryVariableName, QString("")));
-        //     }
-        // } else {
-        //     if (temporaryVariableName.isEmpty()) {
-        //         QString fmt = QString("%1 %2: 1\\n").arg(PromelaConstants::channelSendMessage, channelName);
-        //         QList<Expression> arguments;
-        //         arguments.append(Expression(StringConstant(std::move(fmt))));
-        //         statements.append(PrintfStatement(std::move(arguments)));
-        //     } else {
-        //         QString fmt = QString("%1 %2: ").arg(PromelaConstants::channelSendMessage, channelName);
-        //         statements =
-        //                 m_ccodeGenerator.printfStatements(temporaryVariableType, temporaryVariableName, std::move(fmt));
-        //     }
-        // }
-
-        // while (!statements.empty()) {
-        //     sequence.appendElement(statements.takeFirst());
-        // }
+        generateMessagePrintf(sequence, PromelaConstants::channelSendMessage, temporaryVariableName,
+                temporaryVariableType, channelName, pidName);
     }
 
     if (sequence.getContent().size() == 0) {
@@ -1216,53 +1142,10 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers()
 
                 sequence.appendElement(ChannelSend(VariableRef(channelName), sendParams));
 
-                const QString senderVariableName =
-                            QString("%1_sender").arg(Escaper::escapePromelaField(toFunction));
+                const QString senderVariableName = QString("%1_sender").arg(Escaper::escapePromelaField(toFunction));
 
-                generateMessagePrintf(sequence,
-                                      PromelaConstants::channelSendMessage,
-                                      temporaryVariableName,
-                                      parameterType,
-                                      channelName,
-                                      senderVariableName);
-
-                // QList<PrintfStatement> statements;
-                // if (m_context.isMulticastSupported()) {
-                //     const QString senderVariableName =
-                //             QString("%1_sender").arg(Escaper::escapePromelaField(toFunction));
-
-                //     if (temporaryVariableName.isEmpty()) {
-                //         QString fmt = QString("%1 %2: %d\\n").arg(PromelaConstants::channelSendMessage, channelName);
-                //         QList<Expression> arguments = QList<Expression>()
-                //                 << Expression(StringConstant(std::move(fmt)))
-                //                 << Expression(VariableRef(senderVariableName));
-
-                //         statements.append(PrintfStatement(std::move(arguments)));
-                //     } else {
-                //         QString fmt = QString("%1 %2: %d, ").arg(PromelaConstants::channelSendMessage, channelName);
-                //         QList<Expression> arguments = QList<Expression>()
-                //                 << Expression(StringConstant(std::move(fmt)))
-                //                 << Expression(VariableRef(senderVariableName));
-                //         statements.append(PrintfStatement(std::move(arguments)));
-                //         statements.append(
-                //                 m_ccodeGenerator.printfStatements(parameterType, temporaryVariableName, QString("")));
-                //     }
-                // } else {
-                //     if (temporaryVariableName.isEmpty()) {
-                //         QString fmt = QString("%1 %2: 1\\n").arg(PromelaConstants::channelSendMessage, channelName);
-                //         QList<Expression> arguments;
-                //         arguments.append(Expression(StringConstant(std::move(fmt))));
-                //         statements.append(PrintfStatement(std::move(arguments)));
-                //     } else {
-                //         QString fmt = QString("%1 %2: ").arg(PromelaConstants::channelSendMessage, channelName);
-                //         statements =
-                //                 m_ccodeGenerator.printfStatements(parameterType, temporaryVariableName, std::move(fmt));
-                //     }
-                // }
-
-                // while (!statements.empty()) {
-                //     sequence.appendElement(statements.takeFirst());
-                // }
+                generateMessagePrintf(sequence, PromelaConstants::channelSendMessage, temporaryVariableName,
+                        parameterType, channelName, senderVariableName);
 
                 m_context.model()->addInlineDef(
                         std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence)));
