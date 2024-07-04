@@ -1,0 +1,14 @@
+TEST-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+    MyBetterInteger ::= INTEGER (0 .. 1000)
+
+    MyInteger ::= INTEGER (0 .. 1000)
+
+    MyTestInteger ::= INTEGER (0 .. 1000)
+
+    TestInteger ::= INTEGER (0 .. 1000)
+
+    TestParam ::= INTEGER (0 .. 1000)
+
+END

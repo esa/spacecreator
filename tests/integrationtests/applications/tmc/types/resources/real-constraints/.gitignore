@@ -23,7 +23,6 @@ work/**/SDL/**/Makefile.*
 
 work/binaries/
 work/build/
-work/dataview/
 work/Debug/
 work/Dump/
 work/sql_db/
@@ -50,3 +49,8 @@ work/simulation/*.sqlite
 real-constraints.msc
 work/controller/implem/default/SDL/src/
 work/controller/SDL/src/Controller.cfg
+
+# Except dataview
+!work/dataview/
+work/dataview/*
+!work/dataview/dataview-uniq.asn

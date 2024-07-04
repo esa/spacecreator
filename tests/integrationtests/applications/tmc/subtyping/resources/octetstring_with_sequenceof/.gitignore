@@ -24,7 +24,6 @@ work/**/SDL/**/Makefile.*
 
 work/binaries
 work/build
-work/dataview
 work/Debug
 work/Dump
 work/sql_db
@@ -47,3 +46,8 @@ work/simulation/*.so
 work/simulation/*.ui
 work/simulation/*.cfg
 work/simulation/*.sqlite
+
+# Except dataview
+!work/dataview/
+work/dataview/*
+!work/dataview/dataview-uniq.asn

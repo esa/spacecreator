@@ -5,6 +5,11 @@
 # Ignore whole work directory
 work/*
 
+# Except dataview
+!work/dataview/
+work/dataview/*
+!work/dataview/dataview-uniq.asn
+
 # Except observer.asn
 !work/simulation/
 work/simulation/*

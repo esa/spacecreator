@@ -17,7 +17,6 @@ Makefile.*
 
 work/binaries
 work/build
-work/dataview
 work/Debug
 work/sql_db
 work/glue_simu
@@ -40,3 +39,8 @@ work/simulation/*.so
 work/simulation/*.ui
 work/simulation/*.cfg
 work/simulation/*.sqlite
+
+# Except dataview
+!work/dataview/
+work/dataview/*
+!work/dataview/dataview-uniq.asn
