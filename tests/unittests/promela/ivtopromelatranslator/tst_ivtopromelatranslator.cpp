@@ -260,24 +260,30 @@ void tst_IvToPromelaTranslator::testSimple()
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 0);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 0);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 1);
+        QVERIFY(printfStmt);
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_success");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 0);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 0);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 1);
+        QVERIFY(printfStmt);
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_fail");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 0);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 0);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 1);
+        QVERIFY(printfStmt);
     }
 
     {
@@ -508,24 +514,40 @@ void tst_IvToPromelaTranslator::testParameters()
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_work");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+
+        const InlineCall *assignment = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment);
+        const CCode *code = findProctypeElement<CCode>(inlineDef->getSequence(), 1);
+        QVERIFY(code);
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 2);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 3);
+        QVERIFY(printfStmt);
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_result");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+        const InlineCall *assignment = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment);
+        const CCode *code = findProctypeElement<CCode>(inlineDef->getSequence(), 1);
+        QVERIFY(code);
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 2);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 3);
+        QVERIFY(printfStmt);
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_error");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 0);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 0);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 1);
+        QVERIFY(printfStmt);
     }
 
     {
@@ -870,39 +892,68 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Env_0_RI_0_test");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+        const InlineCall *assignment = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment);
+        const CCode *code = findProctypeElement<CCode>(inlineDef->getSequence(), 1);
+        QVERIFY(code);
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 2);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 3);
+        QVERIFY(printfStmt);
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_up_check");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+        const InlineCall *assignment = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment);
+        const CCode *code = findProctypeElement<CCode>(inlineDef->getSequence(), 1);
+        QVERIFY(code);
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 2);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 3);
+        QVERIFY(printfStmt);
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_down_check");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+        const InlineCall *assignment = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment);
+        const CCode *code = findProctypeElement<CCode>(inlineDef->getSequence(), 1);
+        QVERIFY(code);
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 2);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 3);
+        QVERIFY(printfStmt);
     }
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Up_0_RI_0_result");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+        const InlineCall *assignment = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment);
+        const CCode *code = findProctypeElement<CCode>(inlineDef->getSequence(), 1);
+        QVERIFY(code);
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 2);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 3);
+        QVERIFY(printfStmt);
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Down_0_RI_0_result");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+        const InlineCall *assignment = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment);
+        const CCode *code = findProctypeElement<CCode>(inlineDef->getSequence(), 1);
+        QVERIFY(code);
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 2);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 3);
     }
 
     {
@@ -1038,8 +1089,15 @@ void tst_IvToPromelaTranslator::testSimpleObservers()
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Observer_0_RI_0_work_in");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
-        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
-        QVERIFY(std::holds_alternative<ChannelSend>(content.back()->getValue()));
+
+        const InlineCall *assignment = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
+        QVERIFY(assignment);
+        const CCode *code = findProctypeElement<CCode>(inlineDef->getSequence(), 1);
+        QVERIFY(code);
+        const ChannelSend *channelSend = findProctypeElement<ChannelSend>(inlineDef->getSequence(), 2);
+        QVERIFY(channelSend);
+        const PrintfStatement *printfStmt = findProctypeElement<PrintfStatement>(inlineDef->getSequence(), 3);
+        QVERIFY(printfStmt);
     }
 
     {

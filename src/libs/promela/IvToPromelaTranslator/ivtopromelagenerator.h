@@ -85,6 +85,9 @@ private:
             -> std::unique_ptr<model::ProctypeElement>;
     auto createReceiveStatement(const QString &functionName, const QString &channelName, const QString &parameterType,
             const QString &parameterName) -> std::unique_ptr<model::ProctypeElement>;
+    auto generateMessagePrintf(promela::model::Sequence &sequence, const QString &operation,
+            const QString &parameterName, const QString &parameterType, const QString &channelName,
+            const QString &senderPidVariableName) -> void;
 
     auto getFunctionLockChannelName(const QString &functionName) -> QString;
 
@@ -99,6 +102,7 @@ private:
     auto createChannel(const QString &channelName, const QString &messageType, size_t channelSize) -> void;
 
     auto messageTypeName(const QString &typeName) -> QString;
+    auto createProctypeName(const QString &ivFunctionName, const QString &ivInterfaceName) -> QString;
 
 private:
     inline static const QString m_systemInitedVariableName = "inited";

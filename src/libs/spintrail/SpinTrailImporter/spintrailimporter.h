@@ -51,17 +51,12 @@ private:
     constexpr static inline size_t SET_TIMER_EVENT_INTERVAL = 3;
     constexpr static inline size_t RESET_TIMER_EVENT_FUNCTION_NAME = 1;
     constexpr static inline size_t RESET_TIMER_EVENT_INTERFACE_NAME = 2;
-    constexpr static inline size_t CHANNEL_EVENT_PROCTYPE_NAME = 1;
-    constexpr static inline size_t CHANNEL_EVENT_COMMAND_STRING = 2;
     constexpr static inline size_t CHANNEL_EVENT_CHANNEL_NAME = 1;
-    constexpr static inline size_t CHANNEL_EVENT_VALIDATION_PART = 0;
-    constexpr static inline size_t CHANNEL_EVENT_COMMAND_PART = 1;
-    constexpr static inline size_t CHANNEL_EVENT_CHANNEL_PART = 2;
+    constexpr static inline size_t CHANNEL_EVENT_PARAMETER_LIST = 2;
     constexpr static inline size_t UNHANDLED_INPUT_EVENT_FUNCTION_NAME = 1;
     constexpr static inline size_t UNHANDLED_INPUT_EVENT_INTERFACE_NAME = 2;
 
 private:
     void processLine(spintrail::model::SpinTrailModel &model, const QString &line) const;
-    QRegularExpression buildChannelCommandRegexp() const;
 };
 }

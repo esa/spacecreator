@@ -21,9 +21,8 @@
 
 namespace spintrail::model {
 
-ChannelEvent::ChannelEvent(Type type, QString proctypeName, QString channelName, QList<QString> parameters)
+ChannelEvent::ChannelEvent(Type type, QString channelName, QList<QString> parameters)
     : m_type(type)
-    , m_proctypeName(std::move(proctypeName))
     , m_channelName(std::move(channelName))
     , m_parameters(std::move(parameters))
 {
@@ -37,16 +36,6 @@ void ChannelEvent::setType(Type type)
 ChannelEvent::Type ChannelEvent::getType() const
 {
     return m_type;
-}
-
-void ChannelEvent::setProctypeName(QString proctypeName)
-{
-    m_proctypeName = std::move(proctypeName);
-}
-
-const QString &ChannelEvent::getProctypeName() const
-{
-    return m_proctypeName;
 }
 
 void ChannelEvent::setChannelName(QString channelName)

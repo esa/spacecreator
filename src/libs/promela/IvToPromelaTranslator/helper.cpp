@@ -96,7 +96,12 @@ QList<Helper::PrintfTemplate> Helper::generatePrintfTemplate(const QString &type
         fields.remove(0, groupLength);
 
         QString fmt = QString("%d, ").repeated(groupLength - 1);
-        fmt.append("%d");
+        if (fields.empty()) {
+            // for last field, do not append separator
+            fmt.append("%d");
+        } else {
+            fmt.append("%d, ");
+        }
 
         result.append(PrintfTemplate {
                 fmt,

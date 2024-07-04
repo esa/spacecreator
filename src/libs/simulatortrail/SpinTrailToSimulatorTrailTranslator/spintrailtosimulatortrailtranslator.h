@@ -95,26 +95,22 @@ private:
 private:
     void findChannelNames(const promela::translator::SystemInfo &systemInfo, const Asn1Acn::Asn1Model &asn1Model,
             QMap<QString, ChannelInfo> &channel, QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels) const;
-    void findProctypes(const promela::translator::SystemInfo &systemInfo, QMap<QString, QString> &proctypes) const;
     void translate(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
-            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-            const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
-            bool isMulticastSupported) const;
+            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
+            const Asn1Acn::Types::Enumerated *pid, bool isMulticastSupported) const;
     void processSpinTrailEvent(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
-            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-            const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
-            bool isMulticastSupported) const;
+            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
+            const Asn1Acn::Types::Enumerated *pid, bool isMulticastSupported) const;
     void processSpinTrailSendEvent(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
             const Asn1Acn::Types::Enumerated *pid, bool isMulticastSupported) const;
     void processSpinTrailRecvEvent(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
-            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-            const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
-            bool isMulticastSupported) const;
+            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
+            const Asn1Acn::Types::Enumerated *pid, bool isMulticastSupported) const;
     void processSpinTrailEvent(
             simulatortrail::model::SimulatorTrailModel &result, const spintrail::model::ContinuousSignal *event) const;
     void processSpinTrailEvent(const spintrail::model::SetTimerEvent *event) const;

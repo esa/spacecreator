@@ -162,11 +162,6 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
     QMap<QString, std::pair<ChannelInfo, bool>> observerChannels;
     findChannelNames(*systemInfo, *asn1Model, channels, observerChannels);
 
-    // map from name of proctype to name of corresponding taste function
-    // but I have a name of the queue, right?
-    QMap<QString, QString> proctypes;
-    findProctypes(*systemInfo, proctypes);
-
     const Type *observableEventType = findType(*asn1Model, "Observable-Event");
 
     if (observableEventType == nullptr) {
@@ -187,7 +182,7 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
 
     std::unique_ptr<SimulatorTrailModel> simulatorTrail = std::make_unique<SimulatorTrailModel>();
 
-    translate(*simulatorTrail, *spinTrailModel, channels, observerChannels, proctypes, observableEventType, enumerated,
+    translate(*simulatorTrail, *spinTrailModel, channels, observerChannels, observableEventType, enumerated,
             isMulticastSupported);
 
     std::vector<std::unique_ptr<Model>> result;
@@ -285,30 +280,10 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(const SystemInfo &sys
     }
 }
 
-void SpinTrailToSimulatorTrailTranslator::findProctypes(
-        const SystemInfo &systemInfo, QMap<QString, QString> &proctypes) const
-{
-    for (auto iter = systemInfo.m_functions.begin(); iter != systemInfo.m_functions.end(); ++iter) {
-        for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();
-                ++proctypeIter) {
-            proctypes.insert(proctypeIter->first, iter->first);
-        }
-        for (auto proctypeIter = iter->second->m_environmentSourceProctypes.begin();
-                proctypeIter != iter->second->m_environmentSourceProctypes.end(); ++proctypeIter) {
-            proctypes.insert(proctypeIter->first, iter->first);
-        }
-        for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
-                proctypeIter != iter->second->m_environmentSinkProctypes.end(); ++proctypeIter) {
-            proctypes.insert(proctypeIter->first, iter->first);
-        }
-    }
-}
-
 void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
         const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
-        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-        const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
-        bool isMulticastSupported) const
+        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
+        const Asn1Acn::Types::Enumerated *pid, bool isMulticastSupported) const
 {
     const std::list<std::unique_ptr<TrailEvent>> &events = spinTrailModel.getEvents();
 
@@ -317,7 +292,7 @@ void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
         case TrailEvent::EventType::CHANNEL_EVENT: {
             const ChannelEvent *event = dynamic_cast<const ChannelEvent *>(trailEvent.get());
             processSpinTrailEvent(
-                    result, event, channels, observerChannels, proctypes, observableEvent, pid, isMulticastSupported);
+                    result, event, channels, observerChannels, observableEvent, pid, isMulticastSupported);
         } break;
         case TrailEvent::EventType::CONTINUOUS_SIGNAL: {
             const ContinuousSignal *event = dynamic_cast<const ContinuousSignal *>(trailEvent.get());
@@ -341,9 +316,8 @@ void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
 
 void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
-        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-        const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
-        bool isMulticastSupported) const
+        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
+        const Asn1Acn::Types::Enumerated *pid, bool isMulticastSupported) const
 {
     if (isFunctionLockChannel(event->getChannelName())) {
         return;
@@ -354,7 +328,7 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(SimulatorTrailMo
     }
     if (event->getType() == ChannelEvent::Type::Recv) {
         processSpinTrailRecvEvent(
-                result, event, channels, observerChannels, proctypes, observableEvent, pid, isMulticastSupported);
+                result, event, channels, observerChannels, observableEvent, pid, isMulticastSupported);
     }
 }
 
@@ -428,11 +402,9 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTra
 
 void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
-        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-        const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
-        bool isMulticastSupported) const
+        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
+        const Asn1Acn::Types::Enumerated *pid, bool isMulticastSupported) const
 {
-    Q_UNUSED(proctypes);
     if (channels.contains(event->getChannelName())) {
         ChannelInfo &channelInfo = channels[event->getChannelName()];
         if (channelInfo.m_isTimer) {

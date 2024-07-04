@@ -44,11 +44,10 @@ public:
      * @brief Constructor
      *
      * @param type type of channel event
-     * @param proctypeName name of proctype that performed operation, or empty string for init
      * @param channelName name of the channel
      * @param parameters list of values send/received from channel
      */
-    ChannelEvent(Type type, QString proctypeName, QString channelName, QList<QString> parameters);
+    ChannelEvent(Type type, QString channelName, QList<QString> parameters);
 
     /**
      * @brief Setter for channel operation event type
@@ -62,19 +61,6 @@ public:
      * @return Type of channel operation
      */
     Type getType() const;
-
-    /**
-     * @brief Setter for proctype name
-     *
-     * @param proctypeName name of proctype
-     */
-    void setProctypeName(QString proctypeName);
-    /**
-     * @brief Getter for proctype name
-     *
-     * @return Name of proctype
-     */
-    const QString &getProctypeName() const;
 
     /**
      * @brief Setter for channel name
@@ -111,7 +97,6 @@ public:
 
 private:
     Type m_type;
-    QString m_proctypeName;
     QString m_channelName;
     QList<QString> m_parameters;
 };
