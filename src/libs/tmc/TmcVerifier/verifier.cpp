@@ -543,19 +543,17 @@ void TmcVerifier::generateNextTrace()
     m_traceGeneratorProcess->setWorkingDirectory(m_outputDirectory);
 
     const QString inputFile = "system.pml";
-    const QString spinExe = m_spinExecutable.isEmpty() ? QString("spin") : m_spinExecutable;
+    const QString exe = "./pan";
 
     QStringList arguments;
-    arguments.append("-k");
-    arguments.append(trailFile);
-    arguments.append("-t");
+    arguments.append("-S");
+    arguments.append("-n");
     arguments.append("-r");
-    arguments.append("-s");
-    arguments.append(inputFile);
-    Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(spinExe).arg(arguments.join(" ")));
+    arguments.append(trailFile);
+    Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(exe).arg(arguments.join(" ")));
     m_timer->setSingleShot(true);
     m_timer->start(m_startTimeout);
-    m_traceGeneratorProcess->start(spinExe, arguments);
+    m_traceGeneratorProcess->start(exe, arguments);
 }
 
 void TmcVerifier::generateReport()
