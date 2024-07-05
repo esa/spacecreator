@@ -927,9 +927,8 @@ void AstXmlParser::readSequenceComponent(Types::Type &type)
         if (m_xmlReader.name() == QStringLiteral("Asn1Type")) {
             childType = readType();
         } else if (m_xmlReader.name() == QStringLiteral("Default")) {
-            m_xmlReader.readNextStartElement();
-            defaultValue = m_xmlReader.readElementText();
-            m_xmlReader.skipCurrentElement();
+            ValuePtr defVal = findAndReadValueAssignmentValue();
+            defaultValue = defVal->asString();
         } else {
             m_xmlReader.skipCurrentElement();
         }
