@@ -50,7 +50,6 @@ void SequenceComponentVisitor::visit(const Asn1Acn::AsnSequenceComponent &compon
     m_componentName = Escaper::escapeCName(component.name());
     m_isOptional = component.isOptional();
 
-    // TODO escape
     Helper helper(m_asn1Model, m_target + "." + m_componentName, m_source + "." + m_componentName);
 
     switch (m_operation) {

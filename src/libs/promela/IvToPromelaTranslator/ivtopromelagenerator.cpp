@@ -746,9 +746,6 @@ void IvToPromelaGenerator::createPromelaObjectsForSyncRis(const QString &functio
 
 void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &functionName, const RequiredCallInfo &info)
 {
-    // create a inline to call sporadic REQUIRED interface.
-    // such inline will put a message into channel.
-
     assert(info.m_parameters.size() <= 1); // sporadic interface shall have at most one parameter
 
     QList<QString> inlineArguments;

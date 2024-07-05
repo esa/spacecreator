@@ -142,7 +142,6 @@ std::unique_ptr<SystemInfo> IvToPromelaTranslator::prepareSystemInfo(
 
     result->m_observers = std::set<QString>(observerNames.begin(), observerNames.end());
 
-    // types how to
     for (const IVFunction *ivFunction : ivFunctionList) {
         const QString functionName = ivFunction->property("name").toString();
         if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) != modelFunctions.end()) {
