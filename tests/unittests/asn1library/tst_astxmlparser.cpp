@@ -2570,11 +2570,11 @@ void AstXmlParserTests::test_sequenceDefaultValue()
     const auto *boolComponent =
             dynamic_cast<const AsnSequenceComponent *>(seqType->component(QStringLiteral("boolVal")));
     QVERIFY(boolComponent);
-    QCOMPARE(*boolComponent->defaultValue(), "false");
+    QCOMPARE(*boolComponent->defaultValue(), "FALSE");
 
     const auto *strComponent = dynamic_cast<const AsnSequenceComponent *>(seqType->component(QStringLiteral("strVal")));
     QVERIFY(strComponent);
-    QCOMPARE(*strComponent->defaultValue(), "DefaultString");
+    QCOMPARE(*strComponent->defaultValue(), "\"DefaultString\"");
 }
 
 void AstXmlParserTests::test_octetStringWithSizeConstraint()
