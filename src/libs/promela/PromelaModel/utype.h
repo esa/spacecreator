@@ -65,6 +65,11 @@ public:
      */
     void addField(const Declaration &field);
 
+    /**
+     * @brief Add a conditional declaration to the used defined type
+     *
+     * @param field conditional declaration to add
+     */
     void addField(const ConditionalDeclaration &field);
 
     /**

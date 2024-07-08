@@ -80,8 +80,26 @@ public:
      */
     const QList<QString> &getIncludes() const noexcept;
 
+    /**
+     * @brief Add C declaration block.
+     *
+     * @param declaration the cdecl to add to the model
+     */
     void addCDecl(CDecl declaration);
+
+    /**
+     * @brief Getter for C declaration block.
+     *
+     * @returns a reference to the cdecl.
+     * @throws std::bad_optional_access if there's no cdecl
+     */
     const CDecl &getCDecl() const noexcept;
+
+    /**
+     * @brief Check if the model has a c declaration block.
+     *
+     * @returns true if cdecl block is set, otherwise false.
+     */
     bool hasCDecl() const noexcept;
 
     /**

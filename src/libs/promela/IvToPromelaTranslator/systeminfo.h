@@ -278,6 +278,9 @@ struct SystemInfo {
      */
     std::set<QString> m_observers;
 
+    /**
+     * @brief A set of type names (ASN.1 naming convention) used in channels.
+     */
     std::set<QString> m_messageTypes;
 };
 

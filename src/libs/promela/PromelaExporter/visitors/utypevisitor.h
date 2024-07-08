@@ -45,8 +45,18 @@ public:
      */
     void visit(const model::Utype &utype);
 
+    /**
+     * @brief Visit Declaration
+     *
+     * @param declaration Declaration to visit
+     */
     void operator()(const model::Declaration &declaration);
 
+    /**
+     * @brief Visit ConditionalDeclaration
+     *
+     * @param declaration ConditionalDeclaration to visit
+     */
     void operator()(const model::ConditionalDeclaration &declaration);
 
 private:

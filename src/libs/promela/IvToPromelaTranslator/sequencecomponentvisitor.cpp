@@ -19,7 +19,7 @@
 
 #include "sequencecomponentvisitor.h"
 
-#include "helper.h"
+#include "asn1typehelper.h"
 
 #include <QDebug>
 #include <asn1library/asn1/asnsequencecomponent.h>
@@ -50,7 +50,7 @@ void SequenceComponentVisitor::visit(const Asn1Acn::AsnSequenceComponent &compon
     m_componentName = Escaper::escapeCName(component.name());
     m_isOptional = component.isOptional();
 
-    Helper helper(m_asn1Model, m_target + "." + m_componentName, m_source + "." + m_componentName);
+    Asn1TypeHelper helper(m_asn1Model, m_target + "." + m_componentName, m_source + "." + m_componentName);
 
     switch (m_operation) {
     case Operation::FROM_PROMELA_TO_C:
@@ -62,7 +62,7 @@ void SequenceComponentVisitor::visit(const Asn1Acn::AsnSequenceComponent &compon
                 PromelaNameHelper::createChildTypeNameForCCode(m_sequenceName, m_componentName), component.type());
         break;
     case Operation::LIST_PROMELA_FIELDS: {
-        Helper fieldHelper(m_asn1Model, m_target, "");
+        Asn1TypeHelper fieldHelper(m_asn1Model, m_target, "");
         m_fields = fieldHelper.generateListOfFields(component.type());
     } break;
     }

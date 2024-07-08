@@ -19,7 +19,7 @@
 
 #include "ccodegenerator.h"
 
-#include "helper.h"
+#include "asn1typehelper.h"
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
@@ -38,7 +38,7 @@ using promela::model::VariableRef;
 namespace promela::translator {
 CCodeGenerator::CCodeGenerator(const Asn1Acn::Asn1Model *asn1Model, const std::set<QString> &messageTypes)
 {
-    Helper helper(asn1Model, "$target$", "$source$");
+    Asn1TypeHelper helper(asn1Model, "$target$", "$source$");
     for (const QString &messageType : messageTypes) {
         m_templatesFromPromelaToC.insert(messageType, helper.createAssignmentTemplateFromPromelaToC(messageType));
         m_templatesFromCToPromela.insert(messageType, helper.createAssignmentTemplateFromCToPromela(messageType));
@@ -141,11 +141,11 @@ QList<PrintfStatement> CCodeGenerator::printfStatements(
         throw TranslationException(message);
     }
 
-    const QList<Helper::PrintfTemplate> &tmpltList = m_printfTemplates.value(typeName);
+    const QList<Asn1TypeHelper::PrintfTemplate> &tmpltList = m_printfTemplates.value(typeName);
 
     QList<PrintfStatement> result;
 
-    for (const Helper::PrintfTemplate &tmplt : tmpltList) {
+    for (const Asn1TypeHelper::PrintfTemplate &tmplt : tmpltList) {
         QList<Expression> arguments;
 
         QString fmt = tmplt.m_fmt;

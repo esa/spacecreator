@@ -115,13 +115,34 @@ public:
      */
     void appendElement(QString ref, std::unique_ptr<Expression> indexExpression);
 
+    /**
+     * @brief Prepend single name element to the variable reference.
+     *
+     * @param ref Name of element to prepend.
+     */
     void prependElement(QString ref);
 
+    /**
+     * @brief Prepend single name element to the variable reference.
+     *
+     * @param ref Name of element to prepend.
+     * @param indexExpression index expression of element to prepend.
+     */
     void prependElement(QString ref, std::unique_ptr<Expression> indexExpression);
 
-    void addIndexExpression(std::unique_ptr<Expression> indexExpression);
-
+    /**
+     * @brief Modify the name of first element.
+     *
+     * @param ref Name of element to set.
+     */
     void changeFirstRef(QString ref);
+
+    /**
+     * @brief Modify the index expression of first element.
+     *
+     * @param indexExpression expression to set.
+     */
+    void addIndexExpression(std::unique_ptr<Expression> indexExpression);
 
     /**
      * @brief Getter for elements to variable reference.

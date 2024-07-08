@@ -2,7 +2,7 @@ project(IvToPromelaTranslator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
   ccodegenerator.cpp
-  helper.cpp
+  asn1typehelper.cpp
   ivtopromelagenerator.cpp
   ivtopromelatranslatorcontext.cpp
   observerattachment.cpp
@@ -12,7 +12,7 @@ set(SOURCES
 )
 set(INCLUDES
   ccodegenerator.h
-  helper.h
+  asn1typehelper.h
   ivtopromelagenerator.h
   ivtopromelatranslatorcontext.h
   observerattachment.h

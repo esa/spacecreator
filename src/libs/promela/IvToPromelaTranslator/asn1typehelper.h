@@ -28,7 +28,7 @@
 #include <promela/PromelaModel/variableref.h>
 
 namespace promela::translator {
-class Helper
+class Asn1TypeHelper
 {
 public:
     struct PrintfTemplate {
@@ -37,7 +37,7 @@ public:
     };
 
 public:
-    Helper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source);
+    Asn1TypeHelper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source);
 
     QString createAssignmentTemplateFromPromelaToC(const QString &typeName);
     QString createAssignmentTemplateFromCToPromela(const QString &typeName);

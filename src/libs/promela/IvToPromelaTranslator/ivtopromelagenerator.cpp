@@ -19,7 +19,7 @@
 
 #include "ivtopromelagenerator.h"
 
-#include "helper.h"
+#include "asn1typehelper.h"
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
@@ -785,7 +785,7 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
                 sequence, argumentName, parameterInfo.m_parameterType, temporaryVariableName, messageVariableName);
     } else {
         if (info.m_parameters.empty() && sendArguments.empty()) {
-            // if there's PID nor parameter, put zero in queue.
+            // if there's no PID nor parameter, put zero in queue.
             sendArguments.append(Expression(Constant(0)));
         }
     }

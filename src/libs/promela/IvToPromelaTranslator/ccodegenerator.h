@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "helper.h"
+#include "asn1typehelper.h"
 
 #include <QHash>
 #include <QString>
@@ -47,7 +47,7 @@ public:
 private:
     QHash<QString, QString> m_templatesFromPromelaToC;
     QHash<QString, QString> m_templatesFromCToPromela;
-    QHash<QString, QList<Helper::PrintfTemplate>> m_printfTemplates;
+    QHash<QString, QList<Asn1TypeHelper::PrintfTemplate>> m_printfTemplates;
 };
 
 }

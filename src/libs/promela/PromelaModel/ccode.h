@@ -22,14 +22,44 @@
 #include <QString>
 
 namespace promela::model {
+/**
+ * @brief Representation of c_code block in promela
+ */
 class CCode final
 {
 public:
+    /**
+     * @brief default constructor
+     * Constructs c_code with empty content
+     */
     CCode();
+    /**
+     * @brief constructor
+     * Constructs c_code with given content
+     *
+     * @param content the content of c_code block
+     */
     CCode(QString content);
 
+    /**
+     * @brief Getter for content of c_code block
+     *
+     * @returns the reference to content of c_code
+     */
     const QString &getContent() const noexcept;
+
+    /**
+     * @brief Check if the c_code contains any content
+     *
+     * @returns true if the content is not empty, otherwise false
+     */
     bool hasContent() const noexcept;
+
+    /**
+     * @brief Setter for content of c_code block
+     *
+     * @param content content to set
+     */
     void setContent(QString content);
 
 private:

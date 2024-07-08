@@ -22,12 +22,19 @@
 #include <QString>
 
 namespace promela::common {
+/**
+ * @brief Constants used in promela modules.
+ */
 class PromelaConstants
 {
 public:
+    /** @brief a common part of printf message for sending */
     inline static const QString channelSendMessage = "channel_send";
+    /** @brief a common part of printf message for receiving */
     inline static const QString channelRecvMessage = "channel_recv";
+    /** @brief an unit of indent used for promela and c code inside promela */
     inline static const QString baseIndent = "    ";
+    /** @brief suffix for type of array element */
     inline static const QString sequenceOfElementTypeNameSuffix = "elem";
 };
 }

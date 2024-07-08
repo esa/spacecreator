@@ -153,7 +153,11 @@ public:
      * @param statement PrintfStatement to export
      */
     void operator()(const model::PrintfStatement &statement);
-
+    /**
+     * @brief Handle CCode
+     *
+     * @param statement CCode to export
+     */
     void operator()(const model::CCode &code);
 
 private:

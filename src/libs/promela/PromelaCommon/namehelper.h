@@ -22,11 +22,30 @@
 #include <QString>
 
 namespace promela::common {
+/**
+ * @brief Helper for generation of names of promela entites.
+ */
 class PromelaNameHelper
 {
 public:
+    /**
+     * @brief Create a name of type alias for component of SEQUENCE type.
+     * The resulting name uses double underscore separator.
+     *
+     * @param parentTypeName name of the SEQUENCE type
+     * @param componentName name of the component
+     * @returns a name of type for component
+     */
     static QString createChildTypeName(const QString &parentTypeName, const QString &componentName);
 
+    /**
+     * @brief Create a name of type alias for component of SEQUENCE type for use in c_code blocks.
+     * The resulting name uses single underscore separator.
+     *
+     * @param parentTypeName name of the SEQUENCE type
+     * @param componentName name of the component
+     * @returns a name of type for component
+     */
     static QString createChildTypeNameForCCode(const QString &parentTypeName, const QString &componentName);
 };
 }

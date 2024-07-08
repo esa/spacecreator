@@ -47,10 +47,26 @@ public:
     ArrayType(size_t size, Type type);
 
     /**
+     * @brief Constructor with size which is named constant
+     * The size of array is defined externally, the name of constant is used.
+     *
+     * @param constantName Name of the preprocessor constant which determines the size
+     * @param type  Base type of the array
      */
     ArrayType(QString constantName, Type type);
 
+    /**
+     * @brief Getter for constant name, which determines the size
+     *
+     * @returns reference to constant name
+     * @throws std::bad_variant_access if constant is not set
+     */
     const QString &getSizeConstantName() const;
+    /**
+     * @brief Check if size is defined externally using constant name.
+     *
+     * @returns true if the size is defined by constant name, false if the size is defined here.
+     */
     bool hasExternallyDefinedSize() const;
     /**
      * @brief Getter for array size

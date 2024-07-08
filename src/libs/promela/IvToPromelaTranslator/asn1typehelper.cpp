@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "helper.h"
+#include "asn1typehelper.h"
 
 #include "sequencecomponentvisitor.h"
 
@@ -48,14 +48,14 @@ using promela::model::Expression;
 using promela::model::VariableRef;
 
 namespace promela::translator {
-Helper::Helper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source)
+Asn1TypeHelper::Asn1TypeHelper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source)
     : m_asn1Model(asn1Model)
     , m_target(std::move(target))
     , m_source(std::move(source))
 {
 }
 
-QString Helper::createAssignmentTemplateFromPromelaToC(const QString &typeName)
+QString Asn1TypeHelper::createAssignmentTemplateFromPromelaToC(const QString &typeName)
 {
     const Asn1Acn::TypeAssignment *type = findType(typeName);
     if (type == nullptr) {
@@ -66,7 +66,7 @@ QString Helper::createAssignmentTemplateFromPromelaToC(const QString &typeName)
     return createAssignmentTemplateFromPromelaToC(typeName, type->type());
 }
 
-QString Helper::createAssignmentTemplateFromCToPromela(const QString &typeName)
+QString Asn1TypeHelper::createAssignmentTemplateFromCToPromela(const QString &typeName)
 {
     const Asn1Acn::TypeAssignment *type = findType(typeName);
     if (type == nullptr) {
@@ -77,7 +77,7 @@ QString Helper::createAssignmentTemplateFromCToPromela(const QString &typeName)
     return createAssignmentTemplateFromCToPromela(typeName, type->type());
 }
 
-QList<Helper::PrintfTemplate> Helper::generatePrintfTemplate(const QString &typeName)
+QList<Asn1TypeHelper::PrintfTemplate> Asn1TypeHelper::generatePrintfTemplate(const QString &typeName)
 {
     const Asn1Acn::TypeAssignment *type = findType(typeName);
     if (type == nullptr) {
@@ -112,7 +112,8 @@ QList<Helper::PrintfTemplate> Helper::generatePrintfTemplate(const QString &type
     return result;
 }
 
-QString Helper::createAssignmentTemplateFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::Type *type)
+QString Asn1TypeHelper::createAssignmentTemplateFromPromelaToC(
+        const QString &cTypeName, const Asn1Acn::Types::Type *type)
 {
     switch (type->typeEnum()) {
     case Asn1Acn::Types::Type::ASN1Type::INTEGER:
@@ -150,7 +151,8 @@ QString Helper::createAssignmentTemplateFromPromelaToC(const QString &cTypeName,
     }
 }
 
-QString Helper::createAssignmentTemplateFromCToPromela(const QString &cTypeName, const Asn1Acn::Types::Type *type)
+QString Asn1TypeHelper::createAssignmentTemplateFromCToPromela(
+        const QString &cTypeName, const Asn1Acn::Types::Type *type)
 {
     switch (type->typeEnum()) {
     case Asn1Acn::Types::Type::ASN1Type::INTEGER:
@@ -188,7 +190,7 @@ QString Helper::createAssignmentTemplateFromCToPromela(const QString &cTypeName,
     }
 }
 
-QList<VariableRef> Helper::generateListOfFields(const Asn1Acn::Types::Type *type)
+QList<VariableRef> Asn1TypeHelper::generateListOfFields(const Asn1Acn::Types::Type *type)
 {
     switch (type->typeEnum()) {
     case Asn1Acn::Types::Type::ASN1Type::INTEGER:
@@ -225,7 +227,7 @@ QList<VariableRef> Helper::generateListOfFields(const Asn1Acn::Types::Type *type
     }
 }
 
-const Asn1Acn::TypeAssignment *Helper::findType(const QString &name)
+const Asn1Acn::TypeAssignment *Asn1TypeHelper::findType(const QString &name)
 {
     for (const std::unique_ptr<Asn1Acn::File> &file : m_asn1Model->data()) {
         const Asn1Acn::File::DefinitionsList &definitionList = file->definitionsList();
@@ -239,7 +241,7 @@ const Asn1Acn::TypeAssignment *Helper::findType(const QString &name)
     return nullptr;
 }
 
-QString Helper::sequenceAssignmentFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::Sequence *type)
+QString Asn1TypeHelper::sequenceAssignmentFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::Sequence *type)
 {
     QString result;
     QList<QString> optionalFields;
@@ -261,14 +263,15 @@ QString Helper::sequenceAssignmentFromPromelaToC(const QString &cTypeName, const
     return result;
 }
 
-QString Helper::sequenceOfAssignmentFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::SequenceOf *type)
+QString Asn1TypeHelper::sequenceOfAssignmentFromPromelaToC(
+        const QString &cTypeName, const Asn1Acn::Types::SequenceOf *type)
 {
     SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
 
     QString elementType = PromelaNameHelper::createChildTypeNameForCCode(
             cTypeName, PromelaConstants::sequenceOfElementTypeNameSuffix);
-    Helper helper(m_asn1Model, m_target + ".arr[i]", m_source + ".data[i]");
+    Asn1TypeHelper helper(m_asn1Model, m_target + ".arr[i]", m_source + ".data[i]");
     QString itemAssignment = addIndent(helper.createAssignmentTemplateFromPromelaToC(elementType, type->itemsType()));
 
     QString result = QString("int i = 0;\n"
@@ -286,7 +289,7 @@ QString Helper::sequenceOfAssignmentFromPromelaToC(const QString &cTypeName, con
     return result;
 }
 
-QString Helper::choiceAssignmentFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::Choice *type)
+QString Asn1TypeHelper::choiceAssignmentFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::Choice *type)
 {
     QString result;
     int32_t index = 1;
@@ -294,7 +297,7 @@ QString Helper::choiceAssignmentFromPromelaToC(const QString &cTypeName, const A
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
         QString componentName = Escaper::escapeCName(component->name());
         QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, componentName);
-        Helper helper(m_asn1Model, m_target + ".u." + componentName, m_source + ".data." + componentName);
+        Asn1TypeHelper helper(m_asn1Model, m_target + ".u." + componentName, m_source + ".data." + componentName);
         QString assignment = addIndent(helper.createAssignmentTemplateFromPromelaToC(elementType, component->type()));
         QString prefix = index == 1 ? "" : "else ";
         result += QString("%1if(%3.selection == %4_%5_PRESENT)\n"
@@ -309,7 +312,7 @@ QString Helper::choiceAssignmentFromPromelaToC(const QString &cTypeName, const A
     return result;
 }
 
-QString Helper::octetStringAssignmentFromPromelaToC(const Asn1Acn::Types::OctetString *type)
+QString Asn1TypeHelper::octetStringAssignmentFromPromelaToC(const Asn1Acn::Types::OctetString *type)
 {
     SizeConstraintVisitor<OctetStringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
@@ -330,7 +333,7 @@ QString Helper::octetStringAssignmentFromPromelaToC(const Asn1Acn::Types::OctetS
     return result;
 }
 
-QString Helper::ia5StringAssignmentFromPromelaToC(const Asn1Acn::Types::IA5String *type)
+QString Asn1TypeHelper::ia5StringAssignmentFromPromelaToC(const Asn1Acn::Types::IA5String *type)
 {
     SizeConstraintVisitor<StringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
@@ -353,7 +356,7 @@ QString Helper::ia5StringAssignmentFromPromelaToC(const Asn1Acn::Types::IA5Strin
     return result;
 }
 
-QString Helper::sequenceAssignmentFromCToPromela(const QString &typeName, const Asn1Acn::Types::Sequence *type)
+QString Asn1TypeHelper::sequenceAssignmentFromCToPromela(const QString &typeName, const Asn1Acn::Types::Sequence *type)
 {
     QString result;
     QList<QString> optionalFields;
@@ -375,15 +378,16 @@ QString Helper::sequenceAssignmentFromCToPromela(const QString &typeName, const 
     return result;
 }
 
-QString Helper::sequenceOfAssignmentFromCToPromela(const QString &typeName, const Asn1Acn::Types::SequenceOf *type)
+QString Asn1TypeHelper::sequenceOfAssignmentFromCToPromela(
+        const QString &typeName, const Asn1Acn::Types::SequenceOf *type)
 {
     SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
 
-    QString elementType =
-            PromelaNameHelper::createChildTypeNameForCCode(typeName, PromelaConstants::sequenceOfElementTypeNameSuffix);
+    QString elementType = PromelaNameHelper::createChildTypeNameForCCode(
+            typeName, PromelaConstants::sequenceOfElementTypeNameSuffix);
 
-    Helper helper(m_asn1Model, m_target + ".data[i]", m_source + ".arr[i]");
+    Asn1TypeHelper helper(m_asn1Model, m_target + ".data[i]", m_source + ".arr[i]");
     QString itemAssignment = addIndent(helper.createAssignmentTemplateFromCToPromela(elementType, type->itemsType()));
 
     QString result = QString("int i = 0;\n"
@@ -401,7 +405,7 @@ QString Helper::sequenceOfAssignmentFromCToPromela(const QString &typeName, cons
     return result;
 }
 
-QString Helper::choiceAssignmentFromCToPromela(const QString &cTypeName, const Asn1Acn::Types::Choice *type)
+QString Asn1TypeHelper::choiceAssignmentFromCToPromela(const QString &cTypeName, const Asn1Acn::Types::Choice *type)
 {
     QString result;
     int32_t index = 1;
@@ -409,7 +413,7 @@ QString Helper::choiceAssignmentFromCToPromela(const QString &cTypeName, const A
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
         QString componentName = Escaper::escapeCName(component->name());
         QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, componentName);
-        Helper helper(m_asn1Model, m_target + ".data." + componentName, m_source + ".u." + componentName);
+        Asn1TypeHelper helper(m_asn1Model, m_target + ".data." + componentName, m_source + ".u." + componentName);
         QString assignment = addIndent(helper.createAssignmentTemplateFromCToPromela(elementType, component->type()));
         QString prefix = index == 1 ? "" : " else ";
         result += QString("%1if(%3.kind == %4_%5_PRESENT)\n"
@@ -424,7 +428,7 @@ QString Helper::choiceAssignmentFromCToPromela(const QString &cTypeName, const A
     return result;
 }
 
-QString Helper::octetStringAssignmentFromCToPromela(const Asn1Acn::Types::OctetString *type)
+QString Asn1TypeHelper::octetStringAssignmentFromCToPromela(const Asn1Acn::Types::OctetString *type)
 {
     SizeConstraintVisitor<OctetStringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
@@ -444,7 +448,7 @@ QString Helper::octetStringAssignmentFromCToPromela(const Asn1Acn::Types::OctetS
     return result;
 }
 
-QString Helper::ia5StringAssignmentFromCToPromela(const Asn1Acn::Types::IA5String *type)
+QString Asn1TypeHelper::ia5StringAssignmentFromCToPromela(const Asn1Acn::Types::IA5String *type)
 {
     SizeConstraintVisitor<StringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
@@ -465,7 +469,7 @@ QString Helper::ia5StringAssignmentFromCToPromela(const Asn1Acn::Types::IA5Strin
     return result;
 }
 
-QList<VariableRef> Helper::sequenceListOfFields(const Asn1Acn::Types::Sequence *type)
+QList<VariableRef> Asn1TypeHelper::sequenceListOfFields(const Asn1Acn::Types::Sequence *type)
 {
     QList<VariableRef> result;
     QList<QString> optionalFields;
@@ -499,12 +503,12 @@ QList<VariableRef> Helper::sequenceListOfFields(const Asn1Acn::Types::Sequence *
     return result;
 }
 
-QList<VariableRef> Helper::sequenceOfListOfFields(const Asn1Acn::Types::SequenceOf *type)
+QList<VariableRef> Asn1TypeHelper::sequenceOfListOfFields(const Asn1Acn::Types::SequenceOf *type)
 {
     SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
 
-    Helper helper(m_asn1Model, "data", "");
+    Asn1TypeHelper helper(m_asn1Model, "data", "");
     QList<VariableRef> fieldsOfItem = helper.generateListOfFields(type->itemsType());
 
     QList<VariableRef> result;
@@ -528,12 +532,12 @@ QList<VariableRef> Helper::sequenceOfListOfFields(const Asn1Acn::Types::Sequence
     return result;
 }
 
-QList<VariableRef> Helper::choiceListOfFields(const Asn1Acn::Types::Choice *type)
+QList<VariableRef> Asn1TypeHelper::choiceListOfFields(const Asn1Acn::Types::Choice *type)
 {
     QList<VariableRef> result;
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
         QString componentName = Escaper::escapePromelaName(component->name());
-        Helper helper(m_asn1Model, componentName, "");
+        Asn1TypeHelper helper(m_asn1Model, componentName, "");
         QList<VariableRef> fieldsOfElement = helper.generateListOfFields(component->type());
 
         while (!fieldsOfElement.empty()) {
@@ -551,7 +555,7 @@ QList<VariableRef> Helper::choiceListOfFields(const Asn1Acn::Types::Choice *type
     return result;
 }
 
-QList<promela::model::VariableRef> Helper::octetStringListOfFields(const Asn1Acn::Types::OctetString *type)
+QList<promela::model::VariableRef> Asn1TypeHelper::octetStringListOfFields(const Asn1Acn::Types::OctetString *type)
 {
     SizeConstraintVisitor<OctetStringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
@@ -575,7 +579,7 @@ QList<promela::model::VariableRef> Helper::octetStringListOfFields(const Asn1Acn
     return result;
 }
 
-QList<promela::model::VariableRef> Helper::ia5StringListOfFields(const Asn1Acn::Types::IA5String *type)
+QList<promela::model::VariableRef> Asn1TypeHelper::ia5StringListOfFields(const Asn1Acn::Types::IA5String *type)
 {
     SizeConstraintVisitor<StringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
@@ -599,7 +603,7 @@ QList<promela::model::VariableRef> Helper::ia5StringListOfFields(const Asn1Acn::
     return result;
 }
 
-QString Helper::addIndent(const QString &text)
+QString Asn1TypeHelper::addIndent(const QString &text)
 {
     QStringList lines = text.split('\n');
     QStringList indentedLines;

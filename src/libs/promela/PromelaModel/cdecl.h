@@ -22,14 +22,44 @@
 #include <QString>
 
 namespace promela::model {
+/**
+ * @brief Representation of c_decl block in promela
+ */
 class CDecl final
 {
 public:
+    /**
+     * @brief Default Constructor
+     * Constructs empty c_decl block
+     */
     CDecl();
+    /**
+     * @brief Constructor
+     * Constructs c_decl with content
+     *
+     * @param content content of c declaration
+     */
     CDecl(QString content);
 
+    /**
+     * @brief Getter for content of c_decl block
+     *
+     * @returns the reference to content of c_decl
+     */
     const QString &getContent() const noexcept;
+
+    /**
+     * @brief Check if the c_decl contains any content
+     *
+     * @returns true if the content is not empty, otherwise false
+     */
     bool hasContent() const noexcept;
+
+    /**
+     * @brief Setter for content of c_decl block
+     *
+     * @param content content to set
+     */
     void setContent(QString content);
 
 private:
