@@ -386,12 +386,9 @@ void TmcVerifier::startCompilation()
 {
     QDir outputDir(m_outputDirectory);
 
+    // find generated C source files
     m_cSourceFiles = outputDir.entryList(QStringList("*.c"),
             QDir::Files | QDir::CaseSensitive | QDir::Readable | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-    // find c files
-    // compile
-    // link
-    // inject here
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
@@ -542,13 +539,12 @@ void TmcVerifier::generateNextTrace()
     ++m_trailCounter;
     m_traceGeneratorProcess->setWorkingDirectory(m_outputDirectory);
 
-    const QString inputFile = "system.pml";
     const QString exe = "./pan";
 
     QStringList arguments;
-    arguments.append("-S");
-    arguments.append("-n");
-    arguments.append("-r");
+    arguments.append("-S"); // silent replay: only user defined printfs show
+    arguments.append("-n"); // no listing of unreached states
+    arguments.append("-r"); // read and execute trail in file
     arguments.append(trailFile);
     Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(exe).arg(arguments.join(" ")));
     m_timer->setSingleShot(true);

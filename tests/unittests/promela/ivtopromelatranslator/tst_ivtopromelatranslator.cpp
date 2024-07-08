@@ -140,6 +140,7 @@ void tst_IvToPromelaTranslator::testSimple()
     QVERIFY(promelaModel->getIncludes().indexOf("controller.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("actuator.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("env_inlines.pml") >= 0);
+    QVERIFY(promelaModel->getIncludes().indexOf("message_sizes.pml") >= 0);
 
     QCOMPARE(promelaModel->getUtypes().size(), 1);
 
@@ -357,6 +358,7 @@ void tst_IvToPromelaTranslator::testParameters()
     QVERIFY(promelaModel->getIncludes().indexOf("controller.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("actuator.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("env_inlines.pml") >= 0);
+    QVERIFY(promelaModel->getIncludes().indexOf("message_sizes.pml") >= 0);
 
     QCOMPARE(promelaModel->getUtypes().size(), 3);
 
@@ -624,6 +626,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     QVERIFY(promelaModel->getIncludes().indexOf("up.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("down.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("env_inlines.pml") >= 0);
+    QVERIFY(promelaModel->getIncludes().indexOf("message_sizes.pml") >= 0);
 
     QCOMPARE(promelaModel->getUtypes().size(), 3);
 
