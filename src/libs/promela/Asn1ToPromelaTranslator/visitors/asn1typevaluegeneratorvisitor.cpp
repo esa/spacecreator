@@ -395,7 +395,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 
             if (asnSequenceComponent->presence() != Asn1Acn::AsnSequenceComponent::Presence::NotSpecified) {
                 // presence is either absent or present, need to generate exist flag
-                auto variableName = QStringLiteral("%1.exist.%2").arg(valueVariableName, asnSequenceComponent->name());
+                auto variableName =
+                        QStringLiteral("%1.exist.%2")
+                                .arg(valueVariableName, Escaper::escapePromelaName(asnSequenceComponent->name()));
                 auto presenceFlag =
                         asnSequenceComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent
                         ? PresenceFlag::Absent
@@ -688,15 +690,15 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
 {
     const QString typeToGenerateName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
     const QString typeGeneratorToCallName = getInlineGeneratorName(typeToGenerateName);
-    const QString &componentName = asnSequenceComponent->name();
+    const QString &componentName = Escaper::escapePromelaName(asnSequenceComponent->name());
 
     if (asnSequenceComponent->isOptional()) {
         const QString valueExistAssignmentName = QString("%1.exist.%2").arg(argumentName).arg(componentName);
 
         auto valueExistsSequence = ProctypeMaker::makeNormalSequence();
         valueExistsSequence->appendElement(ProctypeMaker::makeTrueExpressionProctypeElement());
-        valueExistsSequence->appendElement(ProctypeMaker::makeInlineCall(typeGeneratorToCallName,
-                Escaper::escapePromelaName(argumentName), Escaper::escapePromelaName(componentName)));
+        valueExistsSequence->appendElement(ProctypeMaker::makeInlineCall(
+                typeGeneratorToCallName, Escaper::escapePromelaName(argumentName), componentName));
         valueExistsSequence->appendElement(
                 ProctypeMaker::makeAssignmentProctypeElement(valueExistAssignmentName, Constant(1)));
 
@@ -711,8 +713,7 @@ std::unique_ptr<ProctypeElement> Asn1TypeValueGeneratorVisitor::generateAsnSeque
 
         return std::make_unique<ProctypeElement>(std::move(conditional));
     } else {
-        return ProctypeMaker::makeInlineCall(
-                typeGeneratorToCallName, argumentName, Escaper::escapePromelaName(componentName));
+        return ProctypeMaker::makeInlineCall(typeGeneratorToCallName, argumentName, componentName);
     }
 }
 
