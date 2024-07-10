@@ -25,6 +25,7 @@
 #include <memory>
 #include <promela/PromelaModel/declaration.h>
 #include <promela/PromelaModel/inlinedef.h>
+#include <promela/PromelaModel/promelamodel.h>
 #include <promela/PromelaModel/utype.h>
 
 using Asn1Acn::Definitions;
@@ -60,12 +61,15 @@ private Q_SLOTS:
 
     void testTypeSorting();
 
+    void testSequenceSubtyping();
+
 private:
     std::unique_ptr<Definitions> createModel();
     const ::promela::model::InlineDef *findInline(
             const std::list<std::unique_ptr<::promela::model::InlineDef>> &list, const QString &name);
 
     const ::promela::model::Declaration *findUtypeField(const ::promela::model::Utype &utype, int index);
+    const ::promela::model::Utype *findUtype(const ::promela::model::PromelaModel &model, const QString &name);
 
     template<typename T>
     const T *findProctypeElement(const ::promela::model::Sequence &sequence, size_t index);

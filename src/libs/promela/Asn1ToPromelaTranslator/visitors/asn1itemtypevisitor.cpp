@@ -380,6 +380,8 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
     Utype nestedUtype(nestedUtypeName);
 
     QList<QString> optionalFields;
+    QList<QString> alwaysPresentFields;
+    QList<QString> alwaysAbsentFields;
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
@@ -396,6 +398,13 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
                 optionalFields.append(componentVisitor.getComponentName());
             }
 
+            if (componentVisitor.getComponentPresence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysPresent) {
+                alwaysPresentFields.append(componentVisitor.getComponentName());
+            } else if (componentVisitor.getComponentPresence()
+                    == Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent) {
+                alwaysAbsentFields.append(componentVisitor.getComponentName());
+            }
+
             VariableRef dst("dst");
             dst.appendElement(componentVisitor.getComponentName());
             VariableRef src("src");
@@ -410,6 +419,8 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
         }
     }
 
+    const QString existFieldName = "exist";
+
     if (!optionalFields.isEmpty()) {
         const QString existUtypeName = QString("%1_exist").arg(nestedUtypeName);
         Utype existUtype(existUtypeName);
@@ -417,7 +428,6 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
             existUtype.addField(Declaration(DataType(BasicType::BOOLEAN), field));
         }
         m_promelaModel.addUtype(existUtype);
-        const QString existFieldName = "exist";
         nestedUtype.addField(Declaration(DataType(UtypeRef(existUtypeName)), existFieldName));
 
         for (const QString &field : optionalFields) {
@@ -437,6 +447,27 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
     }
 
     m_promelaModel.addUtype(nestedUtype);
+
+    // generate checks for always absent/present components
+    for (const QString &field : alwaysPresentFields) {
+        VariableRef existRef("dst");
+        existRef.appendElement(existFieldName);
+        existRef.appendElement(field);
+        Expression expression(BinaryExpression(BinaryExpression::Operator::EQUAL,
+                std::make_unique<Expression>(std::move(existRef)), std::make_unique<Expression>(Constant(1))));
+
+        sequence.appendElement(AssertCall(expression));
+    }
+
+    for (const QString &field : alwaysAbsentFields) {
+        VariableRef existRef("dst");
+        existRef.appendElement(existFieldName);
+        existRef.appendElement(field);
+        Expression expression(BinaryExpression(BinaryExpression::Operator::EQUAL,
+                std::make_unique<Expression>(std::move(existRef)), std::make_unique<Expression>(Constant(0))));
+
+        sequence.appendElement(AssertCall(expression));
+    }
 
     addAssignValueInline(nestedUtypeName, std::move(sequence));
 

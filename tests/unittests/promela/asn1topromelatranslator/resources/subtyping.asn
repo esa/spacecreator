@@ -1,0 +1,14 @@
+MYMODULE DEFINITIONS ::= BEGIN
+
+   MyInteger ::= INTEGER (0 .. 100)
+
+   MyBase ::= SEQUENCE {
+      abc MyInteger,
+      test MyInteger OPTIONAL
+   }
+
+   MyChildA ::= MyBase (WITH COMPONENTS { test PRESENT })
+
+   MyChildB ::= MyBase (WITH COMPONENTS { test ABSENT })
+
+END

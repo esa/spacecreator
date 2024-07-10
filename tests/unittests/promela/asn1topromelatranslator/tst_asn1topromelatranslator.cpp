@@ -38,6 +38,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/typefactory.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <modelloader.h>
 #include <promela/Asn1ToPromelaTranslator/promelatypesorter.h>
 #include <promela/Asn1ToPromelaTranslator/translator.h>
 #include <promela/Asn1ToPromelaTranslator/visitors/asn1nodevisitor.h>
@@ -70,6 +71,7 @@ using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::Type;
 using Asn1Acn::Types::TypeFactory;
 using Asn1Acn::Types::UserdefinedType;
+using promela::model::AssertCall;
 using promela::model::Assignment;
 using promela::model::BasicType;
 using promela::model::BinaryExpression;
@@ -1602,6 +1604,148 @@ void tst_Asn1ToPromelaTranslator::testTypeSorting()
     }
 }
 
+void tst_Asn1ToPromelaTranslator::testSequenceSubtyping()
+{
+    const QString inputAsnFilename = "subtyping.asn";
+
+    auto model = plugincommon::ModelLoader::loadAsn1Model(
+            QString("resources%1%2").arg(QDir::separator()).arg(inputAsnFilename));
+    QVERIFY(model != nullptr);
+    QVERIFY(!model->data().empty());
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*model->data().front());
+
+    QCOMPARE(promelaModel.getUtypes().size(), 6);
+
+    const Utype *base = findUtype(promelaModel, "MyBase");
+    QVERIFY(base);
+    QCOMPARE(base->getFields().size(), 3);
+    {
+        const Declaration *abc = findUtypeField(*base, 0);
+        QVERIFY(abc);
+        QCOMPARE(abc->getName(), "abc");
+        const Declaration *test = findUtypeField(*base, 1);
+        QVERIFY(test);
+        QCOMPARE(test->getName(), "test");
+        const Declaration *exist = findUtypeField(*base, 2);
+        QVERIFY(exist);
+        QCOMPARE(exist->getName(), "exist");
+    }
+
+    const Utype *baseExist = findUtype(promelaModel, "MyBase_exist");
+    QVERIFY(baseExist);
+    QCOMPARE(baseExist->getFields().size(), 1);
+    {
+        const Declaration *test = findUtypeField(*baseExist, 0);
+        QVERIFY(test);
+        QCOMPARE(test->getName(), "test");
+    }
+
+    const Utype *childA = findUtype(promelaModel, "MyChildA");
+    QVERIFY(childA);
+    QCOMPARE(childA->getFields().size(), 3);
+    {
+        const Declaration *abc = findUtypeField(*childA, 0);
+        QVERIFY(abc);
+        QCOMPARE(abc->getName(), "abc");
+        const Declaration *test = findUtypeField(*childA, 1);
+        QVERIFY(test);
+        QCOMPARE(test->getName(), "test");
+        const Declaration *exist = findUtypeField(*childA, 2);
+        QVERIFY(exist);
+        QCOMPARE(exist->getName(), "exist");
+    }
+
+    const Utype *childAExist = findUtype(promelaModel, "MyChildA_exist");
+    QVERIFY(childAExist);
+    QCOMPARE(childAExist->getFields().size(), 1);
+    {
+        const Declaration *test = findUtypeField(*childAExist, 0);
+        QVERIFY(test);
+        QCOMPARE(test->getName(), "test");
+    }
+
+    const Utype *childB = findUtype(promelaModel, "MyChildB");
+    QVERIFY(childB);
+    QCOMPARE(childB->getFields().size(), 3);
+    {
+        const Declaration *abc = findUtypeField(*childB, 0);
+        QVERIFY(abc);
+        QCOMPARE(abc->getName(), "abc");
+        const Declaration *test = findUtypeField(*childB, 1);
+        QVERIFY(test);
+        QCOMPARE(test->getName(), "test");
+        const Declaration *exist = findUtypeField(*childB, 2);
+        QVERIFY(exist);
+        QCOMPARE(exist->getName(), "exist");
+    }
+
+    const Utype *childBExist = findUtype(promelaModel, "MyChildB_exist");
+    QVERIFY(childBExist);
+    QCOMPARE(childBExist->getFields().size(), 1);
+    {
+        const Declaration *test = findUtypeField(*childBExist, 0);
+        QVERIFY(test);
+        QCOMPARE(test->getName(), "test");
+    }
+
+    {
+        const InlineDef *childAAssignValue = findInline(promelaModel.getInlineDefs(), "MyChildA_assign_value");
+        QVERIFY(childAAssignValue);
+        QCOMPARE(childAAssignValue->getArguments().size(), 2);
+        const auto &sequence = childAAssignValue->getSequence();
+        QCOMPARE(sequence.getContent().size(), 4);
+
+        const auto abcFieldAssignment = findProctypeElement<InlineCall>(sequence, 0);
+        QVERIFY(abcFieldAssignment);
+        const auto testFieldAssignment = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(testFieldAssignment);
+        const auto existAssignment = findProctypeElement<Assignment>(sequence, 2);
+        QVERIFY(existAssignment);
+        const auto check = findProctypeElement<AssertCall>(sequence, 3);
+        QVERIFY(check);
+        const BinaryExpression *expr = std::get_if<BinaryExpression>(&check->expression().getContent());
+        QVERIFY(expr);
+        QCOMPARE(expr->getOperator(), BinaryExpression::Operator::EQUAL);
+
+        const VariableRef *expectedRef = std::get_if<VariableRef>(&expr->getLeft()->getContent());
+        QVERIFY(expectedRef);
+
+        const Constant *expectedOne = std::get_if<Constant>(&expr->getRight()->getContent());
+        QVERIFY(expectedOne);
+        QCOMPARE(expectedOne->getValue(), 1);
+    }
+
+    {
+        const InlineDef *childBAssignValue = findInline(promelaModel.getInlineDefs(), "MyChildB_assign_value");
+        QVERIFY(childBAssignValue);
+        QCOMPARE(childBAssignValue->getArguments().size(), 2);
+        const auto &sequence = childBAssignValue->getSequence();
+        QCOMPARE(sequence.getContent().size(), 4);
+
+        const auto abcFieldAssignment = findProctypeElement<InlineCall>(sequence, 0);
+        QVERIFY(abcFieldAssignment);
+        const auto testFieldAssignment = findProctypeElement<InlineCall>(sequence, 1);
+        QVERIFY(testFieldAssignment);
+        const auto existAssignment = findProctypeElement<Assignment>(sequence, 2);
+        QVERIFY(existAssignment);
+        const auto check = findProctypeElement<AssertCall>(sequence, 3);
+        QVERIFY(check);
+        const BinaryExpression *expr = std::get_if<BinaryExpression>(&check->expression().getContent());
+        QVERIFY(expr);
+        QCOMPARE(expr->getOperator(), BinaryExpression::Operator::EQUAL);
+
+        const VariableRef *expectedRef = std::get_if<VariableRef>(&expr->getLeft()->getContent());
+        QVERIFY(expectedRef);
+
+        const Constant *expectedZero = std::get_if<Constant>(&expr->getRight()->getContent());
+        QVERIFY(expectedZero);
+        QCOMPARE(expectedZero->getValue(), 0);
+    }
+}
+
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator::createModel()
 {
     return std::make_unique<Definitions>("myModule", SourceLocation());
@@ -1632,6 +1776,17 @@ const ::promela::model::Declaration *tst_Asn1ToPromelaTranslator::findUtypeField
             }
         }
         ++current;
+    }
+    return nullptr;
+}
+
+const ::promela::model::Utype *tst_Asn1ToPromelaTranslator::findUtype(
+        const ::promela::model::PromelaModel &model, const QString &name)
+{
+    const QList<Utype> &utypes = model.getUtypes();
+    auto iter = std::find_if(utypes.begin(), utypes.end(), [&](const Utype &utype) { return utype.getName() == name; });
+    if (iter != utypes.end()) {
+        return &(*iter);
     }
     return nullptr;
 }
