@@ -41,6 +41,7 @@ Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(
     , m_baseTypeName(std::move(baseTypeName))
     , m_enhancedSpinSupport(enhancedSpinSupport)
     , m_optionalComponent(false)
+    , m_presence(Asn1Acn::AsnSequenceComponent::Presence::NotSpecified)
     , m_nestedIndexCounter(nestedIndexCounter)
 {
 }
@@ -49,10 +50,12 @@ void Asn1SequenceComponentVisitor::visit(const AsnSequenceComponent &component)
 {
     Asn1ItemTypeVisitor visitor(
             m_promelaModel, m_baseTypeName, component.name(), false, m_enhancedSpinSupport, m_nestedIndexCounter);
+    m_presence = component.presence();
     component.type()->accept(visitor);
     m_componentName = Escaper::escapePromelaName(component.name());
     m_componentType = visitor.getResultDataType();
     m_optionalComponent = component.isOptional();
+    m_presentWhen = component.presentWhen();
 }
 
 void Asn1SequenceComponentVisitor::visit(const AcnSequenceComponent &component)
@@ -78,5 +81,15 @@ DataType Asn1SequenceComponentVisitor::getComponentType() const
 bool Asn1SequenceComponentVisitor::isComponentOptional() const
 {
     return m_optionalComponent;
+}
+
+Asn1Acn::AsnSequenceComponent::Presence Asn1SequenceComponentVisitor::getComponentPresence() const
+{
+    return m_presence;
+}
+
+QString Asn1SequenceComponentVisitor::presentWhen() const
+{
+    return m_presentWhen;
 }
 }

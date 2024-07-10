@@ -390,7 +390,9 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
         if (componentVisitor.wasComponentVisited()) {
             nestedUtype.addField(Declaration(componentVisitor.getComponentType(), componentVisitor.getComponentName()));
 
-            if (componentVisitor.isComponentOptional()) {
+            if (componentVisitor.isComponentOptional()
+                    || componentVisitor.getComponentPresence()
+                            != Asn1Acn::AsnSequenceComponent::Presence::NotSpecified) {
                 optionalFields.append(componentVisitor.getComponentName());
             }
 

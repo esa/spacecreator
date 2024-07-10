@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QString>
+#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/sequencecomponentvisitor.h>
 #include <promela/PromelaModel/promelamodel.h>
 #include <promela/PromelaModel/utype.h>
@@ -83,6 +84,19 @@ public:
      * @return true if component is optional, false if component is mandatory of component was not visited.
      */
     bool isComponentOptional() const;
+    /**
+     * @brief Getter for presence property of component.
+     * If component wasn't visited, the NotSpecified value is returned.
+     *
+     * @return presence property of visited component.
+     */
+    Asn1Acn::AsnSequenceComponent::Presence getComponentPresence() const;
+    /**
+     * @brief Getter for present when-property of visited component.
+     *
+     * @return present-when property of visited component.
+     */
+    QString presentWhen() const;
 
 private:
     model::PromelaModel &m_promelaModel;
@@ -92,6 +106,8 @@ private:
     std::optional<QString> m_componentName;
     std::optional<model::DataType> m_componentType;
     bool m_optionalComponent;
+    Asn1Acn::AsnSequenceComponent::Presence m_presence;
+    QString m_presentWhen;
     int m_nestedIndexCounter;
 };
 }
