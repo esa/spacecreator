@@ -1723,15 +1723,14 @@ void tst_Asn1ToPromelaTranslator::testSequenceSubtyping()
         QVERIFY(childBAssignValue);
         QCOMPARE(childBAssignValue->getArguments().size(), 2);
         const auto &sequence = childBAssignValue->getSequence();
-        QCOMPARE(sequence.getContent().size(), 4);
+        QCOMPARE(sequence.getContent().size(), 3);
 
         const auto abcFieldAssignment = findProctypeElement<InlineCall>(sequence, 0);
         QVERIFY(abcFieldAssignment);
-        const auto testFieldAssignment = findProctypeElement<InlineCall>(sequence, 1);
-        QVERIFY(testFieldAssignment);
-        const auto existAssignment = findProctypeElement<Assignment>(sequence, 2);
+        // NOTE the test field is omitted here
+        const auto existAssignment = findProctypeElement<Assignment>(sequence, 1);
         QVERIFY(existAssignment);
-        const auto check = findProctypeElement<AssertCall>(sequence, 3);
+        const auto check = findProctypeElement<AssertCall>(sequence, 2);
         QVERIFY(check);
         const BinaryExpression *expr = std::get_if<BinaryExpression>(&check->expression().getContent());
         QVERIFY(expr);

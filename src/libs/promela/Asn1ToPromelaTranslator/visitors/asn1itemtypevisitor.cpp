@@ -405,17 +405,22 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
                 alwaysAbsentFields.append(componentVisitor.getComponentName());
             }
 
-            VariableRef dst("dst");
-            dst.appendElement(componentVisitor.getComponentName());
-            VariableRef src("src");
-            src.appendElement(componentVisitor.getComponentName());
+            // if the component is marked as always absent
+            // the field assignment is omitted to do not trigger possible range checks
+            // instead, the exist field is filled and then validated
+            if (componentVisitor.getComponentPresence() != Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent) {
+                VariableRef dst("dst");
+                dst.appendElement(componentVisitor.getComponentName());
+                VariableRef src("src");
+                src.appendElement(componentVisitor.getComponentName());
 
-            const QString inlineName = getAssignValueInlineNameForNestedType(
-                    nestedUtypeName, Escaper::escapePromelaName(componentVisitor.getComponentName()));
-            QList<InlineCall::Argument> arguments;
-            arguments.append(dst);
-            arguments.append(src);
-            sequence.appendElement(InlineCall(inlineName, arguments));
+                const QString inlineName = getAssignValueInlineNameForNestedType(
+                        nestedUtypeName, Escaper::escapePromelaName(componentVisitor.getComponentName()));
+                QList<InlineCall::Argument> arguments;
+                arguments.append(dst);
+                arguments.append(src);
+                sequence.appendElement(InlineCall(inlineName, arguments));
+            }
         }
     }
 
@@ -448,7 +453,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
 
     m_promelaModel.addUtype(nestedUtype);
 
-    // generate checks for always absent/present components
+    // generate checks for always present components
     for (const QString &field : alwaysPresentFields) {
         VariableRef existRef("dst");
         existRef.appendElement(existFieldName);
@@ -459,6 +464,7 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
         sequence.appendElement(AssertCall(expression));
     }
 
+    // generate checks for always absent components
     for (const QString &field : alwaysAbsentFields) {
         VariableRef existRef("dst");
         existRef.appendElement(existFieldName);

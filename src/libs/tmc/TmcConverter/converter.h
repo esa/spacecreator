@@ -168,6 +168,12 @@ public:
      */
     void setSdl2PromelaTimeout(int timeout);
     /**
+     * @brief   Set timeout for external commands used by converter.
+     *
+     * @param   timeout Timeout value.
+     */
+    void setCommandTimeout(int timeout);
+    /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
      * @param   filepaths   Paths to the files
@@ -313,6 +319,7 @@ private:
     std::optional<QString> m_delta;
     bool m_isRealTypeEnabled;
     bool m_isMulticastEnabled;
+    int m_commandTimeout = 12000;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;
@@ -342,6 +349,5 @@ private:
 
     inline static const QString m_opengeodeCommand = "opengeode";
     constexpr static int m_commandStartTimeout = 12000;
-    constexpr static int m_commandTimeout = 12000;
 };
 }

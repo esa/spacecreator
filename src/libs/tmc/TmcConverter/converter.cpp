@@ -109,6 +109,7 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     , m_outputDirectory(outputDirectory)
     , m_isRealTypeEnabled(false)
     , m_isMulticastEnabled(false)
+    , m_commandTimeout(12000)
     , m_numberOfProctypes(0)
     , m_process(new QProcess(this))
     , m_timer(new QTimer(this))
@@ -301,6 +302,11 @@ void TmcConverter::setMulticastEnabled(bool isMulticastEnabled)
 void TmcConverter::setSdl2PromelaTimeout(int timeout)
 {
     m_sdlToPromelaConverter->setSdl2PromelaTimeout(timeout);
+}
+
+void TmcConverter::setCommandTimeout(int timeout)
+{
+    m_commandTimeout = timeout;
 }
 
 void TmcConverter::setRealTypeEnabled(bool isRealTypeEnabled)

@@ -151,6 +151,7 @@ void TmcVerifier::setCCompilerTimeout(int timeout)
 void TmcVerifier::setExternalCommandTimeout(int timeout)
 {
     m_externalCommandTimeout = timeout;
+    m_converter->setCommandTimeout(timeout);
 }
 
 void TmcVerifier::setAdditionalCompilerFlags(QString compilerFlags)
