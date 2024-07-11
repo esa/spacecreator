@@ -319,7 +319,7 @@ private:
     std::optional<QString> m_delta;
     bool m_isRealTypeEnabled;
     bool m_isMulticastEnabled;
-    int m_commandTimeout = 12000;
+    int m_commandTimeout;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;

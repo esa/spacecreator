@@ -306,7 +306,7 @@ void TmcConverter::setSdl2PromelaTimeout(int timeout)
 
 void TmcConverter::setCommandTimeout(int timeout)
 {
-    m_commandTimeout = timeout;
+    m_commandTimeout = timeout * 1000; // convert to ms
 }
 
 void TmcConverter::setRealTypeEnabled(bool isRealTypeEnabled)
