@@ -35,25 +35,29 @@ class Asn1NodeValueGeneratorVisitor : public Asn1Acn::Visitor
 {
 public:
     /**
-     * @brief Constructor.
+     * @brief Create visitor to generate inlines for environment subtypes.
+     * The visitor requires access to iv model to obtain original type.
      *
      * @param   promelaModel    Target promela model
      * @param   asn1Model       ASN.1 model
      * @param   ivModel         Interface View model
      * @param   delta           Space between generated floats
      */
-    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel, const Asn1Acn::Asn1Model *asn1Model,
-            const ivm::IVModel *ivModel, const std::optional<float> &delta = std::nullopt);
+    static Asn1NodeValueGeneratorVisitor generatorForEnvironmentSubtypes(model::PromelaModel &promelaModel,
+            const Asn1Acn::Asn1Model *asn1Model, const ivm::IVModel *ivModel,
+            const std::optional<float> &delta = std::nullopt);
+
     /**
-     * @brief Constructor.
+     * @brief Create visitor do generate inlines for model types.
      *
      * @param   promelaModel    Target promela model
      * @param   typeNames       List of top-level type names to generate value generation inlines
      * @param   delta           Space between generated floats
      */
-    Asn1NodeValueGeneratorVisitor(
-            model::PromelaModel &promelaModel, QStringList typeNames, const std::optional<float> &delta = std::nullopt);
+    static Asn1NodeValueGeneratorVisitor generatorForModelTypes(model::PromelaModel &promelaModel,
+            const QStringList &typeNames, const std::optional<float> &delta = std::nullopt);
 
+public:
     /// @brief Visit Asn1Acn::Definitions
     void visit(const Asn1Acn::Definitions &defs) override;
     /// @brief Visit Asn1Acn::File
@@ -68,16 +72,21 @@ public:
     void visit(const Asn1Acn::Root &root) override;
 
 private:
-    const Asn1Acn::Types::Type *findOverridenType(
-            const QString &subtypeName, const QMap<QString, QString> &mapping) const;
-    QMap<QString, QString> prepareTypeMapping() const;
+    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel, const Asn1Acn::Asn1Model *asn1Model,
+            const ivm::IVModel *ivModel, const std::optional<float> &delta);
+    Asn1NodeValueGeneratorVisitor(
+            model::PromelaModel &promelaModel, QStringList typeNames, const std::optional<float> &delta);
+
+    const Asn1Acn::Types::Type *findOriginalIvParameterType(const QString &subtypeName) const;
+    QMap<QString, QString> prepareEnvironmentSubtypeToIvTypeMap() const;
 
 private:
     model::PromelaModel &m_promelaModel;
     const Asn1Acn::Asn1Model *m_asn1Model;
     const ivm::IVModel *m_ivModel;
     QStringList m_typeNames;
-    bool m_generateSubtypes;
+    bool m_isEnvironmentSubtype;
     std::optional<float> m_delta;
+    QMap<QString, QString> m_environmentSubtypeToIvTypeMapping;
 };
 }

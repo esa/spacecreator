@@ -94,9 +94,9 @@ static auto translateAsnToPromela(const QString &inputAsnFilename, const QString
         const QString &actualOutputFilename) -> void;
 static auto compareTextFiles(const QString &actualOutputFilename, const QString &expectedOutputFilename) -> void;
 
-void tst_Asn1ToPromelaTranslator_Env::initTestCase() {}
+void tst_Asn1ToPromelaTranslator_Env::initTestCase() { }
 
-void tst_Asn1ToPromelaTranslator_Env::cleanupTestCase() {}
+void tst_Asn1ToPromelaTranslator_Env::cleanupTestCase() { }
 
 void tst_Asn1ToPromelaTranslator_Env::testBoolean() const
 {
@@ -112,7 +112,8 @@ void tst_Asn1ToPromelaTranslator_Env::testBoolean() const
 
     PromelaModel promelaModel;
     const QStringList typesToTranslate = { "MyBoolean" };
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
+    Asn1NodeValueGeneratorVisitor visitor =
+            Asn1NodeValueGeneratorVisitor::generatorForModelTypes(promelaModel, typesToTranslate);
     visitor.visit(*asn1Model);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 1);
@@ -177,7 +178,8 @@ void tst_Asn1ToPromelaTranslator_Env::testInteger() const
     PromelaModel promelaModel;
     QStringList typesToTranslate;
     typesToTranslate.append(QString("MyInteger"));
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
+    Asn1NodeValueGeneratorVisitor visitor =
+            Asn1NodeValueGeneratorVisitor::generatorForModelTypes(promelaModel, typesToTranslate);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 1);
@@ -255,7 +257,8 @@ void tst_Asn1ToPromelaTranslator_Env::testEnumerated() const
     PromelaModel promelaModel;
     QStringList typesToTranslate;
     typesToTranslate.append(QString("MyType"));
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, typesToTranslate);
+    Asn1NodeValueGeneratorVisitor visitor =
+            Asn1NodeValueGeneratorVisitor::generatorForModelTypes(promelaModel, typesToTranslate);
     visitor.visit(*model);
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 1);
@@ -476,7 +479,8 @@ void translateAsnToPromela(
     QVERIFY(!asnModel->data().empty());
 
     PromelaModel promelaModel;
-    Asn1NodeValueGeneratorVisitor visitor(promelaModel, asnTypesToTranslate);
+    Asn1NodeValueGeneratorVisitor visitor =
+            Asn1NodeValueGeneratorVisitor::generatorForModelTypes(promelaModel, asnTypesToTranslate);
     const auto &asnFile = *asnModel->data().front();
     visitor.visit(asnFile);
 

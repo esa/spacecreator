@@ -46,25 +46,17 @@ using shared::InterfaceParameter;
 
 namespace promela::translator {
 
-Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel, const Asn1Model *asn1Model,
-        const IVModel *ivModel, const std::optional<float> &delta)
-    : m_promelaModel(promelaModel)
-    , m_asn1Model(asn1Model)
-    , m_ivModel(ivModel)
-    , m_generateSubtypes(true)
-    , m_delta(delta)
+Asn1NodeValueGeneratorVisitor Asn1NodeValueGeneratorVisitor::generatorForEnvironmentSubtypes(
+        model::PromelaModel &promelaModel, const Asn1Acn::Asn1Model *asn1Model, const ivm::IVModel *ivModel,
+        const std::optional<float> &delta)
 {
+    return Asn1NodeValueGeneratorVisitor(promelaModel, asn1Model, ivModel, delta);
 }
 
-Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(
-        PromelaModel &promelaModel, QStringList typeNames, const std::optional<float> &delta)
-    : m_promelaModel(promelaModel)
-    , m_asn1Model(nullptr)
-    , m_ivModel(nullptr)
-    , m_typeNames(std::move(typeNames))
-    , m_generateSubtypes(false)
-    , m_delta(delta)
+Asn1NodeValueGeneratorVisitor Asn1NodeValueGeneratorVisitor::generatorForModelTypes(
+        model::PromelaModel &promelaModel, const QStringList &typeNames, const std::optional<float> &delta)
 {
+    return Asn1NodeValueGeneratorVisitor(promelaModel, std::move(typeNames), delta);
 }
 
 void Asn1NodeValueGeneratorVisitor::visit(const Definitions &defs)
@@ -83,13 +75,12 @@ void Asn1NodeValueGeneratorVisitor::visit(const File &file)
 
 void Asn1NodeValueGeneratorVisitor::visit(const TypeAssignment &type)
 {
-    if (m_generateSubtypes) {
-        QMap<QString, QString> mapping = prepareTypeMapping();
+    if (m_isEnvironmentSubtype) {
+        const auto originalParameterType = findOriginalIvParameterType(type.name());
 
-        const auto overridenType = findOverridenType(type.name(), mapping);
-
-        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), overridenType, m_delta);
+        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), originalParameterType, m_delta);
         type.type()->accept(typeVisitor);
+
     } else if (m_typeNames.contains(type.name())) {
         Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), nullptr, m_delta);
         type.type()->accept(typeVisitor);
@@ -111,10 +102,32 @@ void Asn1NodeValueGeneratorVisitor::visit(const Root &root)
     Q_UNUSED(root);
 }
 
-const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(
-        const QString &subtypeName, const QMap<QString, QString> &mapping) const
+Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel, const Asn1Model *asn1Model,
+        const IVModel *ivModel, const std::optional<float> &delta)
+    : m_promelaModel(promelaModel)
+    , m_asn1Model(asn1Model)
+    , m_ivModel(ivModel)
+    , m_isEnvironmentSubtype(true)
+    , m_delta(delta)
 {
-    for (auto iter = mapping.constBegin(); iter != mapping.constEnd(); ++iter) {
+    m_environmentSubtypeToIvTypeMapping = prepareEnvironmentSubtypeToIvTypeMap();
+}
+
+Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(
+        PromelaModel &promelaModel, QStringList typeNames, const std::optional<float> &delta)
+    : m_promelaModel(promelaModel)
+    , m_asn1Model(nullptr)
+    , m_ivModel(nullptr)
+    , m_typeNames(std::move(typeNames))
+    , m_isEnvironmentSubtype(false)
+    , m_delta(delta)
+{
+}
+
+const Type *Asn1NodeValueGeneratorVisitor::findOriginalIvParameterType(const QString &subtypeName) const
+{
+    for (auto iter = m_environmentSubtypeToIvTypeMapping.constBegin();
+            iter != m_environmentSubtypeToIvTypeMapping.constEnd(); ++iter) {
         if (subtypeName.compare(iter.key(), Qt::CaseSensitivity::CaseInsensitive) == 0) {
             const QString &ivParameterTypeName = iter.value();
             for (const auto &asn1File : m_asn1Model->data()) {
@@ -129,7 +142,7 @@ const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(
     return nullptr;
 }
 
-QMap<QString, QString> Asn1NodeValueGeneratorVisitor::prepareTypeMapping() const
+QMap<QString, QString> Asn1NodeValueGeneratorVisitor::prepareEnvironmentSubtypeToIvTypeMap() const
 {
     QMap<QString, QString> result;
 

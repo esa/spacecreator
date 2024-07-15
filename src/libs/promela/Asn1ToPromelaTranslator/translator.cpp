@@ -122,14 +122,17 @@ std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generat
 
     auto promelaModel = std::make_unique<PromelaDataModel>();
     for (const std::unique_ptr<File> &file : asn1Model->data()) {
-        const auto subtypesFilepathFound = std::find_if(subtypesFilepaths.begin(), subtypesFilepaths.end(),
+        const bool isEnvironmentSubtype = std::any_of(subtypesFilepaths.begin(), subtypesFilepaths.end(),
                 [&](const auto &filepath) { return filepath == file->name(); });
 
-        if (subtypesFilepathFound == subtypesFilepaths.end()) {
-            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, typeNames, delta);
+        if (isEnvironmentSubtype) {
+            Asn1NodeValueGeneratorVisitor visitor = Asn1NodeValueGeneratorVisitor::generatorForEnvironmentSubtypes(
+                    *promelaModel, asn1Model, ivModel, delta);
             visitor.visit(*file);
+
         } else {
-            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, asn1Model, ivModel, delta);
+            Asn1NodeValueGeneratorVisitor visitor =
+                    Asn1NodeValueGeneratorVisitor::generatorForModelTypes(*promelaModel, typeNames, delta);
             visitor.visit(*file);
         }
     }
