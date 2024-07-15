@@ -20,15 +20,17 @@ mkdir $TEST_OUTPUT_DIR
 # Translate
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -o $TEST_OUTPUT_DIR \
-	-scl $PROPERTIES_DIR/validation/validation.scl \
-	-sub $SUBTYPES_DIR/test-subtype.asn
+    -scl $PROPERTIES_DIR/validation/validation.scl \
+    -sub $SUBTYPES_DIR/test-subtype.asn
 
 $ASN1SCC -uPER -typePrefix asn1Scc -renamePolicy 3 -c -o "${TEST_OUTPUT_DIR}" "${RESOURCE_DIR}/work/dataview/dataview-uniq.asn"
 
+# If subtypes are working correctly, the verifier shouldn't find any errors.
+# Otherwise, the verifier shall find that stop condition is not true.
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
     && $CC -o system.out *.c \
-	&& ./system.out -m1000000 -n > system.output \
+    && ./system.out -m1000000 -n > system.output \
     && grep -q "errors: 0" system.output \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR

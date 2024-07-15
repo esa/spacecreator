@@ -48,7 +48,7 @@ public:
             const std::optional<float> &delta = std::nullopt);
 
     /**
-     * @brief Create visitor do generate inlines for model types.
+     * @brief Create visitor to generate inlines for model types.
      *
      * @param   promelaModel    Target promela model
      * @param   typeNames       List of top-level type names to generate value generation inlines
@@ -85,7 +85,7 @@ private:
     const Asn1Acn::Asn1Model *m_asn1Model;
     const ivm::IVModel *m_ivModel;
     QStringList m_typeNames;
-    bool m_isEnvironmentSubtype;
+    bool m_generateEnvironmentSubtype;
     std::optional<float> m_delta;
     QMap<QString, QString> m_environmentSubtypeToIvTypeMapping;
 };

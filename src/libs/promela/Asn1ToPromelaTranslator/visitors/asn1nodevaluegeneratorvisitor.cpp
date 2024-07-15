@@ -75,7 +75,7 @@ void Asn1NodeValueGeneratorVisitor::visit(const File &file)
 
 void Asn1NodeValueGeneratorVisitor::visit(const TypeAssignment &type)
 {
-    if (m_isEnvironmentSubtype) {
+    if (m_generateEnvironmentSubtype) {
         const auto originalParameterType = findOriginalIvParameterType(type.name());
 
         Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), originalParameterType, m_delta);
@@ -107,7 +107,7 @@ Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &prome
     : m_promelaModel(promelaModel)
     , m_asn1Model(asn1Model)
     , m_ivModel(ivModel)
-    , m_isEnvironmentSubtype(true)
+    , m_generateEnvironmentSubtype(true)
     , m_delta(delta)
 {
     m_environmentSubtypeToIvTypeMapping = prepareEnvironmentSubtypeToIvTypeMap();
@@ -119,7 +119,7 @@ Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(
     , m_asn1Model(nullptr)
     , m_ivModel(nullptr)
     , m_typeNames(std::move(typeNames))
-    , m_isEnvironmentSubtype(false)
+    , m_generateEnvironmentSubtype(false)
     , m_delta(delta)
 {
 }
