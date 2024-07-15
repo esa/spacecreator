@@ -1,0 +1,34 @@
+default_attributes.xml
+
+*.msc
+*.aadl
+.cache/
+*.pro.user
+
+# Ignore whole tmc directory
+tmc/*
+
+# Ignore whole work directory
+work/*
+
+# Except simulation directory
+!work/simulation/
+
+# Except dataview-uniq.asn
+!work/dataview/
+work/dataview/*
+!work/dataview/dataview-uniq.asn
+
+# Except modelchecking directory
+!work/modelchecking/
+
+# Except sat source
+!work/sat/
+work/sat/*
+!work/sat/SDL
+work/sat/SDL/*
+!work/sat/SDL/src
+work/sat/SDL/src/*
+!work/sat/SDL/src/sat.pr
+!work/sat/SDL/src/system_structure.pr
+!work/sat/SDL/src/sat_datamodel.asn

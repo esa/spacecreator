@@ -36,6 +36,7 @@ private Q_SLOTS:
     void test_octetstring_fixed_size();
     void test_octetstring();
     void test_octetstring_sequenceof();
+    void test_name_matching();
 };
 
 void tst_Tmc_Subtyping::test_external_proc()
@@ -83,6 +84,12 @@ void tst_Tmc_Subtyping::test_octetstring()
 void tst_Tmc_Subtyping::test_octetstring_sequenceof()
 {
     const int result = system("./test_octetstring_with_sequenceof.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping::test_name_matching()
+{
+    const int result = system("./test_name_matching.sh");
     QCOMPARE(result, 0);
 }
 

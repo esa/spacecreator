@@ -1,0 +1,7 @@
+NAME-MATCHING-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10)
+
+END
+

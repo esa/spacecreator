@@ -68,7 +68,9 @@ public:
     void visit(const Asn1Acn::Root &root) override;
 
 private:
-    const Asn1Acn::Types::Type *findOverridenType(const QString &subtypeName) const;
+    const Asn1Acn::Types::Type *findOverridenType(
+            const QString &subtypeName, const QMap<QString, QString> &mapping) const;
+    QMap<QString, QString> prepareTypeMapping() const;
 
 private:
     model::PromelaModel &m_promelaModel;

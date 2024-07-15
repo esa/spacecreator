@@ -1,0 +1,7 @@
+GROUND-STATION-SUBTYPE DEFINITIONS ::=
+BEGIN
+   IMPORTS MyInteger FROM NAME-MATCHING-DATAVIEW;
+
+   Ground-Station-test-param-p1-value ::= MyInteger (0 .. 5)
+
+END

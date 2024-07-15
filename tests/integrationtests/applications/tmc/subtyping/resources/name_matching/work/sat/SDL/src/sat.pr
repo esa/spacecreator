@@ -1,0 +1,37 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+
+process Sat;
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (436, 283), (170, 140) */
+    dcl param MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Idle;
+    /* CIF state (801, 194), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Idle;
+        /* CIF input (768, 249), (135, 35) */
+        input test_param(param);
+            /* CIF decision (795, 304), (81, 50) */
+            decision param < 6;
+                /* CIF ANSWER (846, 374), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (846, 417), (70, 35) */
+                    NEXTSTATE Busy;
+                /* CIF ANSWER (756, 374), (70, 23) */
+                (true):
+                    /* CIF NEXTSTATE (756, 417), (70, 35) */
+                    NEXTSTATE Idle;
+            enddecision;
+    endstate;
+    /* CIF state (1229, 196), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Busy;
+        /* CIF input (1196, 251), (135, 35) */
+        input test_param(param);
+            /* CIF NEXTSTATE (1229, 306), (70, 35) */
+            NEXTSTATE Busy;
+    endstate;
+endprocess Sat;

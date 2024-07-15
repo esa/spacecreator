@@ -1260,10 +1260,10 @@ QString IvToPromelaGenerator::handleParameterSubtype(const QString &parameterTyp
     auto parameterSubtypeName = buildParameterSubtypeName(functionName, interfaceName, parameterName);
 
     for (const auto definitions : m_context.subtypesDefinitions()) {
-        const auto parameterSubtype = definitions->type(parameterSubtypeName);
-
-        if (parameterSubtype != nullptr) {
-            return Escaper::escapePromelaName(parameterSubtypeName);
+        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &type : definitions->types()) {
+            if (type->name().compare(parameterSubtypeName, Qt::CaseSensitivity::CaseInsensitive) == 0) {
+                return Escaper::escapePromelaName(type->name());
+            }
         }
     }
 
