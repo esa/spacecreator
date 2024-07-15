@@ -31,4 +31,5 @@ work/sat/SDL/*
 work/sat/SDL/src/*
 !work/sat/SDL/src/sat.pr
 !work/sat/SDL/src/system_structure.pr
+!work/sat/SDL/src/dataview-uniq.asn
 !work/sat/SDL/src/sat_datamodel.asn
