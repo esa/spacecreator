@@ -838,7 +838,7 @@ QFileInfo TmcConverter::sdlFunctionContextLocation(const QString &functionName) 
 void TmcConverter::convertNextFunction()
 {
     if (m_functionsToConvert.empty()) {
-        convertNextMscObserver();
+        convertMscPropertiesToObservers();
         return;
     }
 
@@ -857,7 +857,7 @@ void TmcConverter::convertNextFunction()
     return;
 }
 
-void TmcConverter::convertNextMscObserver()
+void TmcConverter::convertMscPropertiesToObservers()
 {
     while (!m_mscObserversToConvert.empty()) {
         const QString mscFilePath = m_mscObserversToConvert.front();

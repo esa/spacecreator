@@ -283,7 +283,7 @@ private:
     QFileInfo sdlFunctionContextLocation(const QString &functionName) const;
     QFileInfo outputFilepath(const QString &name);
     void convertNextFunction();
-    void convertNextMscObserver();
+    void convertMscPropertiesToObservers();
     void prepareNextObserverDatamodel();
     void convertNextObserver();
     void attachNextObserver();
