@@ -614,54 +614,6 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
             { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::PromelaSystem, {}, std::move(options));
 }
 
-bool TmcConverter::convertMscObservers(const QString &ivFilePath)
-{
-    for (const QString &mscFilePath : m_mscObserverFiles) {
-        QFileInfo mscFile(mscFilePath);
-
-        if (!mscFile.exists()) {
-            Q_EMIT message(QString("MSC file %1 doesn't exist\n").arg(mscFilePath));
-            return false;
-        }
-
-        const auto outputDir = mscFile.dir();
-        const auto &outputPath = outputDir.path() + QDir::separator();
-
-        Options options;
-        if (m_isRealTypeEnabled) {
-            options.add(PromelaOptions::enhancedSpinSupport);
-            options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
-        }
-        options.add(MscOptions::inputFilepath, mscFilePath);
-        options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
-        options.add(IvOptions::inputFilepath, ivFilePath);
-        options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
-        options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
-        options.add(SdlOptions::filepathPrefix, outputPath);
-
-        Q_EMIT message(QString("Converting MSC file %1 to an SDL observer\n").arg(mscFilePath));
-
-        if (!convertModel({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl, {},
-                    std::move(options))) {
-            return false;
-        }
-
-        m_timer->setSingleShot(true);
-        m_timer->start(m_commandStartTimeout);
-
-        m_process->setWorkingDirectory(outputPath);
-
-        for (const auto &sdlFileName : QDir(outputPath).entryList({ "*.pr" })) {
-            generateObserverDatamodel(*m_process, sdlFileName);
-
-            const auto sdlFilePath = outputPath + sdlFileName;
-            m_observerInfos.emplace_back(ObserverInfo(sdlFilePath, 1));
-        }
-    }
-
-    return true;
-}
-
 void TmcConverter::generateObserverDatamodel(QProcess &process, const QString &sdlFileName)
 {
     QStringList arguments;
@@ -907,61 +859,69 @@ void TmcConverter::convertNextFunction()
 
 void TmcConverter::convertNextMscObserver()
 {
-    if (m_mscObserversToConvert.empty()) {
-        std::copy(m_observerInfos.begin(), m_observerInfos.end(), std::back_inserter(m_observersToConvert));
-        convertNextObserver();
-        return;
+    while (!m_mscObserversToConvert.empty()) {
+        const QString mscFilePath = m_mscObserversToConvert.front();
+        m_mscObserversToConvert.pop_front();
+
+        QFileInfo mscFile(mscFilePath);
+
+        if (!mscFile.exists()) {
+            Q_EMIT message(QString("MSC file %1 doesn't exist\n").arg(mscFilePath));
+            Q_EMIT conversionFinished(false);
+            return;
+        }
+
+        const auto outputDir = mscFile.dir();
+        const auto &outputPath = outputDir.path() + QDir::separator();
+
+        Options options;
+
+        options.add(MscOptions::inputFilepath, mscFilePath);
+        options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
+        options.add(IvOptions::inputFilepath, m_outputOptimizedIvFileName);
+        options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
+        options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
+        options.add(SdlOptions::filepathPrefix, outputPath);
+
+        Q_EMIT message(QString("Converting MSC file %1 to an SDL observer\n").arg(mscFilePath));
+
+        if (!convertModel({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl, {},
+                    std::move(options))) {
+            return;
+        }
+
+        QStringList sdlFiles = QDir(outputPath).entryList({ "*.pr" });
+        for (const auto &sdlFileName : sdlFiles) {
+            const auto sdlFilePath = outputPath + sdlFileName;
+            m_observerInfos.emplace_back(ObserverInfo(sdlFilePath, 1));
+        }
     }
 
-    const QString mscFilePath = m_mscObserversToConvert.front();
-    m_mscObserversToConvert.pop_front();
-
-    QFileInfo mscFile(mscFilePath);
-
-    if (!mscFile.exists()) {
-        Q_EMIT message(QString("MSC file %1 doesn't exist\n").arg(mscFilePath));
-        Q_EMIT conversionFinished(false);
-        return;
-    }
-
-    const auto outputDir = mscFile.dir();
-    const auto &outputPath = outputDir.path() + QDir::separator();
-
-    Options options;
-
-    options.add(MscOptions::inputFilepath, mscFilePath);
-    options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
-    options.add(IvOptions::inputFilepath, m_outputOptimizedIvFileName);
-    options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
-    options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
-    options.add(SdlOptions::filepathPrefix, outputPath);
-
-    Q_EMIT message(QString("Converting MSC file %1 to an SDL observer\n").arg(mscFilePath));
-
-    if (!convertModel({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl, {},
-                std::move(options))) {
-        return;
-    }
-
-    m_process->setWorkingDirectory(outputPath);
-
-    for (const auto &sdlFileName : QDir(outputPath).entryList({ "*.pr" })) {
-        m_timer->setSingleShot(true);
-        m_timer->start(m_commandStartTimeout);
-        generateObserverDatamodel(*m_process, sdlFileName);
-
-        const auto sdlFilePath = outputPath + sdlFileName;
-        m_observerInfos.emplace_back(ObserverInfo(sdlFilePath, 1));
-    }
+    std::copy(m_observerInfos.begin(), m_observerInfos.end(), std::back_inserter(m_observersToConvert));
+    prepareNextObserverDatamodel();
 }
 
-void TmcConverter::convertNextObserver()
+void TmcConverter::prepareNextObserverDatamodel()
 {
     if (m_observersToConvert.empty()) {
         generateCDataview();
         return;
     }
+
     const ObserverInfo info = m_observersToConvert.front();
+
+    QFileInfo observerFile(info.path());
+    m_process->setWorkingDirectory(observerFile.absolutePath());
+
+    m_timer->setSingleShot(true);
+    m_timer->start(m_commandStartTimeout);
+    generateObserverDatamodel(*m_process, observerFile.fileName());
+}
+
+void TmcConverter::convertNextObserver()
+{
+    const ObserverInfo info = m_observersToConvert.front();
+
     integrateObserver(info, m_observerNames, m_asn1Files, m_allSdlFiles);
 }
 
@@ -989,7 +949,7 @@ void TmcConverter::attachNextObserver()
         return;
     }
 
-    convertNextObserver();
+    prepareNextObserverDatamodel();
 }
 
 void TmcConverter::generateCDataview()
@@ -1150,7 +1110,7 @@ void TmcConverter::processFinished(int exitCode, QProcess::ExitStatus exitStatus
         Q_EMIT conversionFinished(false);
         return;
     }
-    convertNextMscObserver();
+    convertNextObserver();
 }
 
 void TmcConverter::timeout()
