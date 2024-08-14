@@ -1117,10 +1117,11 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers()
                 }
 
                 if (!parameterType.isEmpty()) {
-                    const QString name = QString("%1_%2_%3").arg(observerName).arg(toFunction).arg(parameterName);
-                    inlineArguments.append(name);
-                    const QString messageVariableName = globalMessageName(name);
-                    temporaryVariableName = globalTemporaryVariableName(name);
+                    const QString argumentName =
+                            QString("%1_%2_%3").arg(observerName).arg(observerInterface).arg(parameterName);
+                    inlineArguments.append(argumentName);
+                    const QString messageVariableName = globalMessageName(argumentName);
+                    temporaryVariableName = globalTemporaryVariableName(argumentName);
 
                     Declaration messageVariableDecl =
                             Declaration(DataType(UtypeRef(messageTypeName(parameterType))), messageVariableName);
@@ -1132,7 +1133,7 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers()
 
                     sendParams.append(Expression(VariableRef(messageVariableName)));
                     m_ccodeGenerator.generateConversionFromParameterToBuffer(
-                            sequence, name, parameterType, temporaryVariableName, messageVariableName);
+                            sequence, argumentName, parameterType, temporaryVariableName, messageVariableName);
                 } else {
                     sendParams.append(Expression(Constant(1)));
                 }

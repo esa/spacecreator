@@ -329,7 +329,7 @@ QString Asn1TypeHelper::octetStringAssignmentFromPromelaToC(const Asn1Acn::Types
     QString result = QString("int i = 0;\n"
                              "for(i = 0; i < %1; ++i)\n"
                              "{\n"
-                             "%2.arr[i] = %3.data[1];\n"
+                             "%2.arr[i] = %3.data[i];\n"
                              "}\n")
                              .arg(constraintVisitor.getMaxSize())
                              .arg(m_target)
@@ -527,6 +527,12 @@ QList<VariableRef> Asn1TypeHelper::sequenceOfListOfFields(const Asn1Acn::Types::
     QList<VariableRef> result;
     size_t itemCount = constraintVisitor.getMaxSize();
 
+    if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
+        VariableRef ref(m_target);
+        ref.appendElement("length");
+        result.append(std::move(ref));
+    }
+
     for (size_t index = 0; index < itemCount; ++index) {
         for (const VariableRef &field : fieldsOfItem) {
             VariableRef ref = field;
@@ -534,12 +540,6 @@ QList<VariableRef> Asn1TypeHelper::sequenceOfListOfFields(const Asn1Acn::Types::
             ref.prependElement(m_target);
             result.append(std::move(ref));
         }
-    }
-
-    if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
-        VariableRef ref(m_target);
-        ref.appendElement("length");
-        result.append(std::move(ref));
     }
 
     return result;
@@ -577,15 +577,15 @@ QList<promela::model::VariableRef> Asn1TypeHelper::octetStringListOfFields(const
 
     size_t itemCount = constraintVisitor.getMaxSize();
 
-    for (size_t index = 0; index < itemCount; ++index) {
-        VariableRef ref = VariableRef(m_target);
-        ref.appendElement("data", std::make_unique<Expression>(Constant(index)));
-        result.append(std::move(ref));
-    }
-
     if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
         VariableRef ref(m_target);
         ref.appendElement("length");
+        result.append(std::move(ref));
+    }
+
+    for (size_t index = 0; index < itemCount; ++index) {
+        VariableRef ref = VariableRef(m_target);
+        ref.appendElement("data", std::make_unique<Expression>(Constant(index)));
         result.append(std::move(ref));
     }
 
@@ -601,15 +601,15 @@ QList<promela::model::VariableRef> Asn1TypeHelper::ia5StringListOfFields(const A
 
     size_t itemCount = constraintVisitor.getMaxSize();
 
-    for (size_t index = 0; index < itemCount; ++index) {
-        VariableRef ref = VariableRef(m_target);
-        ref.appendElement("data", std::make_unique<Expression>(Constant(index)));
-        result.append(std::move(ref));
-    }
-
     if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
         VariableRef ref(m_target);
         ref.appendElement("length");
+        result.append(std::move(ref));
+    }
+
+    for (size_t index = 0; index < itemCount; ++index) {
+        VariableRef ref = VariableRef(m_target);
+        ref.appendElement("data", std::make_unique<Expression>(Constant(index)));
         result.append(std::move(ref));
     }
 
