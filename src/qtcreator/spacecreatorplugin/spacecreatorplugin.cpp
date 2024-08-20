@@ -41,6 +41,7 @@
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
+#include <QStandardPaths>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
@@ -151,6 +152,17 @@ void SpaceCreatorPlugin::addHelp()
     });
     Core::Command *showIveHelp = Core::ActionManager::registerAction(iveHelpAction, Constants::IV_HELP_ID, allContexts);
     actions->addAction(showIveHelp);
+
+    // Add directory to search for *.qch help files
+    static const QString DOC_PATHS = "Help/InstalledDocumentation";
+    QSettings qSettings;
+    QStringList docDirs = qSettings.value(DOC_PATHS).toStringList();
+    const QString spaceCreatorDocDir = QString("%1/tool-inst/share/doc/SpaceCreator")
+                                               .arg(QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
+    if (!docDirs.contains(spaceCreatorDocDir)) {
+        docDirs.append(spaceCreatorDocDir);
+        qSettings.setValue(DOC_PATHS, docDirs);
+    }
 }
 
 void SpaceCreatorPlugin::setupTasteLanguageClients()
