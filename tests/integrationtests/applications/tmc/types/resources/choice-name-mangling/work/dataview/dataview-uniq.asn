@@ -1,0 +1,96 @@
+BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 3) -- small range for modelchecking
+
+   MySecondInteger ::= INTEGER ( -1 .. 1 ) -- small range for modelchecking
+
+   ForceWithTemperature ::= SEQUENCE {
+       force MyInteger,
+       temperature MySecondInteger
+   }
+
+   ForceDetailed ::= SEQUENCE {
+       force MyInteger,
+       force-translate-factor MyInteger
+   }
+
+   ALPHA-PUS300-test-Instruction ::= CHOICE
+   {
+      with-temperature-present ForceWithTemperature,
+      with-temperature-absent ForceDetailed
+   }
+
+END
+
+
+TASTE-BasicTypes DEFINITIONS ::=
+BEGIN
+
+-- Set of TASTE predefined basic types
+
+T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
+
+T-UInt32 ::= INTEGER (0 .. 4294967295)
+
+T-Int8 ::= INTEGER (-128 .. 127)
+
+T-UInt8 ::= INTEGER (0 .. 255)
+
+T-Boolean ::= BOOLEAN
+
+T-Null-Record ::= SEQUENCE {}
+
+T-Runtime-Error ::= CHOICE {
+   noerror T-UInt32, -- this shall be NULL, but DMT does not support NULL and SEDS does not support empty sequences
+   encodeerror T-Int32, -- the names shall be changed after fix in seds converter (space creator) will be merged
+   decodeerror T-Int32
+}
+
+END
+
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..2)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       actuator,
+       
+       environ,
+       
+       
+       env
+   }
+
+END
+
+ENVIRON-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyInteger FROM BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW
+
+
+ALPHA-PUS300-test-Instruction FROM BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW
+
+ ;
+
+
+
+
+Environ-response-the-value ::= MyInteger
+
+
+
+
+Environ-perform-test-instruction ::= ALPHA-PUS300-test-Instruction
+
+
+
+
+END
+

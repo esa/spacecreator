@@ -1,0 +1,25 @@
+default_attributes.xml
+
+*.aadl
+.cache/
+*.pro.user
+
+# Ignore whole work directory
+work/*
+
+# Except dataview-uniq.asn
+!work/dataview/
+work/dataview/*
+!work/dataview/dataview-uniq.asn
+
+# Except actuator source
+!work/actuator/
+work/actuator/*
+!work/actuator/SDL
+work/actuator/SDL/*
+!work/actuator/SDL/Context-actuator.asn
+!work/actuator/SDL/src
+work/actuator/SDL/src/*
+!work/actuator/SDL/src/actuator.pr
+!work/actuator/SDL/src/system_structure.pr
+!work/actuator/SDL/src/dataview-uniq.asn

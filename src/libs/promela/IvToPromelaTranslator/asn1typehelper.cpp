@@ -68,7 +68,7 @@ QString Asn1TypeHelper::createAssignmentTemplateFromPromelaToC(const QString &ty
         throw TranslationException(std::move(message));
     }
 
-    return createAssignmentTemplateFromPromelaToC(typeName, type->type());
+    return createAssignmentTemplateFromPromelaToC(Escaper::escapeCName(typeName), type->type());
 }
 
 QString Asn1TypeHelper::createAssignmentTemplateFromCToPromela(const QString &typeName)
@@ -79,7 +79,7 @@ QString Asn1TypeHelper::createAssignmentTemplateFromCToPromela(const QString &ty
         throw TranslationException(std::move(message));
     }
 
-    return createAssignmentTemplateFromCToPromela(typeName, type->type());
+    return createAssignmentTemplateFromCToPromela(Escaper::escapeCName(typeName), type->type());
 }
 
 QList<Asn1TypeHelper::PrintfTemplate> Asn1TypeHelper::generatePrintfTemplate(const QString &typeName)
@@ -476,7 +476,7 @@ QString Asn1TypeHelper::ia5StringAssignmentFromCToPromela(const Asn1Acn::Types::
                              .arg(m_source);
 
     if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
-        result.append(QString("%1.length = strlen(%2)';\n").arg(m_target, m_source));
+        result.append(QString("%1.length = strlen(%2);\n").arg(m_target, m_source));
     }
 
     return result;

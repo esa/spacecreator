@@ -1,0 +1,25 @@
+BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 3) -- small range for modelchecking
+
+   MySecondInteger ::= INTEGER ( -1 .. 1 ) -- small range for modelchecking
+
+   ForceWithTemperature ::= SEQUENCE {
+       force MyInteger,
+       temperature MySecondInteger
+   }
+
+   ForceDetailed ::= SEQUENCE {
+       force MyInteger,
+       force-translate-factor MyInteger
+   }
+
+   ALPHA-PUS300-test-Instruction ::= CHOICE
+   {
+      with-temperature-present ForceWithTemperature,
+      with-temperature-absent ForceDetailed
+   }
+
+END
+

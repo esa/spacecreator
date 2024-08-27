@@ -1,0 +1,48 @@
+<InterfaceView version="1.3" asn1file="builtin_present_name_mangling.acn" UiFile="interfaceview.ui.xml" modifierHash="fac5c679a">
+<Function id="{2213f5de-5737-4a96-baa9-de2c32862a5e}" name="actuator" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{8dda24a1-9f6b-4303-8d35-907d05e8e151}" name="perform_test" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="instruction" type="ALPHA-PUS300-test-Instruction" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{62329928-ebfe-484c-9d5c-9ddbb8ae9c20}" name="response" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="the_value" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{78aa1219-e007-4ac7-80c1-982a381a32f1}" name="environ" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{f0d15670-0d18-4058-846f-bb7dd3ccd7ec}" name="response" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="the_value" type="MyInteger" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{c5a936a5-3ee4-4845-8e7d-2b8b5792cdd4}" name="perform_test" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" wcet="0" priority="1" queue_size="1">
+    <Input_Parameter name="instruction" type="ALPHA-PUS300-test-Instruction" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection id="{9a7e8595-2349-441c-90ff-65737d9ca93a}" name="environ_perform_test____actuator_perform_test" required_system_element="NO">
+    <Source iface_id="{c5a936a5-3ee4-4845-8e7d-2b8b5792cdd4}" func_name="environ" ri_name="perform_test" />
+    <Target iface_id="{8dda24a1-9f6b-4303-8d35-907d05e8e151}" func_name="actuator" pi_name="perform_test" />
+</Connection>
+
+<Connection id="{6bfaf7d7-6ac3-4650-bd5e-5f5c5e3997af}" name="actuator_response____environ_response" required_system_element="NO">
+    <Source iface_id="{62329928-ebfe-484c-9d5c-9ddbb8ae9c20}" func_name="actuator" ri_name="response" />
+    <Target iface_id="{f0d15670-0d18-4058-846f-bb7dd3ccd7ec}" func_name="environ" pi_name="response" />
+</Connection>
+
+<Layer name="default" is_visible="true"/>
+
+</InterfaceView>
