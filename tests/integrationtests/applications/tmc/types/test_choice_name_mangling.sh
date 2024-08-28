@@ -10,7 +10,7 @@ ASN1SCC=asn1scc
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
-RESOURCE_DIR=resources/name-mangling-value-generation
+RESOURCE_DIR=resources/choice-name-mangling
 
 echo "Running TMC test: ${0##*/}"
 
