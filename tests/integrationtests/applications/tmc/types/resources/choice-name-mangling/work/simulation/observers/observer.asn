@@ -1,0 +1,267 @@
+Actuator-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   MyInteger, MySecondInteger, ForceWithTemperature, ForceDetailed, ALPHA-PUS300-test-Instruction FROM BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record, T-Runtime-Error FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview;
+
+Actuator-States ::= ENUMERATED {wait}
+
+Actuator-Context ::= SEQUENCE {
+   state Actuator-States,
+   init-done BOOLEAN,
+   sender PID,
+   offspring PID,
+   instruction ALPHA-PUS300-test-Instruction
+}
+
+Actuator-Alpha-Pus300-Test-Instruction-Selection ::= ENUMERATED {with-temperature-present-present(1), with-temperature-absent-present(2)}
+Actuator-T-Runtime-Error-Selection ::= ENUMERATED {noerror-present(1), encodeerror-present(2), decodeerror-present(3)}
+END
+
+BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 3) -- small range for modelchecking
+
+   MySecondInteger ::= INTEGER ( -1 .. 1 ) -- small range for modelchecking
+
+   ForceWithTemperature ::= SEQUENCE {
+       force MyInteger,
+       temperature MySecondInteger
+   }
+
+   ForceDetailed ::= SEQUENCE {
+       force MyInteger,
+       force-translate-factor MyInteger
+   }
+
+   ALPHA-PUS300-test-Instruction ::= CHOICE
+   {
+      with-temperature-present ForceWithTemperature,
+      with-temperature-absent ForceDetailed
+   }
+
+END
+
+
+TASTE-BasicTypes DEFINITIONS ::=
+BEGIN
+
+-- Set of TASTE predefined basic types
+
+T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
+
+T-UInt32 ::= INTEGER (0 .. 4294967295)
+
+T-Int8 ::= INTEGER (-128 .. 127)
+
+T-UInt8 ::= INTEGER (0 .. 255)
+
+T-Boolean ::= BOOLEAN
+
+T-Null-Record ::= SEQUENCE {}
+
+T-Runtime-Error ::= CHOICE {
+   noerror T-UInt32, -- this shall be NULL, but DMT does not support NULL and SEDS does not support empty sequences
+   encodeerror T-Int32, -- the names shall be changed after fix in seds converter (space creator) will be merged
+   decodeerror T-Int32
+}
+
+END
+
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..2)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       actuator,
+       
+       environ,
+       
+       
+       env
+   }
+
+END
+
+ENVIRON-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyInteger FROM BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW
+
+
+ALPHA-PUS300-test-Instruction FROM BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW
+
+ ;
+
+
+
+
+Environ-response-the-value ::= MyInteger
+
+
+
+
+Environ-perform-test-instruction ::= ALPHA-PUS300-test-Instruction
+
+
+
+
+END
+
+
+Simulation-DataView DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      
+      --  ASN.1 modules used by thread actuator_perform_test
+      ALPHA-PUS300-test-Instruction FROM BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW
+      
+      
+      --  ASN.1 modules used by thread environ_response
+      MyInteger FROM BUILTIN-PRESENT-NAME-MANGLING-DATAVIEW
+      
+      -- Import generic integer type (used for timers)
+      T-UInt32 FROM TASTE-BasicTypes
+      PID      FROM System-Dataview
+      -- Import timers
+      AggregateTimerData FROM Simulation-Timers-DataView
+      --  Import the SDL function states needed for the global system state
+      Actuator-Context FROM Actuator-Datamodel
+   ;
+
+   --  Simulator needs to knows about cyclic interfaces
+   Periodic-Event {Event-Ty} ::= SEQUENCE {
+      period INTEGER (0 .. 500000),  -- Upper limit is arbitrary
+      event  Event-Ty
+   }
+
+   --  To keep a constant list of events.
+   Periodic-Events {Event-Ty, INTEGER:max} ::=
+      SEQUENCE (SIZE (0 .. max)) OF Periodic-Event {Event-Ty}
+
+   
+   
+   
+   Actuator-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         perform-test SEQUENCE { instruction ALPHA-PUS300-test-Instruction}
+      },
+      msg-out CHOICE {
+         response SEQUENCE { the-value MyInteger }
+      }
+   }
+   
+   Environ-Event ::= CHOICE {
+      msg-in CHOICE {
+         response SEQUENCE { the-value MyInteger}
+      },
+      msg-out CHOICE {
+         perform-test SEQUENCE { instruction ALPHA-PUS300-test-Instruction }
+      }
+   }
+   
+
+   --  Current observer state flag (used by model checkers)
+   Observer-State-Kind ::= ENUMERATED {
+      regular-state,
+      error-state,
+      ignore-state,
+      success-state
+   }
+
+   --  Event related to the execution of a PI or call of a RI in the functional code
+   Function-Event ::= CHOICE {
+      actuator Actuator-Event,
+      environ  Environ-Event
+   }
+
+   --  Type used to store events in a database: associate a name to the event
+   Named-Function-Event ::= SEQUENCE {
+      id    IA5String (SIZE (1..80)),
+      event Function-Event
+   }
+
+   --  Event at interface level (PI or RI), including source and destination ID
+   Interface-Event ::= SEQUENCE {
+      source PID,
+      dest   PID,
+      event  Function-Event
+   }
+
+   --  Event generated when a function uses the CREATE symbol to start an instance
+   Create-Event  ::= SEQUENCE {
+      source PID,  --  parent
+      dest   PID   --  offspring
+   }
+
+   -- Event generated when a previously CREATed instance terminates
+   Delete-Event ::= SEQUENCE {
+      instance PID
+   }
+
+   --  Event sent to the observers
+   Observable-Event ::= CHOICE {
+      no-event        SEQUENCE {},
+      system-startup  SEQUENCE {},
+      input-event     Interface-Event,   --  input event is evaluated after the transition
+      output-event    Interface-Event,   --  output event is evaluated before the message is sent
+      unhandled-input Interface-Event,   --  message received in a state where it is not expected
+      create-instance Create-Event,      --  sent after the instance creation
+      delete-instance Delete-Event
+   }
+
+   --  constant that can be used to refer to the absence of an input/output event
+   nothing Observable-Event ::= no-event : {}
+
+   --  Define a queue of events, corresponding to the input queue for each function
+   max-events INTEGER ::= 10
+   Events-Ty ::= SEQUENCE (SIZE (0 .. max-events)) OF Observable-Event
+
+   --  Global system state (excluding observers, which are defined later)
+   actuator-queue-size INTEGER ::= 2
+
+   System-State ::= SEQUENCE {
+      --  Timers
+      timers AggregateTimerData,
+      --  Message queues
+      actuator-queue Events-Ty (SIZE (0 .. actuator-queue-size)),
+
+      actuator  Actuator-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      environ
+   }
+
+END
+
+Simulation-Timers-DataView DEFINITIONS ::=
+BEGIN
+
+   TimerData ::= SEQUENCE {
+      timer-enabled BOOLEAN,
+      interval INTEGER (0 .. 50000)
+   }
+
+   AggregateTimerData ::= SEQUENCE {
+      
+      
+      
+      actuator SEQUENCE {
+      },
+      
+      dummy-entry SEQUENCE {}
+   }
+
+END
+

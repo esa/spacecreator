@@ -12,6 +12,13 @@ work/*
 work/dataview/*
 !work/dataview/dataview-uniq.asn
 
+# Except observer.asn
+!work/simulation/
+work/simulation/*
+!work/simulation/observers/
+work/simulation/observers/*
+!work/simulation/observers/observer.asn
+
 # Except actuator source
 !work/actuator/
 work/actuator/*
