@@ -145,7 +145,7 @@ QString Asn1TypeHelper::createAssignmentTemplateFromPromelaToC(
 
     case Asn1Acn::Types::Type::ASN1Type::USERDEFINED: {
         const Asn1Acn::Types::UserdefinedType *t = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(type);
-        return createAssignmentTemplateFromPromelaToC(t->typeName(), t->type());
+        return createAssignmentTemplateFromPromelaToC(Escaper::escapeCName(t->typeName()), t->type());
     }
 
     default:
@@ -184,7 +184,7 @@ QString Asn1TypeHelper::createAssignmentTemplateFromCToPromela(
 
     case Asn1Acn::Types::Type::ASN1Type::USERDEFINED: {
         const Asn1Acn::Types::UserdefinedType *t = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(type);
-        return createAssignmentTemplateFromCToPromela(t->typeName(), t->type());
+        return createAssignmentTemplateFromCToPromela(Escaper::escapeCName(t->typeName()), t->type());
     }
 
     default:
