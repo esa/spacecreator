@@ -172,8 +172,8 @@ private:
     template<typename ValueType>
     auto handleOverridenType(const QString &typeName,
             const Asn1Acn::Constraints::ConstraintList<ValueType> &constraints, const QString &initInlineName,
-            const QString &valueName, const size_t minSize, const size_t maxSize, model::Sequence *sequence) const
-            -> void;
+            const QString &valueName, const QString &iteratorName, const size_t minSize, const size_t maxSize,
+            model::Sequence *sequence) const -> void;
 
 private:
     model::PromelaModel &m_promelaModel;

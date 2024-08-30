@@ -21,6 +21,7 @@
 
 #include <promela/PromelaModel/assignment.h>
 #include <promela/PromelaModel/basictypes.h>
+#include <promela/PromelaModel/booleanconstant.h>
 #include <promela/PromelaModel/constant.h>
 #include <promela/PromelaModel/datatype.h>
 #include <promela/PromelaModel/declaration.h>
@@ -28,20 +29,28 @@
 #include <promela/PromelaModel/inlinecall.h>
 
 using promela::model::Assignment;
+using promela::model::BooleanConstant;
 using promela::model::Constant;
 using promela::model::Declaration;
+using promela::model::Expression;
 using promela::model::ForLoop;
 using promela::model::InlineCall;
+using promela::model::ProctypeElement;
 using promela::model::Sequence;
+using promela::model::VariableRef;
 
 namespace promela::translator {
 
 std::unique_ptr<ProctypeElement> ProctypeMaker::makeInlineCall(
-        const QString &inlineName, const QString &argumentName, const QString &memberName)
+        const QString &inlineName, const VariableRef &argumentName, VariableRef memberName)
 {
-    const QString inlineCallArgument =
-            memberName.isEmpty() ? argumentName : QString("%1.%2").arg(argumentName).arg(memberName);
-    const QList<InlineCall::Argument> args({ inlineCallArgument });
+    VariableRef argument = argumentName;
+    for (VariableRef::Element &element : memberName.takeElements()) {
+        argument.appendElement(std::move(element));
+    }
+
+    QList<InlineCall::Argument> args;
+    args.emplaceBack(std::move(argument));
 
     auto inlineCall = InlineCall(inlineName, args);
     return std::make_unique<ProctypeElement>(std::move(inlineCall));
@@ -54,7 +63,7 @@ std::unique_ptr<Sequence> ProctypeMaker::makeNormalSequence()
 
 std::unique_ptr<ProctypeElement> ProctypeMaker::makeTrueExpressionProctypeElement()
 {
-    return std::make_unique<ProctypeElement>(Expression(VariableRef("true")));
+    return std::make_unique<ProctypeElement>(Expression(BooleanConstant(true)));
 }
 
 std::unique_ptr<ProctypeElement> ProctypeMaker::makeAssignmentProctypeElement(
@@ -79,20 +88,22 @@ std::unique_ptr<ProctypeElement> ProctypeMaker::makeForLoop(const VariableRef &v
 }
 
 std::unique_ptr<ProctypeElement> ProctypeMaker::makeCallForEachValue(const QString &functionToCallName,
-        const QString &valueName, const Expression &iteratorEndValue, const QString &iteratorVariableName)
+        const VariableRef &objectName, const Expression &iteratorEndValue, const QString &iteratorVariableName)
 {
     auto innerSequence = ProctypeMaker::makeNormalSequence();
-    innerSequence->appendElement(ProctypeMaker::makeInlineCall(functionToCallName, valueName, "data[i]"));
+    VariableRef memberName = VariableRef("data", std::make_unique<Expression>(VariableRef(iteratorVariableName)));
+    innerSequence->appendElement(ProctypeMaker::makeInlineCall(functionToCallName, objectName, std::move(memberName)));
 
     return makeForLoop(VariableRef(iteratorVariableName), Expression(0), iteratorEndValue, std::move(innerSequence));
 }
 
 std::unique_ptr<ProctypeElement> ProctypeMaker::makeCallForEachValue(const QString &functionToCallName,
-        const QString &valueName, const Expression &iteratorStartValue, const Expression &iteratorEndValue,
+        const VariableRef &objectName, const Expression &iteratorStartValue, const Expression &iteratorEndValue,
         const QString &iteratorVariableName)
 {
     auto innerSequence = ProctypeMaker::makeNormalSequence();
-    innerSequence->appendElement(ProctypeMaker::makeInlineCall(functionToCallName, valueName, "data[i]"));
+    VariableRef memberName = VariableRef("data", std::make_unique<Expression>(VariableRef(iteratorVariableName)));
+    innerSequence->appendElement(ProctypeMaker::makeInlineCall(functionToCallName, objectName, std::move(memberName)));
 
     return makeForLoop(
             VariableRef(iteratorVariableName), iteratorStartValue, iteratorEndValue, std::move(innerSequence));

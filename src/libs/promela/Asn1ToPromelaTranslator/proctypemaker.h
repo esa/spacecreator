@@ -27,11 +27,6 @@
 #include <promela/PromelaModel/sequence.h>
 #include <promela/PromelaModel/variableref.h>
 
-using promela::model::BasicType;
-using promela::model::Expression;
-using promela::model::ProctypeElement;
-using promela::model::VariableRef;
-
 namespace promela::translator {
 /**
  * @brief Make promela proctype element entities
@@ -43,13 +38,13 @@ public:
      * @brief make ProctypeElement with InlineCall with one argument
      *
      * @param inlineName     name of selected inline
-     * @param argumentName   name of a variable to be passed as call argument
-     * @param memberName     name of a member of the structure (optional)
+     * @param argumentName   reference to be passed as call argument
+     * @param memberName     reference of a member of the structure, assuming that argumentName is structure (optional)
      *
      * @return  ProctypeElement with specified InlineCall
      */
-    static auto makeInlineCall(const QString &inlineName, const QString &argumentName, const QString &memberName = "")
-            -> std::unique_ptr<ProctypeElement>;
+    static auto makeInlineCall(const QString &inlineName, const promela::model::VariableRef &argumentName,
+            promela::model::VariableRef memberName) -> std::unique_ptr<promela::model::ProctypeElement>;
 
     /**
      * @brief make empty promela Sequence of NORMAL type
@@ -63,7 +58,7 @@ public:
      *
      * @return ProctypeElement with Expression with value "true"
      */
-    static auto makeTrueExpressionProctypeElement() -> std::unique_ptr<ProctypeElement>;
+    static auto makeTrueExpressionProctypeElement() -> std::unique_ptr<promela::model::ProctypeElement>;
 
     /**
      * @brief make ProctypeElement with Assignment
@@ -73,8 +68,8 @@ public:
      *
      * @return ProctypeElement with specified Assignment
      */
-    static auto makeAssignmentProctypeElement(const QString &variableName, const Expression::Value &value)
-            -> std::unique_ptr<ProctypeElement>;
+    static auto makeAssignmentProctypeElement(const QString &variableName,
+            const promela::model::Expression::Value &value) -> std::unique_ptr<promela::model::ProctypeElement>;
 
     /**
      * @brief make ProctypeElement with a variable declaration
@@ -85,7 +80,7 @@ public:
      * @return ProctypeElement with specified specified variable declaration
      */
     static auto makeVariableDeclaration(const model::BasicType &variableType, const QString &variableName)
-            -> std::unique_ptr<ProctypeElement>;
+            -> std::unique_ptr<promela::model::ProctypeElement>;
 
     /**
      * @brief make ProctypeElement with a for loop
@@ -97,36 +92,37 @@ public:
      *
      * @return ProctypeElement with specified for loop
      */
-    static auto makeForLoop(const VariableRef &variable, const Expression &first, const Expression &last,
-            std::unique_ptr<model::Sequence> sequence) -> std::unique_ptr<ProctypeElement>;
+    static auto makeForLoop(const promela::model::VariableRef &variable, const promela::model::Expression &first,
+            const promela::model::Expression &last, std::unique_ptr<model::Sequence> sequence)
+            -> std::unique_ptr<promela::model::ProctypeElement>;
 
     /**
      * @brief make ProctypeElement with a for loop with specified characteristics
      *
      * @param functionToCallName    function to be called in loop's body
-     * @param valueName             name of the accessed value
+     * @param objectName            reference to the variable with elements to iterate
      * @param iteratorEndValue      last value of iterator (inclusive)
      * @param iteratorVariableName  name of iterator variable
      *
      * @return ProctypeElement with specified for loop
      */
-    static auto makeCallForEachValue(const QString &functionToCallName, const QString &valueName,
-            const Expression &iteratorEndValue, const QString &iteratorVariableName = "i")
-            -> std::unique_ptr<ProctypeElement>;
+    static auto makeCallForEachValue(const QString &functionToCallName, const promela::model::VariableRef &objectName,
+            const promela::model::Expression &iteratorEndValue, const QString &iteratorVariableName)
+            -> std::unique_ptr<promela::model::ProctypeElement>;
     /**
      * @brief make ProctypeElement with a for loop with specified characteristics
      *
      * @param functionToCallName    function to be called in loop's body
-     * @param valueName             name of the accessed value
+     * @param objectName            reference to the variable with elements to iterate
      * @param iteratorStartValue    first value of iterator (inclusive)
      * @param iteratorEndValue      last value of iterator (inclusive)
      * @param iteratorVariableName  name of iterator variable
      *
      * @return ProctypeElement with specified for loop
      */
-    static auto makeCallForEachValue(const QString &functionToCallName, const QString &valueName,
-            const Expression &iteratorStartValue, const Expression &iteratorEndValue,
-            const QString &iteratorVariableName = "i") -> std::unique_ptr<ProctypeElement>;
+    static auto makeCallForEachValue(const QString &functionToCallName, const promela::model::VariableRef &objectName,
+            const promela::model::Expression &iteratorStartValue, const promela::model::Expression &iteratorEndValue,
+            const QString &iteratorVariableName) -> std::unique_ptr<promela::model::ProctypeElement>;
 };
 
 } // namespace promela::translator

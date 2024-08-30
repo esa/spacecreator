@@ -46,6 +46,13 @@ public:
         Element(QString name, std::unique_ptr<Expression> index);
 
         /**
+         * @brief Move constructor.
+         *
+         * @param other The other object.
+         */
+        Element(Element &&other);
+
+        /**
          * @brief Name of variable reference element.
          */
         QString m_name;
@@ -54,6 +61,12 @@ public:
          */
         std::unique_ptr<Expression> m_index;
     };
+
+    /**
+     * @brief Default constructor.
+     * Constructs empty object.
+     */
+    VariableRef();
 
     /**
      * @brief Constructor.
@@ -116,6 +129,13 @@ public:
     void appendElement(QString ref, std::unique_ptr<Expression> indexExpression);
 
     /**
+     * @brief Append single element to the variable reference.
+     *
+     * @param element element to append.
+     */
+    void appendElement(VariableRef::Element element);
+
+    /**
      * @brief Prepend single name element to the variable reference.
      *
      * @param ref Name of element to prepend.
@@ -147,9 +167,25 @@ public:
     /**
      * @brief Getter for elements to variable reference.
      *
-     * @retun List of variable reference elements.
+     * @return List of variable reference elements.
      */
     const std::list<Element> &getElements() const noexcept;
+
+    /**
+     * @brief Take elements of variable reference.
+     * After this, the variable reference will be empty, caller is new owner of elements.
+     *
+     * @returns a list of elements.
+     */
+    std::list<Element> takeElements();
+
+    /**
+     * @brief Check if variable reference is empty.
+     * The empty variable reference does not have any elements.
+     *
+     * @return True if object is empty, otherwise false.
+     */
+    bool isEmpty() const noexcept;
 
 private:
     // QString m_ref;
