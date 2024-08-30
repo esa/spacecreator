@@ -1,0 +1,11 @@
+NESTED-SEQUENCEOF-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 1)
+
+   LowSequenceOf ::= SEQUENCE (SIZE(2)) OF MyInteger
+
+   HighSequenceOf ::= SEQUENCE (SIZE(2)) OF LowSequenceOf
+
+END
+

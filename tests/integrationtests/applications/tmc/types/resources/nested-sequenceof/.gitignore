@@ -1,0 +1,32 @@
+default_attributes.xml
+
+*.aadl
+.cache/
+*.pro.user
+
+# Ignore whole work directory
+work/*
+
+# Except dataview-uniq.asn
+!work/dataview/
+work/dataview/*
+!work/dataview/dataview-uniq.asn
+
+# Except observer.asn
+!work/simulation/
+work/simulation/*
+!work/simulation/observers/
+work/simulation/observers/*
+!work/simulation/observers/observer.asn
+
+# Except example_model source
+!work/example_model/
+work/example_model/*
+!work/example_model/SDL
+work/example_model/SDL/*
+!work/example_model/SDL/src
+work/example_model/SDL/src/*
+!work/example_model/SDL/src/example_model.pr
+!work/example_model/SDL/src/system_structure.pr
+!work/example_model/SDL/src/example_model_datamodel.asn
+!work/example_model/SDL/src/dataview-uniq.asn
