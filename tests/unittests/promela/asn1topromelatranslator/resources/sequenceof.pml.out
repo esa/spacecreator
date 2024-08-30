@@ -10,9 +10,9 @@ inline Type1_generate_value(Type1_gv)
 }
 inline SimpleFixedSizeSequenceOf_generate_value(SimpleFixedSizeSequenceOf_gv)
 {
-    int i;
-    for(i : 0 .. 3)
+    int SimpleFixedSizeSequenceOf_it;
+    for(SimpleFixedSizeSequenceOf_it : 0 .. 3)
     {
-        Type1_generate_value(SimpleFixedSizeSequenceOf_gv.data[i]);
+        Type1_generate_value(SimpleFixedSizeSequenceOf_gv.data[SimpleFixedSizeSequenceOf_it]);
     }
 }

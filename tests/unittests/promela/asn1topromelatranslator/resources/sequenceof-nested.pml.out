@@ -10,17 +10,17 @@ inline INTEGER_generate_value(INTEGER_gv)
 }
 inline Type1_generate_value(Type1_gv)
 {
-    int i;
-    for(i : 0 .. 2)
+    int Type1_it;
+    for(Type1_it : 0 .. 2)
     {
-        INTEGER_generate_value(Type1_gv.data[i]);
+        INTEGER_generate_value(Type1_gv.data[Type1_it]);
     }
 }
 inline SimpleFixedSizeSequenceOf_generate_value(SimpleFixedSizeSequenceOf_gv)
 {
-    int i;
-    for(i : 0 .. 3)
+    int SimpleFixedSizeSequenceOf_it;
+    for(SimpleFixedSizeSequenceOf_it : 0 .. 3)
     {
-        Type1_generate_value(SimpleFixedSizeSequenceOf_gv.data[i]);
+        Type1_generate_value(SimpleFixedSizeSequenceOf_gv.data[SimpleFixedSizeSequenceOf_it]);
     }
 }

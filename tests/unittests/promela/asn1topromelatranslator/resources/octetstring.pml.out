@@ -10,9 +10,9 @@ inline OctetStringElement_generate_value(OctetStringElement_gv)
 }
 inline MyOctetString_generate_value(MyOctetString_gv)
 {
-    int i;
-    for(i : 0 .. 5)
+    int MyOctetString_it;
+    for(MyOctetString_it : 0 .. 5)
     {
-        OctetStringElement_generate_value(MyOctetString_gv.data[i]);
+        OctetStringElement_generate_value(MyOctetString_gv.data[MyOctetString_it]);
     }
 }
