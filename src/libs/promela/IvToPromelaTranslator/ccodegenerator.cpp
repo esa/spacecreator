@@ -38,7 +38,7 @@ using promela::model::VariableRef;
 namespace promela::translator {
 CCodeGenerator::CCodeGenerator(const Asn1Acn::Asn1Model *asn1Model, const std::set<QString> &messageTypes)
 {
-    Asn1TypeHelper helper(asn1Model, "$target$", "$source$");
+    Asn1TypeHelper helper(asn1Model, "$target$", "$source$", 0);
     for (const QString &messageType : messageTypes) {
         m_templatesFromPromelaToC.insert(messageType, helper.createAssignmentTemplateFromPromelaToC(messageType));
         m_templatesFromCToPromela.insert(messageType, helper.createAssignmentTemplateFromCToPromela(messageType));

@@ -37,7 +37,7 @@ public:
     };
 
 public:
-    Asn1TypeHelper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source);
+    Asn1TypeHelper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source, size_t nestingLevel);
 
     QString createAssignmentTemplateFromPromelaToC(const QString &typeName);
     QString createAssignmentTemplateFromCToPromela(const QString &typeName);
@@ -69,10 +69,12 @@ private:
     QList<promela::model::VariableRef> ia5StringListOfFields(const Asn1Acn::Types::IA5String *type);
 
     QString addIndent(const QString &text);
+    QString createIteratorVariableName();
 
 private:
     const Asn1Acn::Asn1Model *m_asn1Model;
     const QString m_target;
     const QString m_source;
+    const size_t m_nestingLevel;
 };
 }

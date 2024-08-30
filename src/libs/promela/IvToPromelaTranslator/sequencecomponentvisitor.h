@@ -38,7 +38,7 @@ public:
 
 public:
     SequenceComponentVisitor(Operation operation, const Asn1Acn::Asn1Model *asn1Model, QString target, QString source,
-            QString sequenceName);
+            QString sequenceName, size_t nestingLevel);
 
     void visit(const Asn1Acn::AsnSequenceComponent &component) override;
     void visit(const Asn1Acn::AcnSequenceComponent &component) override;
@@ -55,6 +55,7 @@ private:
     const QString m_target;
     const QString m_source;
     const QString m_sequenceName;
+    const size_t m_nestingLevel;
     bool m_componentVisited;
     QString m_componentName;
     bool m_isOptional;

@@ -32,12 +32,13 @@ using conversion::Escaper;
 using promela::common::PromelaNameHelper;
 
 SequenceComponentVisitor::SequenceComponentVisitor(Operation operation, const Asn1Acn::Asn1Model *asn1Model,
-        QString target, QString source, const QString sequenceName)
+        QString target, QString source, const QString sequenceName, size_t nestingLevel)
     : m_operation(operation)
     , m_asn1Model(asn1Model)
     , m_target(std::move(target))
     , m_source(std::move(source))
     , m_sequenceName(std::move(sequenceName))
+    , m_nestingLevel(nestingLevel)
     , m_componentVisited(false)
     , m_isOptional(false)
     , m_content()
@@ -50,7 +51,8 @@ void SequenceComponentVisitor::visit(const Asn1Acn::AsnSequenceComponent &compon
     m_componentName = Escaper::escapeCName(component.name());
     m_isOptional = component.isOptional();
 
-    Asn1TypeHelper helper(m_asn1Model, m_target + "." + m_componentName, m_source + "." + m_componentName);
+    Asn1TypeHelper helper(
+            m_asn1Model, m_target + "." + m_componentName, m_source + "." + m_componentName, m_nestingLevel);
 
     switch (m_operation) {
     case Operation::FROM_PROMELA_TO_C:
@@ -62,7 +64,7 @@ void SequenceComponentVisitor::visit(const Asn1Acn::AsnSequenceComponent &compon
                 PromelaNameHelper::createChildTypeNameForCCode(m_sequenceName, m_componentName), component.type());
         break;
     case Operation::LIST_PROMELA_FIELDS: {
-        Asn1TypeHelper fieldHelper(m_asn1Model, m_target, "");
+        Asn1TypeHelper fieldHelper(m_asn1Model, m_target, "", m_nestingLevel);
         m_fields = fieldHelper.generateListOfFields(component.type());
     } break;
     }

@@ -53,10 +53,11 @@ namespace promela::translator {
 // This helper can generate a flat list of references to atomic promela types, what can be
 // used to printf value of complex types.
 // The code is generated recursively for components of complex types.
-Asn1TypeHelper::Asn1TypeHelper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source)
+Asn1TypeHelper::Asn1TypeHelper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source, size_t nestingLevel)
     : m_asn1Model(asn1Model)
     , m_target(std::move(target))
     , m_source(std::move(source))
+    , m_nestingLevel(nestingLevel)
 {
 }
 
@@ -251,8 +252,8 @@ QString Asn1TypeHelper::sequenceAssignmentFromPromelaToC(const QString &cTypeNam
     QString result;
     QList<QString> optionalFields;
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type->components()) {
-        SequenceComponentVisitor visitor(
-                SequenceComponentVisitor::Operation::FROM_PROMELA_TO_C, m_asn1Model, m_target, m_source, cTypeName);
+        SequenceComponentVisitor visitor(SequenceComponentVisitor::Operation::FROM_PROMELA_TO_C, m_asn1Model, m_target,
+                m_source, cTypeName, m_nestingLevel + 1);
         component->accept(visitor);
         if (visitor.hasComponent()) {
             result.append(visitor.getContent());
@@ -274,20 +275,23 @@ QString Asn1TypeHelper::sequenceOfAssignmentFromPromelaToC(
     SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
 
+    QString iteratorName = createIteratorVariableName();
     QString elementType = PromelaNameHelper::createChildTypeNameForCCode(
             cTypeName, PromelaConstants::sequenceOfElementTypeNameSuffix);
-    Asn1TypeHelper helper(m_asn1Model, m_target + ".arr[i]", m_source + ".data[i]");
+    Asn1TypeHelper helper(m_asn1Model, QString("%1.arr[%2]").arg(m_target).arg(iteratorName),
+            QString("%1.data[%2]").arg(m_source).arg(iteratorName), m_nestingLevel + 1);
     QString itemAssignment = addIndent(helper.createAssignmentTemplateFromPromelaToC(elementType, type->itemsType()));
 
     // generate a for loop to copy values of all elements of array
     // use the itemAssignment, which is a code generated for element type
-    QString result = QString("int i = 0;\n"
-                             "for(i = 0; i < %1; ++i)\n"
+    QString result = QString("int %3 = 0;\n"
+                             "for(%3 = 0; %3 < %1; ++%3)\n"
                              "{\n"
                              "%2"
                              "}\n")
                              .arg(constraintVisitor.getMaxSize())
-                             .arg(itemAssignment);
+                             .arg(itemAssignment)
+                             .arg(iteratorName);
 
     if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
         result.append(QString("%1.nCount = %2.length;\n").arg(m_target, m_source));
@@ -306,7 +310,8 @@ QString Asn1TypeHelper::choiceAssignmentFromPromelaToC(const QString &cTypeName,
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
         QString componentName = Escaper::escapeCName(component->name());
         QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, componentName);
-        Asn1TypeHelper helper(m_asn1Model, m_target + ".u." + componentName, m_source + ".data." + componentName);
+        Asn1TypeHelper helper(
+                m_asn1Model, m_target + ".u." + componentName, m_source + ".data." + componentName, m_nestingLevel + 1);
         QString assignment = addIndent(helper.createAssignmentTemplateFromPromelaToC(elementType, component->type()));
         QString prefix = index == 1 ? "" : "else ";
         result += QString("%1if(%3.selection == %4_%5_PRESENT)\n"
@@ -326,14 +331,17 @@ QString Asn1TypeHelper::octetStringAssignmentFromPromelaToC(const Asn1Acn::Types
     SizeConstraintVisitor<OctetStringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
 
-    QString result = QString("int i = 0;\n"
-                             "for(i = 0; i < %1; ++i)\n"
+    QString iteratorName = createIteratorVariableName();
+
+    QString result = QString("int %4 = 0;\n"
+                             "for(%4 = 0; %4 < %1; ++%4)\n"
                              "{\n"
-                             "%2.arr[i] = %3.data[i];\n"
+                             "%2.arr[%4] = %3.data[%4];\n"
                              "}\n")
                              .arg(constraintVisitor.getMaxSize())
                              .arg(m_target)
-                             .arg(m_source);
+                             .arg(m_source)
+                             .arg(iteratorName);
 
     if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
         result.append(QString("%1.nCount = %2.length;\n").arg(m_target, m_source));
@@ -347,14 +355,17 @@ QString Asn1TypeHelper::ia5StringAssignmentFromPromelaToC(const Asn1Acn::Types::
     SizeConstraintVisitor<StringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
 
-    QString result = QString("int i = 0;\n"
-                             "for(i = 0; i < %1; ++i)\n"
+    QString iteratorName = createIteratorVariableName();
+
+    QString result = QString("int %4 = 0;\n"
+                             "for(%4 = 0; %4 < %1; ++%4)\n"
                              "{\n"
-                             "%2[i] = %3.data[i];\n"
+                             "%2[%4] = %3.data[%4];\n"
                              "}\n")
                              .arg(constraintVisitor.getMaxSize())
                              .arg(m_target)
-                             .arg(m_source);
+                             .arg(m_source)
+                             .arg(iteratorName);
 
     if (constraintVisitor.getMinSize() == constraintVisitor.getMaxSize()) {
         result.append(QString("%1[%2] = '\\0';\n").arg(m_target).arg(constraintVisitor.getMaxSize()));
@@ -370,8 +381,8 @@ QString Asn1TypeHelper::sequenceAssignmentFromCToPromela(const QString &typeName
     QString result;
     QList<QString> optionalFields;
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type->components()) {
-        SequenceComponentVisitor visitor(
-                SequenceComponentVisitor::Operation::FROM_C_TO_PROMELA, m_asn1Model, m_target, m_source, typeName);
+        SequenceComponentVisitor visitor(SequenceComponentVisitor::Operation::FROM_C_TO_PROMELA, m_asn1Model, m_target,
+                m_source, typeName, m_nestingLevel + 1);
         component->accept(visitor);
         if (visitor.hasComponent()) {
             result.append(visitor.getContent());
@@ -396,18 +407,22 @@ QString Asn1TypeHelper::sequenceOfAssignmentFromCToPromela(
     QString elementType =
             PromelaNameHelper::createChildTypeNameForCCode(typeName, PromelaConstants::sequenceOfElementTypeNameSuffix);
 
-    Asn1TypeHelper helper(m_asn1Model, m_target + ".data[i]", m_source + ".arr[i]");
+    QString iteratorName = createIteratorVariableName();
+
+    Asn1TypeHelper helper(m_asn1Model, QString("%1.data[%2]").arg(m_target).arg(iteratorName),
+            QString("%1.arr[%2]").arg(m_source).arg(iteratorName), m_nestingLevel + 1);
     QString itemAssignment = addIndent(helper.createAssignmentTemplateFromCToPromela(elementType, type->itemsType()));
 
     // generate a for loop to copy values of all elements of array
     // use the itemAssignment, which is a code generated for element type
-    QString result = QString("int i = 0;\n"
-                             "for(i = 0; i < %1; ++i)\n"
+    QString result = QString("int %3 = 0;\n"
+                             "for(%3 = 0; %3 < %1; ++%3)\n"
                              "{\n"
                              "%2"
                              "}\n")
                              .arg(constraintVisitor.getMaxSize())
-                             .arg(itemAssignment);
+                             .arg(itemAssignment)
+                             .arg(iteratorName);
 
     if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
         result.append(QString("%1.length = %2.nCount;\n").arg(m_target, m_source));
@@ -426,7 +441,8 @@ QString Asn1TypeHelper::choiceAssignmentFromCToPromela(const QString &cTypeName,
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
         QString componentName = Escaper::escapeCName(component->name());
         QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, componentName);
-        Asn1TypeHelper helper(m_asn1Model, m_target + ".data." + componentName, m_source + ".u." + componentName);
+        Asn1TypeHelper helper(
+                m_asn1Model, m_target + ".data." + componentName, m_source + ".u." + componentName, m_nestingLevel + 1);
         QString assignment = addIndent(helper.createAssignmentTemplateFromCToPromela(elementType, component->type()));
         QString prefix = index == 1 ? "" : " else ";
         result += QString("%1if(%3.kind == %4_%5_PRESENT)\n"
@@ -445,14 +461,16 @@ QString Asn1TypeHelper::octetStringAssignmentFromCToPromela(const Asn1Acn::Types
 {
     SizeConstraintVisitor<OctetStringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
-    QString result = QString("int i = 0;\n"
-                             "for(i = 0; i < %1; ++i)\n"
+    QString iteratorName = createIteratorVariableName();
+    QString result = QString("int %4 = 0;\n"
+                             "for(%4 = 0; %4 < %1; ++%4)\n"
                              "{\n"
-                             "%2.data[i] = %3.arr[i];\n"
+                             "%2.data[%4] = %3.arr[%4];\n"
                              "}\n")
                              .arg(constraintVisitor.getMaxSize())
                              .arg(m_target)
-                             .arg(m_source);
+                             .arg(m_source)
+                             .arg(iteratorName);
 
     if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
         result.append(QString("%1.length = %2.nCount;\n").arg(m_target, m_source));
@@ -466,14 +484,17 @@ QString Asn1TypeHelper::ia5StringAssignmentFromCToPromela(const Asn1Acn::Types::
     SizeConstraintVisitor<StringValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
 
-    QString result = QString("int i = 0;\n"
-                             "for(i = 0; i < %1; ++i)\n"
+    QString iteratorName = createIteratorVariableName();
+
+    QString result = QString("int %4 = 0;\n"
+                             "for(%4 = 0; %4 < %1; ++%4)\n"
                              "{\n"
-                             "%2.data[i] = %3[i];\n"
+                             "%2.data[%4] = %3[%4];\n"
                              "}\n")
                              .arg(constraintVisitor.getMaxSize())
                              .arg(m_target)
-                             .arg(m_source);
+                             .arg(m_source)
+                             .arg(iteratorName);
 
     if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
         result.append(QString("%1.length = strlen(%2);\n").arg(m_target, m_source));
@@ -488,8 +509,8 @@ QList<VariableRef> Asn1TypeHelper::sequenceListOfFields(const Asn1Acn::Types::Se
     QList<QString> optionalFields;
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type->components()) {
         QString componentName = Escaper::escapePromelaName(component->name());
-        SequenceComponentVisitor visitor(
-                SequenceComponentVisitor::Operation::LIST_PROMELA_FIELDS, m_asn1Model, componentName, "", "");
+        SequenceComponentVisitor visitor(SequenceComponentVisitor::Operation::LIST_PROMELA_FIELDS, m_asn1Model,
+                componentName, "", "", m_nestingLevel + 1);
         component->accept(visitor);
         if (visitor.hasComponent()) {
             QList<VariableRef> fieldsOfElement = visitor.takeListOfFields();
@@ -521,7 +542,7 @@ QList<VariableRef> Asn1TypeHelper::sequenceOfListOfFields(const Asn1Acn::Types::
     SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
 
-    Asn1TypeHelper helper(m_asn1Model, "data", "");
+    Asn1TypeHelper helper(m_asn1Model, "data", "", m_nestingLevel + 1);
     QList<VariableRef> fieldsOfItem = helper.generateListOfFields(type->itemsType());
 
     QList<VariableRef> result;
@@ -550,7 +571,7 @@ QList<VariableRef> Asn1TypeHelper::choiceListOfFields(const Asn1Acn::Types::Choi
     QList<VariableRef> result;
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
         QString componentName = Escaper::escapePromelaName(component->name());
-        Asn1TypeHelper helper(m_asn1Model, componentName, "");
+        Asn1TypeHelper helper(m_asn1Model, componentName, "", m_nestingLevel + 1);
         QList<VariableRef> fieldsOfElement = helper.generateListOfFields(component->type());
 
         while (!fieldsOfElement.empty()) {
@@ -624,5 +645,10 @@ QString Asn1TypeHelper::addIndent(const QString &text)
             [](const QString &l) { return PromelaConstants::baseIndent + l + "\n"; });
 
     return std::accumulate(indentedLines.begin(), indentedLines.end(), QString(""));
+}
+
+QString Asn1TypeHelper::createIteratorVariableName()
+{
+    return QString("c_code_it_%1").arg(m_nestingLevel);
 }
 }
