@@ -1,0 +1,20 @@
+Black-hole-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   MyInteger, MyComplexA, MyBoolean, MyOctetString, MyIA5String, MyEnumerated, MyChoice, MySequence, MyInlineSequence, MySequenceOf FROM CONSTANTS-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record, T-Runtime-Error FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview;
+
+Black-hole-States ::= ENUMERATED {wait}
+
+Black-hole-Context ::= SEQUENCE {
+   state Black-hole-States,
+   init-done BOOLEAN,
+   sender PID,
+   offspring PID
+}
+
+Black-Hole-Mychoice-Selection ::= ENUMERATED {scenario-a-present(1), scenario-b-present(2)}
+Black-Hole-T-Runtime-Error-Selection ::= ENUMERATED {noerror-present(1), encodeerror-present(2), decodeerror-present(3)}
+END

@@ -1,0 +1,32 @@
+default_attributes.xml
+
+*.aadl
+.cache/
+*.pro.user
+
+# Ignore whole work directory
+work/*
+
+# Except dataview-uniq.asn
+!work/dataview/
+work/dataview/*
+!work/dataview/dataview-uniq.asn
+
+# Except observer.asn
+!work/simulation/
+work/simulation/*
+!work/simulation/observers/
+work/simulation/observers/*
+!work/simulation/observers/observer.asn
+
+# Except black_hole source
+!work/black_hole/
+work/black_hole/*
+!work/black_hole/SDL
+work/black_hole/SDL/*
+!work/black_hole/SDL/src
+work/black_hole/SDL/src/*
+!work/black_hole/SDL/src/black_hole.pr
+!work/black_hole/SDL/src/system_structure.pr
+!work/black_hole/SDL/src/black_hole_datamodel.asn
+!work/black_hole/SDL/src/dataview-uniq.asn

@@ -1,0 +1,119 @@
+CONSTANTS-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10)
+
+   MyComplexA ::= SEQUENCE {
+     example-a MyInteger,
+     example-b MyInteger OPTIONAL
+   }
+
+   MyBoolean ::= BOOLEAN
+   MyOctetString ::= OCTET STRING (SIZE(4))
+   MyIA5String ::= IA5String (SIZE(4))
+   MyEnumerated ::= ENUMERATED {
+      option-a, option-b, option-c
+   }
+   MyChoice ::= CHOICE {
+      scenario-a MyInteger,
+      scenario-b MyComplexA
+   }
+   MySequence ::= SEQUENCE {
+      subsystem-a MyInteger,
+      subsystem-b MyComplexA
+   }
+   MyInlineSequence ::= SEQUENCE {
+      configuration-a SEQUENCE { param-a INTEGER (0 .. 100), param-b INTEGER (1 .. 32) },
+      configuration-b MyInteger
+   }
+   MySequenceOf ::= SEQUENCE (SIZE(2)) OF MyComplexA
+
+
+   test-int MyInteger ::= 4
+   test-bool MyBoolean ::= TRUE
+   test-octet-string MyOctetString ::= 'aabbccdd'H
+   test-ia5-string MyIA5String ::= "beta"
+   test-enumerated MyEnumerated ::= option-b
+   test-choice MyChoice ::= scenario-b : { example-a 8, example-b 4 }
+   test-sequence MySequence ::= {
+      subsystem-a 1,
+      subsystem-b { example-a 2, example-b 4 }
+   }
+   test-inline-sequence MyInlineSequence ::= {
+      configuration-a { param-a 0, param-b 2 },
+      configuration-b 4
+   }
+   test-sequence-of MySequenceOf ::= {
+      { example-a 1 },
+      { example-a 2, example-b 4 }
+   }
+END
+
+
+TASTE-BasicTypes DEFINITIONS ::=
+BEGIN
+
+-- Set of TASTE predefined basic types
+
+T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
+
+T-UInt32 ::= INTEGER (0 .. 4294967295)
+
+T-Int8 ::= INTEGER (-128 .. 127)
+
+T-UInt8 ::= INTEGER (0 .. 255)
+
+T-Boolean ::= BOOLEAN
+
+T-Null-Record ::= SEQUENCE {}
+
+T-Runtime-Error ::= CHOICE {
+   noerror T-UInt32, -- this shall be NULL, but DMT does not support NULL and SEDS does not support empty sequences
+   encodeerror T-Int32, -- the names shall be changed after fix in seds converter (space creator) will be merged
+   decodeerror T-Int32
+}
+
+END
+
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..2)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       black-hole,
+       
+       environ,
+       
+       
+       env
+   }
+
+END
+
+ENVIRON-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyInteger FROM CONSTANTS-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Environ-write-data-p1 ::= MyInteger
+
+
+
+
+END
+

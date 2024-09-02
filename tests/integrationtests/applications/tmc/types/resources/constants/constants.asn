@@ -1,0 +1,51 @@
+CONSTANTS-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10)
+
+   MyComplexA ::= SEQUENCE {
+     example-a MyInteger,
+     example-b MyInteger OPTIONAL
+   }
+
+   MyBoolean ::= BOOLEAN
+   MyOctetString ::= OCTET STRING (SIZE(4))
+   MyIA5String ::= IA5String (SIZE(4))
+   MyEnumerated ::= ENUMERATED {
+      option-a, option-b, option-c
+   }
+   MyChoice ::= CHOICE {
+      scenario-a MyInteger,
+      scenario-b MyComplexA
+   }
+   MySequence ::= SEQUENCE {
+      subsystem-a MyInteger,
+      subsystem-b MyComplexA
+   }
+   MyInlineSequence ::= SEQUENCE {
+      configuration-a SEQUENCE { param-a INTEGER (0 .. 100), param-b INTEGER (1 .. 32) },
+      configuration-b MyInteger
+   }
+   MySequenceOf ::= SEQUENCE (SIZE(2)) OF MyComplexA
+
+
+   test-int MyInteger ::= 4
+   test-bool MyBoolean ::= TRUE
+   test-octet-string MyOctetString ::= 'aabbccdd'H
+   test-ia5-string MyIA5String ::= "beta"
+   test-enumerated MyEnumerated ::= option-b
+   test-choice MyChoice ::= scenario-b : { example-a 8, example-b 4 }
+   test-sequence MySequence ::= {
+      subsystem-a 1,
+      subsystem-b { example-a 2, example-b 4 }
+   }
+   test-inline-sequence MyInlineSequence ::= {
+      configuration-a { param-a 0, param-b 2 },
+      configuration-b 4
+   }
+   test-sequence-of MySequenceOf ::= {
+      { example-a 1 },
+      { example-a 2, example-b 4 }
+   }
+END
+

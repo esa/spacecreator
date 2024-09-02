@@ -28,6 +28,7 @@ configure_file(test_sequence.sh test_sequence.sh COPYONLY)
 configure_file(test_sequenceof.sh test_sequenceof.sh COPYONLY)
 configure_file(test_choice_name_mangling.sh test_choice_name_mangling.sh COPYONLY)
 configure_file(test_nested_sequenceof.sh test_nested_sequenceof.sh COPYONLY)
+configure_file(test_constants.sh test_constants.sh COPYONLY)
 add_custom_target(${TEST_NAME}_copy_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources
     DEPENDS ${TEST_NAME})

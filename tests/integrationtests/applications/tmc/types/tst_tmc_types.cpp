@@ -41,6 +41,7 @@ private Q_SLOTS:
     void test_sequenceof();
     void test_choice_name_mangling();
     void test_nested_sequenceof();
+    void test_constants();
 };
 
 void tst_Tmc_Types::test_bool()
@@ -117,7 +118,13 @@ void tst_Tmc_Types::test_choice_name_mangling()
 
 void tst_Tmc_Types::test_nested_sequenceof()
 {
-    const int result = system("./test_choice_name_mangling.sh");
+    const int result = system("./test_nested_sequenceof.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Types::test_constants()
+{
+    const int result = system("./test_constants.sh");
     QCOMPARE(result, 0);
 }
 } // namespace tmc::test

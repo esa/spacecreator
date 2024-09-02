@@ -1,0 +1,33 @@
+<InterfaceView version="1.3" asn1file="constants.acn" UiFile="interfaceview.ui.xml" modifierHash="3859b886d">
+<Function id="{7cbe7f38-842c-4839-9638-9d31d1da66fe}" name="black_hole" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" instances_min="1" startup_priority="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{5dfad176-d8f3-4554-8246-f532be3e69b0}" name="write_data" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" queue_size="1" miat="0" priority="1" wcet="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{bec4e161-ede3-4ff1-9204-cdc43efbeae3}" name="environ" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" instances_min="1" startup_priority="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Required_Interface id="{d3596ca4-b115-407a-b7a2-2d255d8a3751}" name="write_data" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" queue_size="1" miat="0" priority="1" wcet="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection id="{dcb1f622-f6e9-41b0-aca6-7fb30113bf6c}" name="environ_write_data____black_hole_write_data" required_system_element="NO">
+    <Source iface_id="{d3596ca4-b115-407a-b7a2-2d255d8a3751}" func_name="environ" ri_name="write_data" />
+    <Target iface_id="{5dfad176-d8f3-4554-8246-f532be3e69b0}" func_name="black_hole" pi_name="write_data" />
+</Connection>
+
+<Layer name="default" is_visible="true"/>
+
+</InterfaceView>
