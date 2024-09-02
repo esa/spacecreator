@@ -148,7 +148,7 @@ void tst_Asn1ToPromelaTranslator_Values::testSequence() const
         {
             const InlineCall *call = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
             QVERIFY(call != 0);
-            QCOMPARE(call->getName(), "MySeq_field1_assign_value");
+            QCOMPARE(call->getName(), "MySeq__field1_assign_value");
             QCOMPARE(call->getArguments().size(), 2);
             QVERIFY(std::holds_alternative<VariableRef>(call->getArguments().at(0)));
             QCOMPARE(std::get<VariableRef>(call->getArguments().at(0)).getElements().size(), 2);
@@ -177,7 +177,7 @@ void tst_Asn1ToPromelaTranslator_Values::testSequence() const
         {
             const InlineCall *call = findProctypeElement<InlineCall>(inlineDef->getSequence(), 2);
             QVERIFY(call != 0);
-            QCOMPARE(call->getName(), "MySeq_field2_assign_value");
+            QCOMPARE(call->getName(), "MySeq__field2_assign_value");
             QCOMPARE(call->getArguments().size(), 2);
             QVERIFY(std::holds_alternative<VariableRef>(call->getArguments().at(0)));
             QCOMPARE(std::get<VariableRef>(call->getArguments().at(0)).getElements().size(), 2);
