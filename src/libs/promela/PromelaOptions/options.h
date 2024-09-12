@@ -77,6 +77,9 @@ public:
 
     /** @brief Space between two consecutive generated real numbers for real generator */
     inline static const QString realGeneratorDelta = "Promela_RealGeneratorDelta";
+
+    /**  @brief Required system capability. */
+    inline static const QString requiredSystemCapability = "Promela_Convert_RequiredSystemCapability";
 };
 
 }

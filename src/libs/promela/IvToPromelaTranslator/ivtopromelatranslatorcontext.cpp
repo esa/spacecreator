@@ -203,4 +203,14 @@ const std::vector<QString> &IvToPromelaTranslatorContext::getObserversWithContin
 {
     return m_observersWithContinuousSignals;
 }
+
+void IvToPromelaTranslatorContext::setRequiredSystemCapabilities(std::vector<QString> capabilities)
+{
+    m_requiredSystemCapabilities = std::move(capabilities);
+}
+
+const std::vector<QString> &IvToPromelaTranslatorContext::requiredSystemCapabilities() const
+{
+    return m_requiredSystemCapabilities;
+}
 }

@@ -518,11 +518,16 @@ void TmcConverter::integrateObserver(const ObserverInfo &info, QStringList &obse
 
     const auto promelaFilename = Escaper::escapePromelaIV(processName) + ".pml";
     const auto infoPath = outputFilepath(Escaper::escapePromelaIV(processName) + ".info");
+    const QFileInfo outputCapabilitiesFile =
+            outputFilepath(Escaper::escapePromelaIV(processName) + "_capabilities.txt");
     observerNames.append(Escaper::escapePromelaIV(processName));
     allSdlFiles.emplace(processName, meta);
     asn1Files.append(datamodel.absoluteFilePath());
 
-    m_sdlToPromelaConverter->convertObserverSdl(meta, outputFilepath(promelaFilename), infoPath);
+    m_sdlToPromelaConverter->convertObserverSdl(
+            meta, outputFilepath(promelaFilename), infoPath, outputCapabilitiesFile);
+
+    readRequiredSystemCapabilities(outputCapabilitiesFile);
 }
 
 bool TmcConverter::convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles)
@@ -609,6 +614,14 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
     for (const QString &inputFileName : asn1FilepathList) {
         options.add(Asn1Options::inputFilepath, inputFileName);
     }
+
+    QStringList caps;
+    for (const QString &capability : m_requiredSystemCapabilities) {
+        options.add(PromelaOptions::requiredSystemCapability, capability);
+        caps.append(capability);
+    }
+
+    Q_EMIT message(QString("Using following system capabilities: %1\n").arg(caps.join(", ")));
 
     return convertModel(
             { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::PromelaSystem, {}, std::move(options));
@@ -843,15 +856,15 @@ void TmcConverter::convertNextFunction()
     }
 
     const ProcessMetadata processMetadata = m_functionsToConvert.front();
-    m_functionsToConvert.pop_front();
     const QFileInfo outputFile = outputFilepath(processMetadata.getName().toLower() + ".pml");
+    const QFileInfo outputCapabilitiesFile = outputFilepath(processMetadata.getName().toLower() + "_capabilities.txt");
 
     if (m_conversionFinishedConnection) {
         disconnect(m_conversionFinishedConnection);
     }
     m_conversionFinishedConnection = connect(
             m_sdlToPromelaConverter, SIGNAL(conversionFinished(bool)), this, SLOT(functionConversionFinished(bool)));
-    if (!m_sdlToPromelaConverter->convertSdl(processMetadata, outputFile)) {
+    if (!m_sdlToPromelaConverter->convertSdl(processMetadata, outputFile, outputCapabilitiesFile)) {
         Q_EMIT conversionFinished(false);
     }
     return;
@@ -928,8 +941,6 @@ void TmcConverter::convertNextObserver()
 void TmcConverter::attachNextObserver()
 {
     const ObserverInfo info = m_observersToConvert.front();
-    m_observersToConvert.pop_front();
-
     const auto process = QFileInfo(info.path());
     const auto processName = process.baseName();
 
@@ -1009,6 +1020,24 @@ bool TmcConverter::generateMessageSizes(QFileInfo input, QFileInfo output)
     inputFile.close();
 
     return true;
+}
+
+void TmcConverter::readRequiredSystemCapabilities(const QFileInfo &input)
+{
+    QFile file(input.absoluteFilePath());
+    if (file.open(QIODevice::ReadOnly)) {
+        QTextStream in(&file);
+        while (!in.atEnd()) {
+            QString capability = in.readLine().trimmed();
+            Q_EMIT message(QString("Line %1\n").arg(capability));
+            if (!capability.isEmpty()) {
+                m_requiredSystemCapabilities.insert(capability);
+            }
+        }
+        file.close();
+    } else {
+        Q_EMIT message(QString("Cannot open file to read %1\n").arg(input.absoluteFilePath()));
+    }
 }
 
 void TmcConverter::finishConversion()
@@ -1110,6 +1139,13 @@ void TmcConverter::processFinished(int exitCode, QProcess::ExitStatus exitStatus
         Q_EMIT conversionFinished(false);
         return;
     }
+
+    const ObserverInfo info = m_observersToConvert.front();
+    QFileInfo sdlFilePath = QFileInfo(info.path());
+    const QFileInfo outputCapabilitiesFile = outputFilepath(sdlFilePath.baseName().toLower() + "_capabilities.txt");
+    readRequiredSystemCapabilities(outputCapabilitiesFile);
+    m_observersToConvert.pop_front();
+
     convertNextObserver();
 }
 
@@ -1123,6 +1159,12 @@ void TmcConverter::timeout()
 void TmcConverter::functionConversionFinished(bool success)
 {
     if (success) {
+        const ProcessMetadata processMetadata = m_functionsToConvert.front();
+        const QFileInfo outputCapabilitiesFile =
+                outputFilepath(processMetadata.getName().toLower() + "_capabilities.txt");
+        readRequiredSystemCapabilities(outputCapabilitiesFile);
+        m_functionsToConvert.pop_front();
+
         convertNextFunction();
     } else {
         Q_EMIT conversionFinished(false);

@@ -95,7 +95,7 @@ public:
      */
     auto ivModel() const -> const ivm::IVModel *;
 
-    auto asn1Model() const -> const Asn1Acn::Asn1Model*;
+    auto asn1Model() const -> const Asn1Acn::Asn1Model *;
 
     /**
      * Getter for the conversion options
@@ -153,6 +153,9 @@ public:
      */
     auto getObserversWithContinuousSignals() const -> const std::vector<QString> &;
 
+    auto setRequiredSystemCapabilities(std::vector<QString> capabilities) -> void;
+    auto requiredSystemCapabilities() const -> const std::vector<QString> &;
+
 private:
     model::PromelaSystemModel *m_promelaModel;
     const ivm::IVModel *m_ivModel;
@@ -161,6 +164,7 @@ private:
     const std::vector<const Asn1Acn::Definitions *> &m_asn1SubtypesDefinitons;
     const std::vector<QString> &m_modelFunctions;
     const std::vector<QString> &m_observerNames;
+    std::vector<QString> m_requiredSystemCapabilities;
     uint32_t m_baseProctypePriority;
     const bool m_supportMulticast;
     std::map<QString, std::map<QString, ObserverAttachments>> m_fromObserverAttachments;

@@ -103,6 +103,8 @@ private:
 
     auto messageTypeName(const QString &typeName) -> QString;
     auto createProctypeName(const QString &ivFunctionName, const QString &ivInterfaceName) -> QString;
+    auto generateSystemCapabilities() -> void;
+    auto generatePowerInline() -> void;
 
 private:
     inline static const QString m_systemInitedVariableName = "inited";

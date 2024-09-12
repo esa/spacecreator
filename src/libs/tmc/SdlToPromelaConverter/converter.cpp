@@ -20,6 +20,7 @@
 #include "converter.h"
 
 #include <QDebug>
+#include <QDir>
 
 namespace tmc::converter {
 
@@ -48,7 +49,8 @@ SdlToPromelaConverter::~SdlToPromelaConverter()
     }
 }
 
-bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, const QFileInfo &outputFile)
+bool SdlToPromelaConverter::convertSdl(
+        const ProcessMetadata &processMetadata, const QFileInfo &outputFile, const QFileInfo &outputCapabilitiesFile)
 {
     if (processMetadata.getSystemStructure().has_value() && !processMetadata.getSystemStructure().value().exists()) {
         QString text = QString("File %1 does not exist.\n")
@@ -86,6 +88,9 @@ bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, c
     arguments.append("-o");
     arguments.append(outputFile.absoluteFilePath());
 
+    arguments.append("-c");
+    arguments.append(outputCapabilitiesFile.absoluteFilePath());
+
     arguments.append(m_sdl2PromelaArgs);
 
     startSdl2PromelaProcess(*m_process, arguments);
@@ -93,8 +98,8 @@ bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, c
     return true;
 }
 
-bool SdlToPromelaConverter::convertObserverSdl(
-        const ProcessMetadata &processMetadata, const QFileInfo &outputFile, const QFileInfo &outputInfoFile)
+bool SdlToPromelaConverter::convertObserverSdl(const ProcessMetadata &processMetadata, const QFileInfo &outputFile,
+        const QFileInfo &outputInfoFile, const QFileInfo &outputCapabilitiesFile)
 {
     if (processMetadata.getSystemStructure().has_value() && !processMetadata.getSystemStructure().value().exists()) {
         QString text = QString("File %1 does not exist.\n")
@@ -133,6 +138,9 @@ bool SdlToPromelaConverter::convertObserverSdl(
 
     arguments.append("-oi");
     arguments.append(outputInfoFile.absoluteFilePath());
+
+    arguments.append("-c");
+    arguments.append(outputCapabilitiesFile.absoluteFilePath());
 
     arguments.append(m_sdl2PromelaArgs);
 

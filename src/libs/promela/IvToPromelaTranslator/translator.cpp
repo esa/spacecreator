@@ -67,6 +67,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     IvToPromelaTranslatorContext context(
             promelaModel.get(), ivModel, asn1Model, options, asn1SubtypesDefinitions, modelFunctions, observerNames);
 
+    context.setRequiredSystemCapabilities(options.values(PromelaOptions::requiredSystemCapability));
     for (const auto &info : observerAttachmentInfos) {
         context.addObserverAttachment(ObserverAttachment(info));
     }
@@ -112,6 +113,8 @@ std::unique_ptr<SystemInfo> IvToPromelaTranslator::prepareSystemInfo(
 
     IvToPromelaTranslatorContext context(
             nullptr, model, nullptr, options, asn1Definitions, modelFunctions, observerNames);
+
+    context.setRequiredSystemCapabilities(options.values(PromelaOptions::requiredSystemCapability));
 
     if (options.isSet(PromelaOptions::processesBasePriority)) {
         context.setBaseProctypePriority(options.value(PromelaOptions::processesBasePriority)->toUInt());

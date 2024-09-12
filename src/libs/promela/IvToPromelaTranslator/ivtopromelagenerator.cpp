@@ -78,6 +78,8 @@ void IvToPromelaGenerator::generate()
 {
     m_context.model()->addInclude("dataview.pml");
 
+    generateSystemCapabilities();
+
     m_context.model()->addDeclaration(Declaration(DataType(BasicType::INT), m_systemInitedVariableName));
 
     createMessageTypes();
@@ -1333,5 +1335,45 @@ QString IvToPromelaGenerator::messageTypeName(const QString &typeName)
 QString IvToPromelaGenerator::createProctypeName(const QString &ivFunctionName, const QString &ivInterfaceName)
 {
     return QString("%1_%2").arg(Escaper::escapePromelaIV(ivFunctionName), ivInterfaceName);
+}
+
+void IvToPromelaGenerator::generateSystemCapabilities()
+{
+    for (const QString &capability : m_context.requiredSystemCapabilities()) {
+        if (capability.compare("SYSTEM_CAPABILITY_POWER_INT") == 0) {
+            generatePowerInline();
+        } else {
+            auto message = QString("Unknown system capability '%1' required by SDL").arg(capability);
+            throw TranslationException(message);
+        }
+    }
+}
+
+void IvToPromelaGenerator::generatePowerInline()
+{
+    auto resultDeclaration = Declaration(DataType(BasicType::INT), "system_capability_power_int_result");
+    resultDeclaration.setInit(Expression(Constant(0)));
+    auto baseDeclaration = Declaration(DataType(BasicType::INT), "system_capability_power_int_base");
+    baseDeclaration.setInit(Expression(Constant(0)));
+    auto exponentDeclaration = Declaration(DataType(BasicType::INT), "system_capability_power_int_exponent");
+    exponentDeclaration.setInit(Expression(Constant(0)));
+
+    m_context.model()->addDeclaration(std::move(resultDeclaration));
+    m_context.model()->addDeclaration(std::move(baseDeclaration));
+    m_context.model()->addDeclaration(std::move(exponentDeclaration));
+    const QString powerInlineName = "system_capability_power_int";
+    QList<QString> arguments = { "result", "base", "exponent" };
+    Sequence inlineSequence(Sequence::Type::D_STEP);
+
+    inlineSequence.appendElement(
+            Assignment(VariableRef("system_capability_power_int_base"), Expression(VariableRef("base"))));
+    inlineSequence.appendElement(
+            Assignment(VariableRef("system_capability_power_int_exponent"), Expression(VariableRef("exponent"))));
+    QString callMathPow = QString("now.system_capability_power_int_result = pow(now.system_capability_power_int_base, "
+                                  "now.system_capability_power_int_exponent);");
+    inlineSequence.appendElement(CCode(std::move(callMathPow)));
+    inlineSequence.appendElement(
+            Assignment(VariableRef("result"), Expression(VariableRef("system_capability_power_int_result"))));
+    m_context.model()->addInlineDef(std::make_unique<InlineDef>(powerInlineName, arguments, std::move(inlineSequence)));
 }
 }

@@ -289,6 +289,7 @@ private:
     void attachNextObserver();
     void generateCDataview();
     bool generateMessageSizes(QFileInfo input, QFileInfo output);
+    void readRequiredSystemCapabilities(const QFileInfo &input);
 
 private Q_SLOTS:
     void finishConversion();
@@ -326,6 +327,7 @@ private:
     std::vector<ObserverInfo> m_observerInfos;
     QStringList m_observerAttachmentInfos;
     QStringList m_observerNames;
+    QSet<QString> m_requiredSystemCapabilities;
 
     conversion::Registry m_registry;
 

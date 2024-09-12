@@ -457,6 +457,7 @@ void TmcVerifier::executeCCLinker()
             QDir::Files | QDir::CaseSensitive | QDir::Readable | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 
     const QString outputFile = "pan";
+    arguments.append("-lm");
     arguments.append("-o");
     arguments.append(outputFile);
 
