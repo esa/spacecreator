@@ -24,7 +24,9 @@
 #include "scleditorfactory.h"
 
 #include <texteditor/basehoverhandler.h>
+#if __has_include(<texteditor/texteditoractionhandler.h>)
 #include <texteditor/texteditoractionhandler.h>
+#endif
 
 #include "spacecreatorpluginconstants.h"
 
@@ -64,10 +66,14 @@ SclEditorFactory::SclEditorFactory()
     setMarksVisible(true);
     setParenthesesMatchingEnabled(true);
     setUseGenericHighlighter(true);
+#if __has_include(<texteditor/texteditoractionhandler.h>)
+    setEditorActionHandlers(TextEditorActionHandler::Format | TextEditorActionHandler::UnCommentSelection
+            | TextEditorActionHandler::UnCollapseAll);
 
-    setEditorActionHandlers(TextEditorActionHandler::Format
-                            | TextEditorActionHandler::UnCommentSelection
-                            | TextEditorActionHandler::UnCollapseAll);
+#else
+    setOptionalActionMask(
+            OptionalActions::Format | OptionalActions::UnCommentSelection | OptionalActions::UnCollapseAll);
+#endif
 }
 
 } // namespace spctr
