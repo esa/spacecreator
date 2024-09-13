@@ -36,9 +36,16 @@
 #include <projectexplorer/project.h>
 #include <projectexplorer/taskhub.h>
 
+
 namespace spctr {
 
 const char TASK_CATEGORY_SPACE_CREATOR[] = "Task.Category.SpaceCreator";
+
+#if QTC_VERSION >= 1300
+auto taskhub_instance = &ProjectExplorer::taskHub();
+#else
+auto taskhub_instance = ProjectExplorer::TaskHub::instance;
+#endif
 
 SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *project, QObject *parent)
     : scs::SpaceCreatorProject(parent)
@@ -65,9 +72,9 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     if (!hubInitialized) {
 #if QTC_VERSION >= 1200
         const ProjectExplorer::TaskCategory category { TASK_CATEGORY_SPACE_CREATOR, tr("ASN error"), tr("") };
-        ProjectExplorer::TaskHub::instance()->addCategory(category);
+        taskhub_instance->addCategory(category);
 #else
-        ProjectExplorer::TaskHub::instance()->addCategory(TASK_CATEGORY_SPACE_CREATOR, tr("ASN error"));
+        taskhub_instance->addCategory(TASK_CATEGORY_SPACE_CREATOR, tr("ASN error"));
 #endif
         hubInitialized = true;
     }
@@ -161,13 +168,13 @@ void SpaceCreatorProjectImpl::reportError(const shared::ErrorItem &error)
     ProjectExplorer::Task task(type, error.m_description, Utils::FilePath::fromString(error.m_fileName), error.m_line,
             TASK_CATEGORY_SPACE_CREATOR);
     m_errors.append(task);
-    ProjectExplorer::TaskHub::instance()->addTask(task);
+    taskhub_instance->addTask(task);
     ProjectExplorer::TaskHub::requestPopup();
 }
 
 void SpaceCreatorProjectImpl::clearAllErrors()
 {
-    ProjectExplorer::TaskHub::instance()->clearTasks(TASK_CATEGORY_SPACE_CREATOR);
+    taskhub_instance->clearTasks(TASK_CATEGORY_SPACE_CREATOR);
 }
 
 void SpaceCreatorProjectImpl::clearTasksForFile(const QString &fileName)
@@ -175,7 +182,7 @@ void SpaceCreatorProjectImpl::clearTasksForFile(const QString &fileName)
     auto it = std::remove_if(m_errors.begin(), m_errors.end(), [fileName](const ProjectExplorer::Task &task) {
         const bool same = task.file.toString() == fileName;
         if (same) {
-            ProjectExplorer::TaskHub::instance()->removeTask(task);
+            taskhub_instance->removeTask(task);
         }
         return same;
     });
