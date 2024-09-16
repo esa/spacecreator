@@ -111,7 +111,8 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     , m_isMulticastEnabled(false)
     , m_commandTimeout(12000)
     , m_numberOfProctypes(0)
-    , m_process(new QProcess(this))
+    , m_opengeodeProcess(new QProcess(this))
+    , m_asn1SccProcess(new QProcess(this))
     , m_timer(new QTimer(this))
     , m_sdlToPromelaConverter(new SdlToPromelaConverter(this))
 {
@@ -153,12 +154,24 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     m_dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 
-    connect(m_process, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
-    connect(m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
-    connect(m_process, SIGNAL(started()), this, SLOT(processStarted()));
-    connect(m_process, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
-    connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
-            SLOT(processFinished(int, QProcess::ExitStatus)));
+    connect(m_opengeodeProcess, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
+    connect(m_opengeodeProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
+    connect(m_opengeodeProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this,
+            SLOT(processError(QProcess::ProcessError)));
+
+    connect(m_opengeodeProcess, SIGNAL(started()), this, SLOT(opengeodeProcessStarted()));
+    connect(m_opengeodeProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(opengeodeProcessFinished(int, QProcess::ExitStatus)));
+
+    connect(m_asn1SccProcess, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
+    connect(m_asn1SccProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
+    connect(m_asn1SccProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this,
+            SLOT(processError(QProcess::ProcessError)));
+
+    connect(m_asn1SccProcess, SIGNAL(started()), this, SLOT(asn1SccProcessStarted()));
+    connect(m_asn1SccProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(asn1SccProcessFinished(int, QProcess::ExitStatus)));
+
     connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
     connect(m_sdlToPromelaConverter, SIGNAL(message(QString)), this, SIGNAL(message(QString)));
 }
@@ -166,9 +179,14 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
 TmcConverter::~TmcConverter()
 {
     m_timer->stop();
-    if (m_process->state() != QProcess::ProcessState::NotRunning) {
-        m_process->kill();
-        m_process->waitForFinished();
+    if (m_opengeodeProcess->state() != QProcess::ProcessState::NotRunning) {
+        m_opengeodeProcess->kill();
+        m_opengeodeProcess->waitForFinished();
+    }
+
+    if (m_asn1SccProcess->state() != QProcess::ProcessState::NotRunning) {
+        m_asn1SccProcess->kill();
+        m_asn1SccProcess->waitForFinished();
     }
 }
 
@@ -519,15 +537,13 @@ void TmcConverter::integrateObserver(const ObserverInfo &info, QStringList &obse
     const auto promelaFilename = Escaper::escapePromelaIV(processName) + ".pml";
     const auto infoPath = outputFilepath(Escaper::escapePromelaIV(processName) + ".info");
     const QFileInfo outputCapabilitiesFile =
-            outputFilepath(Escaper::escapePromelaIV(processName) + "_capabilities.txt");
+            outputFilepath(Escaper::escapePromelaIV(processName).toLower() + "_capabilities.txt");
     observerNames.append(Escaper::escapePromelaIV(processName));
     allSdlFiles.emplace(processName, meta);
     asn1Files.append(datamodel.absoluteFilePath());
 
     m_sdlToPromelaConverter->convertObserverSdl(
             meta, outputFilepath(promelaFilename), infoPath, outputCapabilitiesFile);
-
-    readRequiredSystemCapabilities(outputCapabilitiesFile);
 }
 
 bool TmcConverter::convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles)
@@ -921,26 +937,26 @@ void TmcConverter::prepareNextObserverDatamodel()
         return;
     }
 
-    const ObserverInfo info = m_observersToConvert.front();
+    const ObserverInfo &info = m_observersToConvert.front();
 
     QFileInfo observerFile(info.path());
-    m_process->setWorkingDirectory(observerFile.absolutePath());
+    m_opengeodeProcess->setWorkingDirectory(observerFile.absolutePath());
 
     m_timer->setSingleShot(true);
     m_timer->start(m_commandStartTimeout);
-    generateObserverDatamodel(*m_process, observerFile.fileName());
+    generateObserverDatamodel(*m_opengeodeProcess, observerFile.fileName());
 }
 
 void TmcConverter::convertNextObserver()
 {
-    const ObserverInfo info = m_observersToConvert.front();
+    const ObserverInfo &info = m_observersToConvert.front();
 
     integrateObserver(info, m_observerNames, m_asn1Files, m_allSdlFiles);
 }
 
 void TmcConverter::attachNextObserver()
 {
-    const ObserverInfo info = m_observersToConvert.front();
+    const ObserverInfo &info = m_observersToConvert.front();
     const auto process = QFileInfo(info.path());
     const auto processName = process.baseName();
 
@@ -960,6 +976,12 @@ void TmcConverter::attachNextObserver()
         return;
     }
 
+    QFileInfo sdlFilePath = QFileInfo(info.path());
+    const QFileInfo outputCapabilitiesFile = outputFilepath(sdlFilePath.baseName().toLower() + "_capabilities.txt");
+    readRequiredSystemCapabilities(outputCapabilitiesFile);
+
+    m_observersToConvert.pop_front();
+
     prepareNextObserverDatamodel();
 }
 
@@ -978,16 +1000,9 @@ void TmcConverter::generateCDataview()
 
     Q_EMIT message(QString("Converting asn %1\n").arg(dataviewUniqLocation().absolutePath()));
 
-    disconnect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
-            SLOT(processFinished(int, QProcess::ExitStatus)));
-    connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
-            SLOT(asn1sccProcessFinished(int, QProcess::ExitStatus)));
-    disconnect(m_process, SIGNAL(started()), this, SLOT(processStarted()));
-    connect(m_process, SIGNAL(started()), this, SLOT(asn1sccProcessStarted()));
-
     m_timer->setSingleShot(true);
     m_timer->start(m_commandStartTimeout);
-    m_process->start(asn1sccCommand, arguments);
+    m_asn1SccProcess->start(asn1sccCommand, arguments);
 }
 
 bool TmcConverter::generateMessageSizes(QFileInfo input, QFileInfo output)
@@ -1076,8 +1091,8 @@ QFileInfo TmcConverter::outputFilepath(const QString &name)
 
 void TmcConverter::processStderrReady()
 {
-    if (m_process != nullptr) {
-        QByteArray buffer = m_process->readAllStandardError();
+    if (m_opengeodeProcess != nullptr) {
+        QByteArray buffer = m_opengeodeProcess->readAllStandardError();
         QString text = QString(buffer);
         Q_EMIT message(text);
     }
@@ -1085,23 +1100,16 @@ void TmcConverter::processStderrReady()
 
 void TmcConverter::processStdoutReady()
 {
-    if (m_process != nullptr) {
-        QByteArray buffer = m_process->readAllStandardOutput();
+    if (m_opengeodeProcess != nullptr) {
+        QByteArray buffer = m_opengeodeProcess->readAllStandardOutput();
         QString text = QString(buffer);
         Q_EMIT message(text);
     }
 }
 
-void TmcConverter::processStarted()
-{
-    m_timer->stop();
-    m_timer->setSingleShot(true);
-    m_timer->start(m_commandTimeout);
-}
-
 void TmcConverter::processError(QProcess::ProcessError error)
 {
-    m_process->terminate();
+    m_opengeodeProcess->terminate();
     m_timer->stop();
     switch (error) {
     case QProcess::ProcessError::FailedToStart:
@@ -1131,7 +1139,14 @@ void TmcConverter::processError(QProcess::ProcessError error)
     }
 }
 
-void TmcConverter::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
+void TmcConverter::opengeodeProcessStarted()
+{
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(m_commandTimeout);
+}
+
+void TmcConverter::opengeodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitStatus);
     m_timer->stop();
@@ -1140,18 +1155,33 @@ void TmcConverter::processFinished(int exitCode, QProcess::ExitStatus exitStatus
         return;
     }
 
-    const ObserverInfo info = m_observersToConvert.front();
-    QFileInfo sdlFilePath = QFileInfo(info.path());
-    const QFileInfo outputCapabilitiesFile = outputFilepath(sdlFilePath.baseName().toLower() + "_capabilities.txt");
-    readRequiredSystemCapabilities(outputCapabilitiesFile);
-    m_observersToConvert.pop_front();
-
     convertNextObserver();
+}
+
+void TmcConverter::asn1SccProcessStarted()
+{
+    Asn1Acn::Asn1Scc asn1scc;
+    int asn1sccTimeout = asn1scc.getCompilerTimeout();
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(asn1sccTimeout);
+}
+
+void TmcConverter::asn1SccProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    if (exitCode != EXIT_SUCCESS) {
+        Q_EMIT conversionFinished(false);
+        return;
+    }
+
+    QTimer::singleShot(0, this, SLOT(finishConversion()));
 }
 
 void TmcConverter::timeout()
 {
-    m_process->terminate();
+    m_opengeodeProcess->terminate();
     Q_EMIT message(QString("Timeout.\n"));
     Q_EMIT conversionFinished(false);
 }
@@ -1183,26 +1213,5 @@ void TmcConverter::observerConversionFinished(bool success)
 void TmcConverter::stopConditionConversionFinished(bool success)
 {
     Q_EMIT conversionFinished(success);
-}
-
-void TmcConverter::asn1sccProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
-{
-    Q_UNUSED(exitStatus);
-    m_timer->stop();
-    if (exitCode != EXIT_SUCCESS) {
-        Q_EMIT conversionFinished(false);
-        return;
-    }
-
-    QTimer::singleShot(0, this, SLOT(finishConversion()));
-}
-
-void TmcConverter::asn1sccProcessStarted()
-{
-    Asn1Acn::Asn1Scc asn1scc;
-    int asn1sccTimeout = asn1scc.getCompilerTimeout();
-    m_timer->stop();
-    m_timer->setSingleShot(true);
-    m_timer->start(asn1sccTimeout);
 }
 }

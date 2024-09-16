@@ -295,15 +295,15 @@ private Q_SLOTS:
     void finishConversion();
     void processStderrReady();
     void processStdoutReady();
-    void processStarted();
     void processError(QProcess::ProcessError error);
-    void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void opengeodeProcessStarted();
+    void opengeodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void asn1SccProcessStarted();
+    void asn1SccProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void timeout();
     void functionConversionFinished(bool success);
     void observerConversionFinished(bool success);
     void stopConditionConversionFinished(bool success);
-    void asn1sccProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
-    void asn1sccProcessStarted();
 
 private:
     const QString m_inputIvFilepath;
@@ -343,7 +343,8 @@ private:
     std::list<QString> m_mscObserversToConvert;
     std::list<ObserverInfo> m_observersToConvert;
 
-    QProcess *m_process;
+    QProcess *m_opengeodeProcess;
+    QProcess *m_asn1SccProcess;
     QTimer *m_timer;
     SdlToPromelaConverter *m_sdlToPromelaConverter;
 
