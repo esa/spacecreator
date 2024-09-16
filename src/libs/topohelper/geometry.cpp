@@ -423,7 +423,15 @@ QList<PointsList> findSubPath(
                 PointsList previousPoints(prevPoints);
                 previousPoints.removeLast();
                 previousPoints << polygon;
-                allPaths << previousPoints;
+
+                PointsList uniquePreviousPoints;
+                for (const QPointF& point : previousPoints) {
+                    if (!uniquePreviousPoints.contains(point)) {
+                        uniquePreviousPoints.append(point);
+                    }
+                }
+
+                allPaths << uniquePreviousPoints;
             }
         }
     }
