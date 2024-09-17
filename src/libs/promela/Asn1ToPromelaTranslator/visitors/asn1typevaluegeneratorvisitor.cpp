@@ -222,7 +222,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
     const QStringList inlineArguments = { argumentName };
     auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(*sequence));
 
-    m_promelaModel.addInlineDef(std::move(inlineDef));
+    if (!modelContainsInlineGenerator(inlineSeqGeneratorName)) {
+        m_promelaModel.addInlineDef(std::move(inlineDef));
+    }
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
@@ -286,7 +288,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
     const QStringList inlineArguments = { argumentName };
     auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(*sequence));
 
-    m_promelaModel.addInlineDef(std::move(inlineDef));
+    if (!modelContainsInlineGenerator(inlineSeqGeneratorName)) {
+        m_promelaModel.addInlineDef(std::move(inlineDef));
+    }
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const NumericString &type)
@@ -380,7 +384,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
     const QString choiceGeneratorInlineName = Escaper::escapePromelaName(QString("%1_generate_value").arg(m_name));
     auto inlineDef = std::make_unique<InlineDef>(choiceGeneratorInlineName, inlineArguments, std::move(*sequence));
 
-    m_promelaModel.addInlineDef(std::move(inlineDef));
+    if (!modelContainsInlineGenerator(choiceGeneratorInlineName)) {
+        m_promelaModel.addInlineDef(std::move(inlineDef));
+    }
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
@@ -433,7 +439,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
 
     auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(sequence));
 
-    m_promelaModel.addInlineDef(std::move(inlineDef));
+    if (!modelContainsInlineGenerator(inlineSeqGeneratorName)) {
+        m_promelaModel.addInlineDef(std::move(inlineDef));
+    }
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
@@ -506,7 +514,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     const QStringList inlineArguments = { valueVariableName };
     auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(*sequence));
 
-    m_promelaModel.addInlineDef(std::move(inlineDef));
+    if (!modelContainsInlineGenerator(inlineSeqGeneratorName)) {
+        m_promelaModel.addInlineDef(std::move(inlineDef));
+    }
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
