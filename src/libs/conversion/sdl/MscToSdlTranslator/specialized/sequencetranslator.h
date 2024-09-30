@@ -119,6 +119,7 @@ private:
     auto splitChoiceName(const QString &name) const -> std::pair<QString, QString>;
     auto createSdlExpression(const QString &content) const -> std::unique_ptr<::sdl::Expression>;
     auto escapeSdlName(const QString &name) const -> QString;
+    auto escapeSdlNamePart(const QString &part) const -> QString;
 
 protected:
     inline static const QString m_observerNameThen = "then";

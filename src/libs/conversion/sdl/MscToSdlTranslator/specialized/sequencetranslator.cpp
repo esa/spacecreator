@@ -19,6 +19,7 @@
 
 #include "specialized/sequencetranslator.h"
 
+#include <QRegularExpression>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/msc/MscOptions/options.h>
@@ -376,11 +377,33 @@ std::unique_ptr<::sdl::Expression> SequenceTranslator::createSdlExpression(const
 
 QString SequenceTranslator::escapeSdlName(const QString &name) const
 {
-    QStringList sequence;
-    for (const QString &part : name.split('.')) {
-        sequence.append(Escaper::escapeSdlName(part));
+    QRegularExpression regexp = QRegularExpression(R"([.()])");
+
+    int from = 0;
+    QString result;
+
+    while (from < name.length()) {
+        int next = name.indexOf(regexp, from);
+        if (next == -1) {
+            result.append(escapeSdlNamePart(name.right(name.length() - from)));
+            from = name.length();
+        } else {
+            result.append(escapeSdlNamePart(name.mid(from, next - from)));
+            result.append(name[next]);
+            from = next + 1;
+        }
     }
-    return sequence.join('.');
+
+    return result;
+}
+
+QString SequenceTranslator::escapeSdlNamePart(const QString &part) const
+{
+    if (!part.isEmpty() && !part[0].isDigit()) {
+        return Escaper::escapeSdlName(part);
+    }
+
+    return part;
 }
 
 } // namespace conversion::sdl::translator
