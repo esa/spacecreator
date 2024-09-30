@@ -231,15 +231,15 @@ std::unique_ptr<Decision> SequenceTranslator::createParameterRequirements(
     if (value.has_value()) {
         auto trueAnswer = createTrueAnswer(std::move(trueAction), *value);
 
-        auto decisionExpression = std::make_unique<Expression>(name);
+        auto decisionExpression = createSdlExpression(name);
         decision->setExpression(std::move(decisionExpression));
         decision->addAnswer(std::move(trueAnswer));
     } else {
         const auto [choiceName, choiceFieldName] = splitChoiceName(name);
 
-        auto trueAnswer = createTrueAnswer(std::move(trueAction), choiceFieldName);
+        auto trueAnswer = createTrueAnswer(std::move(trueAction), escapeSdlName(choiceFieldName));
 
-        auto decisionExpression = std::make_unique<Expression>(m_isPresentTemplate.arg(choiceName));
+        auto decisionExpression = std::make_unique<Expression>(m_isPresentTemplate.arg(escapeSdlName(choiceName)));
         decision->setExpression(std::move(decisionExpression));
         decision->addAnswer(std::move(trueAnswer));
     }
@@ -367,6 +367,20 @@ std::pair<QString, QString> SequenceTranslator::splitChoiceName(const QString &n
     const auto choiceFieldName = name.section('.', -1);
 
     return { choiceName, choiceFieldName };
+}
+
+std::unique_ptr<::sdl::Expression> SequenceTranslator::createSdlExpression(const QString &content) const
+{
+    return std::make_unique<Expression>(escapeSdlName(content));
+}
+
+QString SequenceTranslator::escapeSdlName(const QString &name) const
+{
+    QStringList sequence;
+    for (const QString &part : name.split('.')) {
+        sequence.append(Escaper::escapeSdlName(part));
+    }
+    return sequence.join('.');
 }
 
 } // namespace conversion::sdl::translator
