@@ -552,10 +552,8 @@ void IvToPromelaGenerator::addEnvironmentProctype(const QString &functionName, c
     // clang-format on
 
     if (limit.has_value()) {
-        // If limit was set to 0, then we don't generate the proctype at all
-        if (*limit == 0) {
-            return;
-        } else {
+        // If limit was set to 0, then we don't generate the loop at all
+        if (*limit != 0) {
             Declaration iteratorVariable(DataType(BasicType::INT), "inputVectorCounter");
             sequence.appendElement(std::move(iteratorVariable));
 
