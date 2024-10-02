@@ -398,7 +398,6 @@ bool Asn1ValueParser::parseChoiceValue(
     const auto *choiceComponent = choiceType->component(name);
     if (choiceComponent && choiceComponent->type()) {
         const QString value = asn1Value.mid(asn1Value.indexOf(":") + 1).trimmed();
-        valueMap["choice"] = parseAsn1Value(choiceComponent->type(), value);
         bool convOk = false;
         valueMap["choice"] = parseAsn1Value(choiceComponent->type(), value, &convOk);
         if (!convOk) {
@@ -555,30 +554,47 @@ bool Asn1ValueParser::checkSizeConstraint(const Constraints::Constraint<ValueTyp
 
 int Asn1ValueParser::nextIndex(const QString &value) const
 {
-    int index;
+    QRegularExpression specialCharSearch("[{,]");
+    QRegularExpression nestingCharSearch("[{}]");
 
-    if (value.startsWith("{")) {
-        /* possible formats:
-         *  { ... }
-         *  { { ...  }, { ... }, ... }
-         *  { { { ...  }, { ... } }, { { ...  }, { ... } }, ... }
-         */
-        int countBracket = 0;
-        for (index = 0; index < value.size(); ++index) {
-            if (value[index] == '{')
-                ++countBracket;
-            else if (value[index] == '}')
-                --countBracket;
+    int index = 0;
 
-            if (countBracket == 0)
-                break;
+    // phase one - search for ',' or '{''
+    // when ',' is found - return index
+    // when '{' is found - start next phase to find matching '}'
+    QRegularExpressionMatch match;
+    index = value.indexOf(specialCharSearch, index, &match);
+    if (index == -1) {
+        return value.size();
+    }
+    if (match.captured() == ",") {
+        return index;
+    }
+
+    // phase two - '{' was found - find matching '}'
+    ++index;
+    if (index >= value.size()) {
+        // input is probably ill-formed, what will be reported later
+        return value.size();
+    }
+    int level = 1;
+    while (level > 0) {
+        index = value.indexOf(nestingCharSearch, index, &match);
+        if (index == -1) {
+            // input is probably ill-formed, what will be reported later
+            return value.size();
         }
-
+        if (match.captured() == "}") {
+            --level;
+        } else {
+            ++level;
+        }
         ++index;
-    } else {
-        index = value.indexOf(",");
-        if (index == -1)
-            index = value.size();
+        if (index >= value.size()) {
+            // input may be ill-formed, what will be reported later
+            // or correct when level is 0
+            return value.size();
+        }
     }
 
     return index;
