@@ -53,11 +53,12 @@ namespace promela::translator {
 // This helper can generate a flat list of references to atomic promela types, what can be
 // used to printf value of complex types.
 // The code is generated recursively for components of complex types.
-Asn1TypeHelper::Asn1TypeHelper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source, size_t nestingLevel)
+Asn1TypeHelper::Asn1TypeHelper(
+        const Asn1Acn::Asn1Model *asn1Model, QString target, QString source, size_t &iteratorCounter)
     : m_asn1Model(asn1Model)
     , m_target(std::move(target))
     , m_source(std::move(source))
-    , m_nestingLevel(nestingLevel)
+    , m_iteratorCounter(iteratorCounter)
 {
 }
 
@@ -253,7 +254,7 @@ QString Asn1TypeHelper::sequenceAssignmentFromPromelaToC(const QString &cTypeNam
     QList<QString> optionalFields;
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type->components()) {
         SequenceComponentVisitor visitor(SequenceComponentVisitor::Operation::FROM_PROMELA_TO_C, m_asn1Model, m_target,
-                m_source, cTypeName, m_nestingLevel + 1);
+                m_source, cTypeName, m_iteratorCounter);
         component->accept(visitor);
         if (visitor.hasComponent()) {
             result.append(visitor.getContent());
@@ -279,7 +280,7 @@ QString Asn1TypeHelper::sequenceOfAssignmentFromPromelaToC(
     QString elementType = PromelaNameHelper::createChildTypeNameForCCode(
             cTypeName, PromelaConstants::sequenceOfElementTypeNameSuffix);
     Asn1TypeHelper helper(m_asn1Model, QString("%1.arr[%2]").arg(m_target).arg(iteratorName),
-            QString("%1.data[%2]").arg(m_source).arg(iteratorName), m_nestingLevel + 1);
+            QString("%1.data[%2]").arg(m_source).arg(iteratorName), m_iteratorCounter);
     QString itemAssignment = addIndent(helper.createAssignmentTemplateFromPromelaToC(elementType, type->itemsType()));
 
     // generate a for loop to copy values of all elements of array
@@ -311,7 +312,7 @@ QString Asn1TypeHelper::choiceAssignmentFromPromelaToC(const QString &cTypeName,
         QString componentName = Escaper::escapeCName(component->name());
         QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, componentName);
         Asn1TypeHelper helper(
-                m_asn1Model, m_target + ".u." + componentName, m_source + ".data." + componentName, m_nestingLevel + 1);
+                m_asn1Model, m_target + ".u." + componentName, m_source + ".data." + componentName, m_iteratorCounter);
         QString assignment = addIndent(helper.createAssignmentTemplateFromPromelaToC(elementType, component->type()));
         QString prefix = index == 1 ? "" : "else ";
         result += QString("%1if(%3.selection == %4_%5_PRESENT)\n"
@@ -382,7 +383,7 @@ QString Asn1TypeHelper::sequenceAssignmentFromCToPromela(const QString &typeName
     QList<QString> optionalFields;
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type->components()) {
         SequenceComponentVisitor visitor(SequenceComponentVisitor::Operation::FROM_C_TO_PROMELA, m_asn1Model, m_target,
-                m_source, typeName, m_nestingLevel + 1);
+                m_source, typeName, m_iteratorCounter);
         component->accept(visitor);
         if (visitor.hasComponent()) {
             result.append(visitor.getContent());
@@ -410,7 +411,7 @@ QString Asn1TypeHelper::sequenceOfAssignmentFromCToPromela(
     QString iteratorName = createIteratorVariableName();
 
     Asn1TypeHelper helper(m_asn1Model, QString("%1.data[%2]").arg(m_target).arg(iteratorName),
-            QString("%1.arr[%2]").arg(m_source).arg(iteratorName), m_nestingLevel + 1);
+            QString("%1.arr[%2]").arg(m_source).arg(iteratorName), m_iteratorCounter);
     QString itemAssignment = addIndent(helper.createAssignmentTemplateFromCToPromela(elementType, type->itemsType()));
 
     // generate a for loop to copy values of all elements of array
@@ -442,7 +443,7 @@ QString Asn1TypeHelper::choiceAssignmentFromCToPromela(const QString &cTypeName,
         QString componentName = Escaper::escapeCName(component->name());
         QString elementType = PromelaNameHelper::createChildTypeNameForCCode(cTypeName, componentName);
         Asn1TypeHelper helper(
-                m_asn1Model, m_target + ".data." + componentName, m_source + ".u." + componentName, m_nestingLevel + 1);
+                m_asn1Model, m_target + ".data." + componentName, m_source + ".u." + componentName, m_iteratorCounter);
         QString assignment = addIndent(helper.createAssignmentTemplateFromCToPromela(elementType, component->type()));
         QString prefix = index == 1 ? "" : " else ";
         result += QString("%1if(%3.kind == %4_%5_PRESENT)\n"
@@ -510,7 +511,7 @@ QList<VariableRef> Asn1TypeHelper::sequenceListOfFields(const Asn1Acn::Types::Se
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type->components()) {
         QString componentName = Escaper::escapePromelaName(component->name());
         SequenceComponentVisitor visitor(SequenceComponentVisitor::Operation::LIST_PROMELA_FIELDS, m_asn1Model,
-                componentName, "", "", m_nestingLevel + 1);
+                componentName, "", "", m_iteratorCounter);
         component->accept(visitor);
         if (visitor.hasComponent()) {
             QList<VariableRef> fieldsOfElement = visitor.takeListOfFields();
@@ -542,7 +543,7 @@ QList<VariableRef> Asn1TypeHelper::sequenceOfListOfFields(const Asn1Acn::Types::
     SizeConstraintVisitor<IntegerValue> constraintVisitor;
     type->constraints().accept(constraintVisitor);
 
-    Asn1TypeHelper helper(m_asn1Model, "data", "", m_nestingLevel + 1);
+    Asn1TypeHelper helper(m_asn1Model, "data", "", m_iteratorCounter);
     QList<VariableRef> fieldsOfItem = helper.generateListOfFields(type->itemsType());
 
     QList<VariableRef> result;
@@ -571,7 +572,7 @@ QList<VariableRef> Asn1TypeHelper::choiceListOfFields(const Asn1Acn::Types::Choi
     QList<VariableRef> result;
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type->components()) {
         QString componentName = Escaper::escapePromelaName(component->name());
-        Asn1TypeHelper helper(m_asn1Model, componentName, "", m_nestingLevel + 1);
+        Asn1TypeHelper helper(m_asn1Model, componentName, "", m_iteratorCounter);
         QList<VariableRef> fieldsOfElement = helper.generateListOfFields(component->type());
 
         while (!fieldsOfElement.empty()) {
@@ -649,6 +650,6 @@ QString Asn1TypeHelper::addIndent(const QString &text)
 
 QString Asn1TypeHelper::createIteratorVariableName()
 {
-    return QString("c_code_it_%1").arg(m_nestingLevel);
+    return QString("c_code_it_%1").arg(m_iteratorCounter++);
 }
 }

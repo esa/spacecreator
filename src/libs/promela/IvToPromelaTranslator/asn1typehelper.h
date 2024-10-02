@@ -37,7 +37,7 @@ public:
     };
 
 public:
-    Asn1TypeHelper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source, size_t nestingLevel);
+    Asn1TypeHelper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source, size_t &iteratorCounter);
 
     QString createAssignmentTemplateFromPromelaToC(const QString &typeName);
     QString createAssignmentTemplateFromCToPromela(const QString &typeName);
@@ -75,6 +75,6 @@ private:
     const Asn1Acn::Asn1Model *m_asn1Model;
     const QString m_target;
     const QString m_source;
-    const size_t m_nestingLevel;
+    size_t &m_iteratorCounter;
 };
 }
