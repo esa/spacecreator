@@ -283,6 +283,7 @@ void TmcExecutor::execute()
             qInfo("  -os <filepath>[:priority]");
             qInfo("                         Use <filepath> as an Observer source file.");
             qInfo("                         Integer <priority> of the Observer is optional");
+            qInfo("  -mos <filepath>        Use <filepath> for verification.");
             qInfo("  -e, --envfunc <name>   Use <name> to specify a SDL function that should be treated as "
                   "environment");
             qInfo("  -k, --keepfunc <name>  Use <name> to specify a SDL function that shouldn't be treated as "

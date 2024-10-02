@@ -301,7 +301,11 @@ bool Asn1ValueParser::parseSequenceValue(
         const auto *sequenceComponent = sequenceType->component(field.toMap()["name"].toString());
 
         if (sequenceComponent && sequenceComponent->type()) {
-            auto childValue = parseAsn1Value(sequenceComponent->type(), field.toMap()["value"].toString());
+            bool convOk = false;
+            auto childValue = parseAsn1Value(sequenceComponent->type(), field.toMap()["value"].toString(), &convOk);
+            if (!convOk) {
+                return false;
+            }
 
             if (!childValue.isEmpty()) {
                 children.append(childValue);
@@ -349,7 +353,11 @@ bool Asn1ValueParser::parseSequenceOfValue(
         auto item = value.mid(0, index);
 
         const auto *itemType = sequenceOfType->itemsType() ? sequenceOfType->itemsType() : asn1Type;
-        auto itemValue = parseAsn1Value(itemType, item);
+        bool convOk = false;
+        auto itemValue = parseAsn1Value(itemType, item, &convOk);
+        if (!convOk) {
+            return false;
+        }
         if (!itemValue.empty()) {
             seqofValues.append(itemValue);
         } else {
@@ -391,6 +399,11 @@ bool Asn1ValueParser::parseChoiceValue(
     if (choiceComponent && choiceComponent->type()) {
         const QString value = asn1Value.mid(asn1Value.indexOf(":") + 1).trimmed();
         valueMap["choice"] = parseAsn1Value(choiceComponent->type(), value);
+        bool convOk = false;
+        valueMap["choice"] = parseAsn1Value(choiceComponent->type(), value, &convOk);
+        if (!convOk) {
+            return false;
+        }
 
         return true;
     }
