@@ -76,7 +76,7 @@ private Q_SLOTS:
     void copyItems();
     void cutItems();
     void wrapItems();
-    void exportToClipboard(const QList<shared::VEObject *> &objects, QMimeData *mimeData = nullptr);
+    void exportToClipboard(const QList<ivm::IVObject *> &objects, QMimeData *mimeData = nullptr);
     void showPropertyEditor(const shared::Id &id);
     void showEditAttributesDialog();
 
@@ -101,7 +101,7 @@ private:
     QVector<QAction *> initActions();
     QVector<QAction *> initViewActions();
 
-    QList<shared::VEObject *> selectedObjects() const;
+    QList<ivm::IVObject *> selectedObjects() const;
 
     ivm::IVFunctionType *functionAtPosition(QPointF &sceneDropPoint);
     Ui::IVAppWidget *ui = nullptr;

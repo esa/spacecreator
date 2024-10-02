@@ -60,7 +60,7 @@ void IvXmlExporter::exportModel(const Model *model, const Options &options) cons
     }
 
     IVXMLWriter exporter;
-    exporter.exportObjectsSilently(ivModel->objects().values(), *outputFilepath);
+    exporter.exportObjectsSilently(ivModel->ivobjects().values(), *outputFilepath);
 }
 
 } // namespace conversion::iv::exporter

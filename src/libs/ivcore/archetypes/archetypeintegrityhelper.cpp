@@ -30,12 +30,11 @@
 #include "ivobject.h"
 #include "parameterarchetype.h"
 #include "shared/parameter.h"
-#include "shared/veobject.h"
 
 namespace ivm {
 
 QStringList ArchetypeIntegrityHelper::checkArchetypeIntegrity(
-        QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel)
+        QList<IVObject *> ivObjects, ivm::ArchetypeModel *archetypesModel)
 {
     QStringList warnings;
     for (auto object : ivObjects) {

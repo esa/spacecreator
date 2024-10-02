@@ -135,6 +135,8 @@ public:
     void clone(IVObject *origin, QList<IVObject *> &importedObjects, CloneType type, IVFunctionType *parent = nullptr,
             const QPointF &pos = {}) const;
 
+    QHash<shared::Id, IVObject *> ivobjects() const;
+
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
 

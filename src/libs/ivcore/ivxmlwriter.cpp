@@ -57,7 +57,7 @@ QString IVXMLWriter::defaultTemplatePath() const
    @param templatePath the grantlee template to use for the export. If empty, the default one is used
    @return true when the export was successful.
  */
-bool IVXMLWriter::exportObjects(const QList<shared::VEObject *> &objects, QIODevice *outBuffer,
+bool IVXMLWriter::exportObjects(const QList<IVObject *> &objects, QIODevice *outBuffer,
         ivm::ArchetypeModel *archetypesModel, const QString &pathToTemplate)
 {
     checkArchetypeIntegrity(objects, archetypesModel);
@@ -68,7 +68,7 @@ bool IVXMLWriter::exportObjects(const QList<shared::VEObject *> &objects, QIODev
     return exportData(ivObjects, pathToTemplate, outBuffer);
 }
 
-bool IVXMLWriter::exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath,
+bool IVXMLWriter::exportObjectsSilently(const QList<IVObject *> &objects, const QString &outPath,
         ivm::ArchetypeModel *archetypesModel, const QString &templatePath)
 {
     if (outPath.isEmpty()) {
@@ -128,8 +128,7 @@ QString IVXMLWriter::groupName(const shared::VEObject *object) const
     return QString();
 }
 
-void IVXMLWriter::checkArchetypeIntegrity(
-        const QList<shared::VEObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel)
+void IVXMLWriter::checkArchetypeIntegrity(const QList<IVObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel)
 {
     if (archetypesModel == nullptr) {
         return;

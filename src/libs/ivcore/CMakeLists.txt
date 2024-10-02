@@ -7,6 +7,8 @@ target_sources(${LIB_NAME} PRIVATE
     abstractsystemchecks.h
     ivcommonprops.cpp
     ivcommonprops.h
+    ivcomponentlibrary.cpp
+    ivcomponentlibrary.h
     ivconnectionchain.cpp
     ivconnectionchain.h
     ivconnectionlayertype.cpp

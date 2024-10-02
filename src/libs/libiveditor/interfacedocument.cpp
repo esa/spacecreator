@@ -23,8 +23,8 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "diskutils.h"
-#include "externalprocess.h"
 #include "itemeditor/ivitemmodel.h"
+#include "ivcomponentlibrary.h"
 #include "ivcomponentmodel.h"
 #include "ivexporter.h"
 #include "ivvisualizationmodelbase.h"
@@ -114,13 +114,14 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QStringList asnFilesNames;
     IVComponentModel *componentsModel;
     IVComponentModel *sharedTypesModel;
+    ivm::IVComponentLibrary *componentLibrary;
 };
 
 void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
 {
     if (!object || object->parentObject()
             || !(object->type() == ivm::IVObject::Type::Function
-                       || object->type() == ivm::IVObject::Type::FunctionType)) {
+                    || object->type() == ivm::IVObject::Type::FunctionType)) {
         return;
     }
 
@@ -141,7 +142,7 @@ void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
 
     QStringList newAsnFiles;
     QStringList importedAsnFiles;
-    for (const QFileInfo &file : qAsConst(fileInfos)) {
+    for (const QFileInfo &file : std::as_const(fileInfos)) {
         QString destFilePath { targetDir.filePath(file.fileName()) };
         const bool isNewFile = !QFile::exists(destFilePath);
         if (!isNewFile && !QFile::remove(destFilePath)) {
@@ -178,7 +179,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
 
     d->dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     d->dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
-
+    d->componentLibrary = new ivm::IVComponentLibrary(shared::componentsLibraryPath(), tr("Components"));
     d->componentsModel = new IVComponentModel(IVComponentModel::Type::ComponentLibrary, tr("Components"), this);
     d->sharedTypesModel = new IVComponentModel(IVComponentModel::Type::SharedTypesLibrary, tr("Shared Types"), this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, this);
@@ -324,9 +325,9 @@ QString InterfaceDocument::getComponentName(const QStringList &exportNames)
     return name;
 }
 
-QList<shared::VEObject *> InterfaceDocument::prepareSelectedObjectsForExport(QString &name, bool silent)
+QList<ivm::IVObject *> InterfaceDocument::prepareSelectedObjectsForExport(QString &name, bool silent)
 {
-    QList<shared::VEObject *> objects;
+    QList<ivm::IVObject *> objects;
     QStringList exportNames;
     for (const auto id : d->objectsSelectionModel->selection().indexes()) {
         const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
@@ -378,19 +379,81 @@ void InterfaceDocument::updateLayersModel() const
     }
 }
 
-bool InterfaceDocument::exportSelectedFunctions()
+static inline bool resolveNameConflict(QString &targetPath, QWidget *window)
 {
-    QString name;
-    const QList<shared::VEObject *> objects = prepareSelectedObjectsForExport(name);
-    if (name.isEmpty()) {
+    QMessageBox msgBox(QMessageBox::Question, QObject::tr("Exporting objects"),
+            QObject::tr("Current object already exported: %1\nDo you want to proceed?").arg(targetPath),
+            QMessageBox::StandardButton::NoButton, window);
+    msgBox.addButton(QMessageBox::Cancel);
+    msgBox.addButton(QObject::tr("Overwrite"), QMessageBox::ButtonRole::AcceptRole);
+    msgBox.addButton(QObject::tr("Rename"), QMessageBox::ButtonRole::ResetRole);
+    msgBox.exec();
+
+    const QMessageBox::ButtonRole role = msgBox.buttonRole(msgBox.clickedButton());
+    switch (role) {
+    case QMessageBox::ButtonRole::AcceptRole:
+        if (!QDir(targetPath).removeRecursively()) {
+            shared::ErrorHub::addError(
+                    shared::ErrorItem::Error, QObject::tr("Unable to cleanup directory %1").arg(targetPath));
+            return false;
+        }
+        break;
+    case QMessageBox::ButtonRole::ResetRole: {
+        const QFileInfo fi(targetPath);
+        bool ok = true;
+        QString text;
+        while (ok) {
+            text = QInputDialog::getText(window, QObject::tr("Exporting objects"),
+                    QObject::tr("Set another name for exporting object"), QLineEdit::Normal, QString(), &ok);
+            if (!ok) {
+                return false;
+            } else if (text.isEmpty()) {
+                shared::ErrorHub::addError(shared::ErrorItem::Error, QObject::tr("Component name can't be empty"));
+            } else if (QFile::exists(fi.absoluteDir().filePath(text))) {
+                shared::ErrorHub::addError(shared::ErrorItem::Error,
+                        QObject::tr("Exported component with such name already exists, choose another one"));
+            } else {
+                break;
+            }
+        }
+        targetPath = fi.absoluteDir().filePath(ivm::IVNameValidator::encodeName(ivm::IVObject::Type::Function, text));
+        break;
+    }
+    case QMessageBox::ButtonRole::RejectRole:
+    default:
         return false;
     }
 
-    QString path = shared::componentsLibraryPath() + QDir::separator() + name;
-    if (exportImpl(path, objects)) {
+    if (!shared::ensureDirExists(targetPath)) {
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, QObject::tr("Unable to create directory %1").arg(targetPath));
+        return false;
+    }
+    return true;
+}
+
+bool InterfaceDocument::exportSelectedFunctions()
+{
+    QString name;
+    const QList<ivm::IVObject *> objects = prepareSelectedObjectsForExport(name);
+    if (name.isEmpty()) {
+        return false;
+    }
+    QString targetPath = d->componentLibrary->libraryPath() + "/" + name;
+
+    if (QFile::exists(QDir(targetPath).filePath(shared::kDefaultInterfaceViewFileName))) {
+        if (!resolveNameConflict(targetPath, nullptr)) {
+            return false;
+        }
+    }
+
+    if (d->componentLibrary->exportComponent(
+                targetPath, objects, path(), asn1FilesPaths(), asn1FilesPathsExternal(), d->archetypesModel)) {
         d->objectsSelectionModel->clearSelection();
         return true;
     }
+    QMessageBox::warning(qApp->activeWindow(), tr("Init TASTE environment"),
+            tr("Error during TASTE environment initiation for exported component!"));
     return false;
 }
 
@@ -416,8 +479,10 @@ bool InterfaceDocument::exportSelectedType()
         return false;
     }
 
-    QString path = shared::sharedTypesPath() + QDir::separator() + rootType->title();
-    if (exportImpl(path, { rootType })) {
+    QString targetPath = shared::sharedTypesPath() + QDir::separator() + rootType->title();
+
+    if (d->componentLibrary->exportComponent(
+                targetPath, { rootType }, path(), asn1FilesPaths(), asn1FilesPathsExternal(), d->archetypesModel)) {
         d->objectsModel->removeObject(rootType);
         d->objectsSelectionModel->clearSelection();
         return true;
@@ -772,9 +837,9 @@ QList<QAction *> InterfaceDocument::customActions() const
     return actions;
 }
 
-QHash<shared::Id, shared::VEObject *> InterfaceDocument::objects() const
+QHash<shared::Id, ivm::IVObject *> InterfaceDocument::objects() const
 {
-    return d->objectsModel->objects();
+    return d->objectsModel->ivobjects();
 }
 
 ivm::IVModel *InterfaceDocument::objectsModel() const
@@ -1020,59 +1085,6 @@ void InterfaceDocument::showInfoMessage(const QString &title, const QString &mes
     QMessageBox::information(qobject_cast<QWidget *>(parent()), title, message);
 }
 
-static inline bool resolveNameConflict(QString &targetPath, QWidget *window)
-{
-    QMessageBox msgBox(QMessageBox::Question, QObject::tr("Exporting objects"),
-            QObject::tr("Current object already exported: %1\nDo you want to proceed?").arg(targetPath),
-            QMessageBox::StandardButton::NoButton, window);
-    msgBox.addButton(QMessageBox::Cancel);
-    msgBox.addButton(QObject::tr("Overwrite"), QMessageBox::ButtonRole::AcceptRole);
-    msgBox.addButton(QObject::tr("Rename"), QMessageBox::ButtonRole::ResetRole);
-    msgBox.exec();
-
-    const QMessageBox::ButtonRole role = msgBox.buttonRole(msgBox.clickedButton());
-    switch (role) {
-    case QMessageBox::ButtonRole::AcceptRole:
-        if (!QDir(targetPath).removeRecursively()) {
-            shared::ErrorHub::addError(
-                    shared::ErrorItem::Error, QObject::tr("Unable to cleanup directory %1").arg(targetPath));
-            return false;
-        }
-        break;
-    case QMessageBox::ButtonRole::ResetRole: {
-        const QFileInfo fi(targetPath);
-        bool ok = true;
-        QString text;
-        while (ok) {
-            text = QInputDialog::getText(window, QObject::tr("Exporting objects"),
-                    QObject::tr("Set another name for exporting object"), QLineEdit::Normal, QString(), &ok);
-            if (!ok) {
-                return false;
-            } else if (text.isEmpty()) {
-                shared::ErrorHub::addError(shared::ErrorItem::Error, QObject::tr("Component name can't be empty"));
-            } else if (QFile::exists(fi.absoluteDir().filePath(text))) {
-                shared::ErrorHub::addError(shared::ErrorItem::Error,
-                        QObject::tr("Exported component with such name already exists, choose another one"));
-            } else {
-                break;
-            }
-        }
-        targetPath = fi.absoluteDir().filePath(ivm::IVNameValidator::encodeName(ivm::IVObject::Type::Function, text));
-        break;
-    }
-    case QMessageBox::ButtonRole::RejectRole:
-    default:
-        return false;
-    }
-
-    if (!shared::ensureDirExists(targetPath)) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, QObject::tr("Unable to create directory %1").arg(targetPath));
-        return false;
-    }
-    return true;
-}
-
 static inline void copyImplementation(
         const QDir &projectDir, const QDir &targetDir, const QVector<ivm::IVObject *> &objects)
 {
@@ -1083,55 +1095,6 @@ static inline void copyImplementation(
             copyImplementation(projectDir, targetDir, fn->children());
         }
     }
-}
-
-bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects)
-{
-    const bool ok = shared::ensureDirExists(targetPath);
-    if (!ok) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Unable to create directory %1").arg(targetPath));
-        return false;
-    }
-
-    QDir targetDir(targetPath);
-    if (QFile::exists(targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
-        if (!resolveNameConflict(targetPath, nullptr)) {
-            return false;
-        } else {
-            targetDir.setPath(targetPath);
-        }
-    }
-
-    if (!exporter()->exportObjectsSilently(objects, targetDir.filePath(shared::kDefaultInterfaceViewFileName),
-                d->archetypesModel, exporter()->templatePath(QLatin1String("interfaceview.ui")))) {
-        return false;
-    }
-
-    const QFileInfo ivPath(path());
-    const QDir ivDir = ivPath.absoluteDir();
-    const QString workDir = QDir(ivDir.canonicalPath() + "/work/").absolutePath();
-    for (const QString &asnFile : asn1FilesPaths()) {
-        if (asnFile.startsWith(workDir)) { // ignore generated .asn file
-            continue;
-        }
-        QFileInfo fi(asnFile);
-        const QString filename = fi.fileName();
-        if (!QFile::copy(ivDir.filePath(filename), targetDir.filePath(filename))) {
-            shared::ErrorHub::addError(
-                    shared::ErrorItem::Error, tr("Error during ASN.1 file copying: %1").arg(asnFile));
-        }
-    }
-
-    QVector<ivm::IVObject *> children;
-    std::for_each(objects.cbegin(), objects.cend(), [&children](shared::VEObject *veObj) {
-        if (auto fn = veObj->as<ivm::IVObject *>()) {
-            children.append(fn);
-        }
-    });
-    copyImplementation(ivDir, targetDir, children);
-    createProFile(targetPath);
-    initTASTEEnv(targetPath);
-    return true;
 }
 
 bool InterfaceDocument::loadImpl(const QString &path)
@@ -1238,20 +1201,6 @@ void InterfaceDocument::showNIYGUI(const QString &title)
 void InterfaceDocument::createProFile(const QString &path)
 {
     shared::QMakeFile::createProFileForDirectory(path, asn1FilesPathsExternal());
-}
-
-void InterfaceDocument::initTASTEEnv(const QString &path)
-{
-    std::unique_ptr<QProcess> initTASTECallerProcess = shared::ExternalProcess::create();
-    initTASTECallerProcess->setProgram("taste");
-    initTASTECallerProcess->setArguments({ "reset" });
-    initTASTECallerProcess->setWorkingDirectory(path);
-    initTASTECallerProcess->start();
-    initTASTECallerProcess->waitForFinished();
-    if (initTASTECallerProcess->exitCode() != 0 || initTASTECallerProcess->exitStatus() != QProcess::NormalExit) {
-        QMessageBox::warning(qApp->activeWindow(), tr("Init TASTE environment"),
-                tr("Error during TASTE environment initiation for exported component!"));
-    }
 }
 
 bool InterfaceDocument::isProjectAsnFile(const QString &filename) const

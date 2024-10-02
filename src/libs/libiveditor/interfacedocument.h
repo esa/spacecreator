@@ -125,7 +125,7 @@ public:
     QList<QAction *> customActions() const;
 
     // objectsModel
-    QHash<shared::Id, shared::VEObject *> objects() const;
+    QHash<shared::Id, ivm::IVObject *> objects() const;
     ivm::IVModel *objectsModel() const;
 
     IVItemModel *itemsModel() const;
@@ -153,7 +153,7 @@ public:
     bool checkInterfaceAsn1Compliance(const ivm::IVInterface *interface) const;
     bool checkAllInterfacesForAsn1Compliance();
 
-    QList<shared::VEObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
+    QList<ivm::IVObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
 
     ivm::IVPropertyTemplateConfig *dynPropConfig() const;
 
@@ -185,7 +185,6 @@ public Q_SLOTS:
 
 private:
     void checkReferencedASN1Files(ivm::IVObject *object);
-    bool exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
     bool loadComponentModel(ivm::IVModel *model, const QString &path, QHash<shared::Id, QString> *pathMappings);
@@ -197,7 +196,6 @@ private:
 
     void showNIYGUI(const QString &title = QString());
     void createProFile(const QString &path);
-    void initTASTEEnv(const QString &path);
     bool isProjectAsnFile(const QString &filename) const;
 
     QList<ivm::IVObject *> getSelectedObjects();

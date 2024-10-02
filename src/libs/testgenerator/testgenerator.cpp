@@ -224,7 +224,7 @@ auto TestGenerator::compileSystemUnderTest() -> void
 auto TestGenerator::exportIvModel(IVModel *ivModel, const QString &outputFilename) -> bool
 {
     IVExporter exporter;
-    return exporter.exportObjectsSilently(ivModel->objects().values(), outputFilename);
+    return exporter.exportObjectsSilently(ivModel->ivobjects().values(), outputFilename);
 }
 
 auto TestGenerator::exportDvModel(DVModel *dvModel, const QString &outputFilename) -> bool

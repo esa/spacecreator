@@ -29,6 +29,8 @@
 
 namespace ivm {
 
+class IVObject;
+
 class IVXMLWriter : public templating::ObjectsExporter
 {
     Q_OBJECT
@@ -37,11 +39,11 @@ public:
     static QString templatePath(const QString &templateName);
     QString defaultTemplatePath() const override;
 
-    bool exportObjects(const QList<shared::VEObject *> &objects, QIODevice *outBuffer,
+    bool exportObjects(const QList<IVObject *> &objects, QIODevice *outBuffer,
             ivm::ArchetypeModel *archetypesModel = nullptr,
             const QString &pathToTemplate = templatePath(QLatin1String("interfaceview.ui")));
 
-    bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath,
+    bool exportObjectsSilently(const QList<IVObject *> &objects, const QString &outPath,
             ivm::ArchetypeModel *archetypesModel = nullptr, const QString &templatePath = QString());
 
 protected:
@@ -56,6 +58,6 @@ private:
     QVariant createFrom(const shared::VEObject *object) const override;
     QString groupName(const shared::VEObject *object) const override;
 
-    void checkArchetypeIntegrity(const QList<shared::VEObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel);
+    void checkArchetypeIntegrity(const QList<IVObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel);
 };
 }

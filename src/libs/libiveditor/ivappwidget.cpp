@@ -527,7 +527,7 @@ void IVAppWidget::wrapItems()
         return;
     }
 
-    QList<shared::VEObject *> objects;
+    QList<ivm::IVObject *> objects;
     for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
         const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
         if (ivm::IVObject *object = m_document->objectsModel()->getObject(index.data(role).toUuid())) {
@@ -553,7 +553,7 @@ void IVAppWidget::wrapItems()
     objects.erase(it, objects.end());
 
     /// and collect not selected connections to be processed
-    QList<shared::VEObject *> notSelectedConnections;
+    QList<ivm::IVObject *> notSelectedConnections;
     std::for_each(objects.cbegin(), objects.cend(), [&](const shared::VEObject *obj) {
         if (auto function = obj->as<const ivm::IVFunction *>()) {
             QVector<ivm::IVConnection *> connections;
@@ -572,7 +572,7 @@ void IVAppWidget::wrapItems()
     static const QSet<ivm::IVObject::Type> kRectTypes { ivm::IVObject::Type::Function,
         ivm::IVObject::Type::FunctionType, ivm::IVObject::Type::Comment };
     QRectF itemSceneRect;
-    for (shared::VEObject *obj : qAsConst(objects)) {
+    for (shared::VEObject *obj : std::as_const(objects)) {
         if (auto iObj = qobject_cast<ivm::IVObject *>(obj)) {
             if (kRectTypes.contains(iObj->type())) {
                 itemSceneRect |= topohelp::geom::rect(iObj->coordinates());
@@ -727,7 +727,7 @@ void IVAppWidget::wrapItems()
     m_document->commandsStack()->endMacro();
 }
 
-void IVAppWidget::exportToClipboard(const QList<shared::VEObject *> &objects, QMimeData *mimeData)
+void IVAppWidget::exportToClipboard(const QList<ivm::IVObject *> &objects, QMimeData *mimeData)
 {
     QBuffer buffer;
     if (!buffer.open(QIODevice::WriteOnly)) {
@@ -1144,9 +1144,9 @@ QVector<QAction *> IVAppWidget::initViewActions()
     return m_viewActions;
 }
 
-QList<shared::VEObject *> IVAppWidget::selectedObjects() const
+QList<ivm::IVObject *> IVAppWidget::selectedObjects() const
 {
-    QList<shared::VEObject *> objects;
+    QList<ivm::IVObject *> objects;
     for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
         const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
         const shared::Id id = index.data(role).toUuid();

@@ -61,7 +61,7 @@ bool IVExporter::exportDocSilently(InterfaceDocument *doc, const QString &outPat
         return false;
     }
 
-    const QList<shared::VEObject *> objects = doc->objects().values();
+    const QList<ivm::IVObject *> objects = doc->objects().values();
 
     checkArchetypeIntegrity(objects, doc->archetypesModel());
     QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
@@ -157,15 +157,14 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
     return grouppedObjects;
 }
 
-void IVExporter::checkArchetypeIntegrity(
-        const QList<shared::VEObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel)
+void IVExporter::checkArchetypeIntegrity(const QList<ivm::IVObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel)
 {
     if (archetypesModel == nullptr) {
         return;
     }
 
     const QStringList warningList = ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(ivObjects, archetypesModel);
-    for (const QString &warning : qAsConst(warningList)) {
+    for (const QString &warning : std::as_const(warningList)) {
         shared::ErrorHub::addError(shared::ErrorItem::Warning, warning);
     }
 }

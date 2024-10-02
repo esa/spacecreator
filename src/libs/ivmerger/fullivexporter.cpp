@@ -39,7 +39,7 @@ bool FullIVExporter::doExport(QString outputIvFile)
 
     ivObjects[QLatin1String("UiFile")] = QVariant::fromValue(uiFile);
 
-    bool result = exportObjectsSilently(m_modelToExport->objects().values(), outputIvFile);
+    bool result = exportObjectsSilently(m_modelToExport->ivobjects().values(), outputIvFile);
     if (!result) {
         return false;
     }

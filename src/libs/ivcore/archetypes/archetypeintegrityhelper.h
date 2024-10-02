@@ -34,6 +34,7 @@ class InterfaceArchetype;
 class ParameterArchetype;
 class IVFunctionType;
 class IVInterface;
+class IVObject;
 
 class ArchetypeIntegrityHelper : public QObject
 {
@@ -42,10 +43,9 @@ public:
     ArchetypeIntegrityHelper() = delete;
 
     /**
-    * @brief checkArchetypeIntegrity checks if all referenced archetypes are implemented correctly
-    */
-    static QStringList checkArchetypeIntegrity(
-            QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
+     * @brief checkArchetypeIntegrity checks if all referenced archetypes are implemented correctly
+     */
+    static QStringList checkArchetypeIntegrity(QList<ivm::IVObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
 
 private:
     static QStringList checkFunctionArchetypeIntegrity(

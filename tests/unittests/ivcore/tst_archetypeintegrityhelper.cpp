@@ -77,7 +77,7 @@ void tst_ArchtypeIntegrityHelper::tst_checkArchetypeIntegrity()
     QCOMPARE(model->objects().size(), 4);
 
     QStringList warningList =
-            ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(model->objects().values(), archetypeModel);
+            ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(model->ivobjects().values(), archetypeModel);
 
     QCOMPARE(warningList.size(), 0);
 }
@@ -91,7 +91,7 @@ void tst_ArchtypeIntegrityHelper::tst_checkArchetypeIntegrityWithInterfaceNameEr
     QCOMPARE(model->objects().size(), 4);
 
     QStringList warningList =
-            ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(model->objects().values(), archetypeModel);
+            ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(model->ivobjects().values(), archetypeModel);
 
     QCOMPARE(warningList.size(), 1);
     QCOMPARE(warningList[0],
@@ -107,7 +107,7 @@ void tst_ArchtypeIntegrityHelper::tst_checkArchetypeIntegrityWithParameterNameEr
     QCOMPARE(model->objects().size(), 4);
 
     QStringList warningList =
-            ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(model->objects().values(), archetypeModel);
+            ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(model->ivobjects().values(), archetypeModel);
 
     QCOMPARE(warningList.size(), 1);
     QCOMPARE(warningList[0],

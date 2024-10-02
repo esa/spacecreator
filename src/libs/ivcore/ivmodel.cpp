@@ -262,6 +262,18 @@ void IVModel::clone(IVObject *origin, QList<IVObject *> &importedObjects, IVMode
     }
 }
 
+QHash<shared::Id, IVObject *> IVModel::ivobjects() const
+{
+    QHash<shared::Id, IVObject *> ivobjects;
+
+    for (const auto &object : objects().asKeyValueRange()) {
+        if (auto ivObject = dynamic_cast<IVObject *>(object.second)) {
+            ivobjects.insert(object.first, ivObject);
+        }
+    }
+    return ivobjects;
+}
+
 bool IVModel::removeObject(shared::VEObject *obj)
 {
     if (shared::VEModel::removeObject(obj)) {

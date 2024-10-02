@@ -672,7 +672,7 @@ std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath
 void TmcConverter::saveOptimizedInterfaceView(const IVModel *ivModel, const QString outputFilePath)
 {
     IVXMLWriter exporter;
-    exporter.exportObjectsSilently(ivModel->objects().values(), outputFilePath);
+    exporter.exportObjectsSilently(ivModel->ivobjects().values(), outputFilePath);
 }
 
 void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdlFunctions,

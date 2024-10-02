@@ -55,7 +55,7 @@ std::unique_ptr<ivm::IVModel> importIvModel(const QString &filepath)
 void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString &outputFilePath)
 {
     ivm::IVXMLWriter exporter;
-    exporter.exportObjectsSilently(ivModel->objects().values(), outputFilePath);
+    exporter.exportObjectsSilently(ivModel->ivobjects().values(), outputFilePath);
 }
 
 int main(int argc, char *argv[])
