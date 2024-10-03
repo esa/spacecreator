@@ -571,12 +571,35 @@ int Asn1ValueParser::nextIndex(const QString &value) const
         return index;
     }
 
-    // phase two - '{' was found - find matching '}'
+    // the '{' was found - there shall be matching '}'
     ++index;
     if (index >= value.size()) {
         // input is probably ill-formed, what will be reported later
         return value.size();
     }
+
+    // phase two - find matching '}'
+    index = findMatchingBracket(value, nestingCharSearch, index);
+
+    // index is after closing '}' what may be ',' or white space
+    // this function shall return index for ',' if it exists
+    int lookaheadIndex = index;
+    while (index < value.length() && value[lookaheadIndex].isSpace()) {
+        ++lookaheadIndex;
+        if (lookaheadIndex < value.length() && value[lookaheadIndex] == ',') {
+            return lookaheadIndex;
+        }
+    }
+
+    return index;
+}
+
+int Asn1ValueParser::findMatchingBracket(
+        const QString &value, const QRegularExpression &nestingCharSearch, int from) const
+{
+    int index = from;
+    QRegularExpressionMatch match;
+
     int level = 1;
     while (level > 0) {
         index = value.indexOf(nestingCharSearch, index, &match);

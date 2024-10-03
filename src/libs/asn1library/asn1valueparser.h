@@ -75,6 +75,7 @@ private:
     bool checkSizeConstraint(const Constraints::Constraint<ValueType> *constraint, int32_t value) const;
 
     int nextIndex(const QString &value) const;
+    int findMatchingBracket(const QString &value, const QRegularExpression &nestingCharSearch, int from) const;
 };
 
 } // namespace asn1

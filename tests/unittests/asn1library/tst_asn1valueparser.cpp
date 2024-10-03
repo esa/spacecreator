@@ -749,7 +749,7 @@ void tst_Asn1ValueParser::testComplexSequence()
 
     bool convOk = false;
     auto valueMap = valueParser->parseAsn1Value(assignment.get(),
-            "{ sun red : { left 11, right 99}, moon { { left  0, right 100 }, { left 10, right 12 } } }", &convOk);
+            "{ sun red : { left 11, right 99}, moon { { left  0, right 100 } , { left 10, right 12 } } }", &convOk);
     QVERIFY(convOk);
 
     QCOMPARE(valueMap.size(), 2);
