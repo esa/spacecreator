@@ -179,6 +179,10 @@ void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const Q
 void MscParameterValueParser::parseValueSequence(
         const QVariantList &seqOfValue, const QString &parentName, ParametersRequirements &result) const
 {
+    // add requirement for length
+    QString lengthExpression = QString("length(%1)").arg(parentName);
+    result.push_back({ lengthExpression, QString::number(seqOfValue.size()) });
+
     for (int i = 0; i < seqOfValue.size(); ++i) {
         const auto &elem = seqOfValue.at(i);
 
