@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2022 N7 Space Sp. z o.o.
+ * @copyright (C) 2024 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,22 +17,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "tst_mscparametervalueparser.h"
-#include "tst_tftable.h"
+#pragma once
 
-#include <QTest>
+#include <QObject>
+#include <QtTest>
 
-int main(int argc, char *argv[])
+namespace tests::sdl {
+
+class tst_MscParameterValueParser : public QObject
 {
-    int status = 0;
-    {
-        tests::sdl::tst_TFTable test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
-    {
-        tests::sdl::tst_MscParameterValueParser test;
-        status |= QTest::qExec(&test, argc, argv);
-    }
+    Q_OBJECT
 
-    return status;
-}
+private Q_SLOTS:
+    void testSequenceOfLength();
+
+};
+
+} // namespace tests::sdl

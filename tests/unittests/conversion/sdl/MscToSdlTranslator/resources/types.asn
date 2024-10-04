@@ -1,0 +1,7 @@
+TEST-TYPES DEFINITIONS ::= BEGIN
+
+	ExampleInteger ::= INTEGER (0 .. 100)
+
+	ExampleSequenceOf ::= SEQUENCE (SIZE(0..4)) OF ExampleInteger
+
+END

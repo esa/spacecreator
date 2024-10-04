@@ -39,11 +39,11 @@ MscParameterValueParser::MscParameterValueParser(const QString &chartName, const
 }
 
 MscParameterValueParser::SignalRequirementsMap MscParameterValueParser::parseSignals(
-        const std::unordered_map<uint32_t, SignalInfo> &signals) const
+        const std::unordered_map<uint32_t, SignalInfo> &signalsMap) const
 {
     SignalRequirementsMap signalRequirements;
 
-    for (const auto &[signalId, signalInfo] : signals) {
+    for (const auto &[signalId, signalInfo] : signalsMap) {
         const auto &parameterList = signalInfo.parameterList;
 
         if (parameterList.empty()) {
@@ -179,7 +179,8 @@ void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const Q
 void MscParameterValueParser::parseValueSequence(
         const QVariantList &seqOfValue, const QString &parentName, ParametersRequirements &result) const
 {
-    // add requirement for length
+    // add requirement for length of SEQUENCEOF
+    // function length works for both fixed-size and variable-size
     QString lengthExpression = QString("length(%1)").arg(parentName);
     result.push_back({ lengthExpression, QString::number(seqOfValue.size()) });
 

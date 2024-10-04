@@ -71,9 +71,9 @@ public:
     /**
      * @brief   Parse given signals
      *
-     * @param   signals     Signals to parse
+     * @param   signalsMap     Signals to parse
      */
-    auto parseSignals(const std::unordered_map<uint32_t, SignalInfo> &signals) const -> SignalRequirementsMap;
+    auto parseSignals(const std::unordered_map<uint32_t, SignalInfo> &signalsMap) const -> SignalRequirementsMap;
 
 private:
     auto parseSignal(const SignalInfo &signalInfo) const -> ParametersRequirements;
