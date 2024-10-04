@@ -21,6 +21,7 @@ work/dataview/*
 
 # Except modelchecking directory
 !work/modelchecking/
+!work/modelchecking/properties/nominal/nominal.msc
 
 # Except controller source
 !work/controller/

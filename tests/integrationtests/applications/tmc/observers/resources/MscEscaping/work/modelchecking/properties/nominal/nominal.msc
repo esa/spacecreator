@@ -1,0 +1,34 @@
+mscdocument nominal /* MSC AND */;
+    language ASN.1;
+    data dataview-uniq.asn;
+/* CIF MSCDOCUMENT (0, 0) (4112, 1757) */
+mscdocument nominal /* MSC LEAF */;
+    language ASN.1;
+    data dataview-uniq.asn;
+msc nominal;
+/* CIF TEXT (2299, 11) (1818, 1356) */
+/* CIF INSTANCE (11, 63) (214, 90) (800, 1580) */
+instance controller;
+/* CIF CONDITION (11, 201) (929, 66) */
+condition When shared all;
+/* CIF MESSAGE (116, 463) (2603, 463) */
+out ping({machine-params {{low-limit 0, high-limit 14}, {low-limit 22, high-limit 29}, {low-limit 39, high-limit 50}}, base-number 32}) to actuator;
+/* CIF CONDITION (11, 405) (929, 66) */
+condition Then shared all;
+/* CIF MESSAGE (2603, 667) (116, 667) */
+in pong(3) from actuator;
+endinstance;
+/* CIF INSTANCE (2506, 63) (196, 90) (800, 1580) */
+instance actuator;
+/* CIF CONDITION (11, 201) (929, 66) */
+condition When shared all;
+/* CIF MESSAGE (116, 463) (2603, 463) */
+in ping({machine-params {{low-limit 0, high-limit 14}, {low-limit 22, high-limit 29}, {low-limit 39, high-limit 50}}, base-number 32}) from controller;
+/* CIF CONDITION (11, 405) (929, 66) */
+condition Then shared all;
+/* CIF MESSAGE (2603, 667) (116, 667) */
+out pong(3) to controller;
+endinstance;
+endmsc;
+endmscdocument;
+endmscdocument;
