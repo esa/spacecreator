@@ -29,8 +29,8 @@ $ASN1SCC -uPER -typePrefix asn1Scc -renamePolicy 3 -c -o "${TEST_OUTPUT_DIR}" "$
 
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
-    && $CC -o system.out *.c \
-    && ./system.out -m1000000 -a -n > system.output \
+    && $CC -o system.out *.c -DNFAIR=3 \
+    && ./system.out -m1000000 -a -n -f > system.output \
     && grep -q "errors: 0" system.output \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR
