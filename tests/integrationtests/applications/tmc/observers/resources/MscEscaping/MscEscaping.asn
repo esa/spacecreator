@@ -1,0 +1,20 @@
+MSCESCAPING-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10000)
+
+
+   My-Struct ::= SEQUENCE {
+      low-limit MyInteger,
+      high-limit MyInteger
+   }
+
+   My-Packet ::= SEQUENCE (SIZE(3)) OF My-Struct
+
+   My-Request ::= SEQUENCE {
+      machine-params My-Packet,
+      base-number MyInteger
+   }
+
+END
+

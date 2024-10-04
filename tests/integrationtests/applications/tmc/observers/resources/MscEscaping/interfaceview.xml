@@ -1,0 +1,71 @@
+<InterfaceView version="1.3" asn1file="MscEscaping.acn" UiFile="interfaceview.ui.xml" modifierHash="71aa363">
+<Function id="{f97afba9-5e95-43c9-94e8-a006fe4f1c67}" name="controller" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_min="1" instances_max="1" startup_priority="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{985373bd-2f1d-47e0-aa52-dd47d953e871}" name="pong" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" priority="1" miat="0" wcet="0" stack_size="1024">
+    <Input_Parameter name="the_response" type="MyInteger" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{372df1f2-4ca0-4dc8-9f9f-e80cd7bea8e3}" name="do_stuff" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" priority="1" miat="0" wcet="0" stack_size="1024">
+</Provided_Interface>
+
+<Required_Interface id="{3b2481ec-26d7-46d5-8551-fe27766204a2}" name="ping" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" priority="1" miat="0" wcet="0" stack_size="1024">
+    <Input_Parameter name="the_request" type="My-Request" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{bb65ab68-e339-4117-b6ea-fbdb03653741}" name="actuator" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_min="1" instances_max="1" startup_priority="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{0855b42a-91ef-40bd-ac20-535c0b8bebfc}" name="ping" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" priority="1" miat="0" wcet="0" stack_size="1024">
+    <Input_Parameter name="the_request" type="My-Request" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{54cca210-3c61-4283-965f-690ee8daca64}" name="pong" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" priority="1" miat="0" wcet="0" stack_size="1024">
+    <Input_Parameter name="the_response" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{c045ffad-ebc4-4284-84e6-7106752f95ca}" name="empty_gui" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_min="1" instances_max="1" startup_priority="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Required_Interface id="{094796fc-159b-487d-a780-088f054cfcdb}" name="do_stuff" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" priority="1" miat="0" wcet="0" stack_size="1024">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection id="{0661102b-d322-486a-bf87-93a2c9272963}" name="actuator_pong____controller_pong" required_system_element="NO">
+    <Source iface_id="{54cca210-3c61-4283-965f-690ee8daca64}" func_name="actuator" ri_name="pong" />
+    <Target iface_id="{985373bd-2f1d-47e0-aa52-dd47d953e871}" func_name="controller" pi_name="pong" />
+</Connection>
+
+<Connection id="{4285995f-2ff5-4b59-85b7-60d19644cc3e}" name="empty_gui_do_stuff____controller_do_stuff" required_system_element="NO">
+    <Source iface_id="{094796fc-159b-487d-a780-088f054cfcdb}" func_name="empty_gui" ri_name="do_stuff" />
+    <Target iface_id="{372df1f2-4ca0-4dc8-9f9f-e80cd7bea8e3}" func_name="controller" pi_name="do_stuff" />
+</Connection>
+
+<Connection id="{19940ac2-f779-48ac-8187-4ad0191b3660}" name="controller_ping____actuator_ping" required_system_element="NO">
+    <Source iface_id="{3b2481ec-26d7-46d5-8551-fe27766204a2}" func_name="controller" ri_name="ping" />
+    <Target iface_id="{0855b42a-91ef-40bd-ac20-535c0b8bebfc}" func_name="actuator" pi_name="ping" />
+</Connection>
+
+<Comment id="{fbe38c42-b04e-48ce-8073-6ffa1cf0531c}" name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3" required_system_element="NO">
+</Comment>
+
+<Layer name="default" is_visible="true"/>
+
+</InterfaceView>

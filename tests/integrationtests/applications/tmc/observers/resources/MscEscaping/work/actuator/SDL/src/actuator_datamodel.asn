@@ -1,0 +1,21 @@
+Actuator-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   MyInteger, My-Struct, My-Packet, My-Request FROM MSCESCAPING-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record, T-Runtime-Error FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview;
+
+Actuator-States ::= ENUMERATED {wait}
+
+Actuator-Context ::= SEQUENCE {
+   state Actuator-States,
+   init-done BOOLEAN,
+   sender PID,
+   offspring PID,
+   param My-Request,
+   response MyInteger
+}
+
+Actuator-T-Runtime-Error-Selection ::= ENUMERATED {noerror-present(1), encodeerror-present(2), decodeerror-present(3)}
+END

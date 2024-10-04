@@ -43,6 +43,7 @@ private Q_SLOTS:
     void test_mscWhenThenNotSequenceFailure();
     void test_mscWhenThenNotSequenceParametersFailure();
     void test_differentInterfaceNames();
+    void test_mscEscaping();
 };
 
 void tst_Tmc_Observers::test_inputMonitoring()
@@ -132,6 +133,12 @@ void tst_Tmc_Observers::test_mscWhenThenNotSequenceParametersFailure()
 void tst_Tmc_Observers::test_differentInterfaceNames()
 {
     const int result = system("./test_different_interface_names.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Observers::test_mscEscaping()
+{
+    const int result = system("./test_msc_escaping.sh");
     QCOMPARE(result, 0);
 }
 

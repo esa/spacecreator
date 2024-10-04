@@ -1,0 +1,36 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+
+process Controller;
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (407, 312), (170, 140) */
+    dcl param My_Request;
+    dcl dummy MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (1101, 302), (70, 35) */
+    START;
+        /* CIF task (1032, 357), (206, 128) */
+        task param := {
+   machine_params {
+      {low_limit 0, high_limit 14},
+      {low_limit 22, high_limit 29},
+      {low_limit 39, high_limit 50}
+   },
+   base_number 32
+};
+        /* CIF output (1088, 505), (94, 35) */
+        output ping(param);
+        /* CIF NEXTSTATE (1101, 555), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (1582, 349), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Wait;
+        /* CIF input (1564, 404), (105, 35) */
+        input pong(dummy);
+            /* CIF NEXTSTATE (1582, 459), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+    /* CIF state (450, 10), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Wait;
+    endstate;
+endprocess Controller;

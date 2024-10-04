@@ -1,0 +1,25 @@
+/* CIF PROCESS (250, 149), (150, 75) */
+
+process Actuator;
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (415, 383), (170, 140) */
+    dcl param My_Request;
+    dcl response MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (1015, 232), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Wait;
+        /* CIF input (1002, 287), (94, 35) */
+        input ping(param);
+            /* CIF task (999, 342), (100, 35) */
+            task response := 3;
+            /* CIF output (992, 397), (115, 35) */
+            output pong(response);
+            /* CIF NEXTSTATE (1015, 452), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Actuator;

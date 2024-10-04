@@ -1,0 +1,47 @@
+default_attributes.xml
+
+*.msc
+*.aadl
+.cache/
+*.pro.user
+
+# Ignore whole tmc directory
+tmc/*
+
+# Ignore whole work directory
+work/*
+
+# Except simulation directory
+!work/simulation/
+
+# Except dataview-uniq.asn
+!work/dataview/
+work/dataview/*
+!work/dataview/dataview-uniq.asn
+
+# Except modelchecking directory
+!work/modelchecking/
+
+# Except controller source
+!work/controller/
+work/controller/*
+!work/controller/SDL
+work/controller/SDL/*
+!work/controller/SDL/src
+work/controller/SDL/src/*
+!work/controller/SDL/src/controller.pr
+!work/controller/SDL/src/system_structure.pr
+!work/controller/SDL/src/dataview-uniq.asn
+!work/controller/SDL/src/controller_datamodel.asn
+
+# Except actuator source
+!work/actuator/
+work/actuator/*
+!work/actuator/SDL
+work/actuator/SDL/*
+!work/actuator/SDL/src
+work/actuator/SDL/src/*
+!work/actuator/SDL/src/actuator.pr
+!work/actuator/SDL/src/system_structure.pr
+!work/actuator/SDL/src/dataview-uniq.asn
+!work/actuator/SDL/src/actuator_datamodel.asn

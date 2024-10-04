@@ -1,0 +1,115 @@
+system nominal;
+    /* CIF Text (0, 0), (400, 500) */
+    use datamodel comment '/home/taste/projects/spacecreator/tests/integrationtests/applications/tmc/observers/resources/MscEscaping/work/simulation/observers/observer.asn';
+    signal sig0(My_Request) renames input ping to actuator;
+    signal sig1(MyInteger) renames input pong to controller;
+    /* CIF ENDTEXT */
+    channel c
+        from env to nominal with sig0, sig1;
+    endchannel;
+    block nominal;
+        signalroute r
+            from env to nominal with sig0, sig1;
+        connect c and r;
+        /* CIF Process (0, 750), (800, 100) */
+        process nominal;
+            /* CIF Text (0, 900), (400, 500) */
+            monitor event Observable_Event;
+            successstates s2;
+            errorstates sErr;
+            /* CIF ENDTEXT */
+            /* CIF Start (0, 1650), (200, 75) */
+            START;
+                /* CIF NextState (0, 1837), (200, 50) */
+                NEXTSTATE s0;
+            /* CIF State (0, 1912), (200, 50) */
+            state s0;
+                /* CIF Input (0, 1912), (200, 50) */
+                input sig0(sig0_param0);
+                    /* CIF Decision (0, 1912), (400, 50) */
+                    decision sig0_param0.machine-params(0).low-limit;
+                        /* CIF Answer (0, 1987), (400, 50) */
+                        (0):
+                            /* CIF Decision (0, 1987), (400, 50) */
+                            decision sig0_param0.machine-params(0).high-limit;
+                                /* CIF Answer (0, 2062), (400, 50) */
+                                (14):
+                                    /* CIF Decision (0, 2062), (400, 50) */
+                                    decision sig0_param0.machine-params(1).low-limit;
+                                        /* CIF Answer (0, 2137), (400, 50) */
+                                        (22):
+                                            /* CIF Decision (0, 2137), (400, 50) */
+                                            decision sig0_param0.machine-params(1).high-limit;
+                                                /* CIF Answer (0, 2212), (400, 50) */
+                                                (29):
+                                                    /* CIF Decision (0, 2212), (400, 50) */
+                                                    decision sig0_param0.machine-params(2).low-limit;
+                                                        /* CIF Answer (0, 2287), (400, 50) */
+                                                        (39):
+                                                            /* CIF Decision (0, 2287), (400, 50) */
+                                                            decision sig0_param0.machine-params(2).high-limit;
+                                                                /* CIF Answer (0, 2362), (400, 50) */
+                                                                (50):
+                                                                    /* CIF Decision (0, 2362), (400, 50) */
+                                                                    decision sig0_param0.base-number;
+                                                                        /* CIF Answer (0, 2437), (400, 50) */
+                                                                        (32):
+                                                                            /* CIF NextState (0, 2512), (200, 50) */
+                                                                            NEXTSTATE s1;
+                                                                        /* CIF Answer (600, 2437), (400, 50) */
+                                                                        ELSE:
+                                                                    enddecision;
+                                                                /* CIF Answer (1800, 2362), (400, 50) */
+                                                                ELSE:
+                                                            enddecision;
+                                                        /* CIF Answer (3000, 2287), (400, 50) */
+                                                        ELSE:
+                                                    enddecision;
+                                                /* CIF Answer (4200, 2212), (400, 50) */
+                                                ELSE:
+                                            enddecision;
+                                        /* CIF Answer (5400, 2137), (400, 50) */
+                                        ELSE:
+                                    enddecision;
+                                /* CIF Answer (6600, 2062), (400, 50) */
+                                ELSE:
+                            enddecision;
+                        /* CIF Answer (7800, 1987), (400, 50) */
+                        ELSE:
+                    enddecision;
+                    /* CIF NextState (8400, 2062), (200, 50) */
+                    NEXTSTATE s0;
+                /* CIF Input (300, 1912), (200, 50) */
+                input *;
+                    /* CIF NextState (300, 1987), (200, 50) */
+                    NEXTSTATE s0;
+            endstate;
+            /* CIF State (8700, 1912), (200, 50) */
+            state s1;
+                /* CIF Input (8700, 1912), (200, 50) */
+                input sig1(sig1_param0);
+                    /* CIF Decision (8700, 1912), (400, 50) */
+                    decision sig1_param0;
+                        /* CIF Answer (8700, 1987), (400, 50) */
+                        (3):
+                            /* CIF NextState (8700, 2062), (200, 50) */
+                            NEXTSTATE s2;
+                        /* CIF Answer (9300, 1987), (400, 50) */
+                        ELSE:
+                    enddecision;
+                    /* CIF NextState (9900, 2062), (200, 50) */
+                    NEXTSTATE sErr;
+                /* CIF Input (9000, 1912), (200, 50) */
+                input *;
+                    /* CIF NextState (9000, 1987), (200, 50) */
+                    NEXTSTATE sErr;
+            endstate;
+            /* CIF State (10200, 1912), (200, 50) */
+            state s2;
+            endstate;
+            /* CIF State (10500, 1912), (200, 50) */
+            state sErr;
+            endstate;
+        endprocess nominal;
+    endblock;
+endsystem;
