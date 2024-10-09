@@ -19,7 +19,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include <QObject>
 #include <common.h>
-#include <vemodel.h>
+#include <ivmodel.h>
 
 namespace ivm {
 
@@ -37,7 +37,7 @@ public:
         QStringList asn1Files;
         QList<shared::Id> rootIds;
         QString componentPath;
-        std::unique_ptr<shared::VEModel> model;
+        std::unique_ptr<IVModel> model;
     };
 
     IVComponentLibrary(const QString &path, const QString &modelName);
@@ -60,9 +60,30 @@ public:
      * \param id
      */
     void removeComponent(const shared::Id &id);
+    /*!
+     * \brief loadComponent tries to load the component taking into account that at least one of the objects in the
+     * model is not of type ivm::IVObject::Type::InterfaceGroup
+     * \param path to the interfaceview.xml file in the
+     * components library
+     * \return return a QSharePointer to a component
+     */
+    QSharedPointer<ivm::IVComponentLibrary::Component> loadComponent(const QString &path);
+    /*!
+     * \brief rootObjects: objects that doesn't have a parentObject
+     * \param objects: list of IVObjects to be filtered
+     * \return
+     */
+    QVector<IVObject *> rootObjects(QVector<IVObject *> objects);
+Q_SIGNALS:
+    void componentUpdated(const shared::Id &id);
+
+private:
+    bool anyLoadableIVObjects(QVector<ivm::IVObject *> objects);
+    QList<shared::Id> rootIds(QVector<ivm::IVObject *> objects);
 
 private:
     struct IVComponentLibraryPrivate;
     IVComponentLibraryPrivate *d;
+    void addComponent(const QSharedPointer<Component> &component);
 };
 } // ivm

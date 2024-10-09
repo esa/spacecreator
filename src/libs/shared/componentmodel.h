@@ -18,6 +18,7 @@
 #pragma once
 
 #include "common.h"
+
 #include <QStandardItemModel>
 #include <memory>
 
@@ -65,10 +66,9 @@ public:
 protected:
     virtual QStandardItem *loadComponent(const QString &path) = 0;
     void addComponent(QSharedPointer<Component> component);
-
-private:
     QStandardItem *itemById(const shared::Id &id);
 
+private:
 private:
     const std::unique_ptr<ComponentModelPrivate> d;
 };

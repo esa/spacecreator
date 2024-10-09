@@ -18,6 +18,7 @@
 #pragma once
 
 #include <componentmodel.h>
+#include <ivcomponentlibrary.h>
 #include <ivobject.h>
 
 namespace ive {
@@ -42,6 +43,7 @@ private:
     QStandardItem *processObject(ivm::IVObject *ivObject);
 
 private:
+    std::unique_ptr<ivm::IVComponentLibrary> m_compLibrary;
     Type m_type;
 };
 

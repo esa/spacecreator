@@ -1,5 +1,7 @@
 #include "ivcomponentlibrary.h"
 
+#include "ivxmlreader.h"
+
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <archetypes/archetypemodel.h>
@@ -106,6 +108,80 @@ void IVComponentLibrary::removeComponent(const shared::Id &id)
 
     QDir dir(component->componentPath);
     dir.removeRecursively();
+}
+
+QSharedPointer<ivm::IVComponentLibrary::Component> IVComponentLibrary::loadComponent(const QString &path)
+{
+    if (path.isEmpty() || !QFileInfo::exists(path)) {
+        qDebug() << path << "doesn't exist";
+        return nullptr;
+    }
+
+    shared::ErrorHub::setCurrentFile(path);
+    ivm::IVXMLReader parser;
+    if (!parser.readFile(path)) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, parser.errorString(), path);
+        shared::ErrorHub::clearCurrentFile();
+        return nullptr;
+    }
+
+    std::unique_ptr<ivm::IVModel> model { new ivm::IVModel(ivm::IVPropertyTemplateConfig::instance()) };
+    model->initFromObjects(parser.parsedObjects(), parser.externalAttributes());
+
+    shared::ErrorHub::clearCurrentFile();
+    if (!anyLoadableIVObjects(model->ivobjects().values())) {
+        return nullptr;
+    }
+
+    QSharedPointer<ivm::IVComponentLibrary::Component> component { new ivm::IVComponentLibrary::Component };
+    component->componentPath = path;
+    component->rootIds = rootIds(model->ivobjects().values());
+    component->model.swap(model);
+
+    static const QStringList asn1extensions { QLatin1String("asn1"), QLatin1String("asn"), QLatin1String("acn") };
+    const QFileInfo fi(path);
+    const QDir dir = fi.absoluteDir();
+    component->asn1Files = shared::QMakeFile::readFilesList(
+            dir.absoluteFilePath(dir.dirName() + QLatin1String(".pro")), asn1extensions);
+
+    addComponent(component);
+    return component;
+}
+
+QList<shared::Id> IVComponentLibrary::rootIds(QVector<IVObject *> objects)
+{
+    QList<shared::Id> ids;
+    std::for_each(objects.constBegin(), objects.constEnd(), [&objects, &ids](IVObject *obj) {
+        if (!obj->parentObject()) {
+            ids.append(obj->id());
+        }
+    });
+    return ids;
+}
+
+QVector<IVObject *> IVComponentLibrary::rootObjects(QVector<IVObject *> objects)
+{
+    QVector<IVObject *> rootObjs;
+    std::for_each(objects.constBegin(), objects.constEnd(), [&objects, &rootObjs](IVObject *obj) {
+        if (!obj->parentObject()) {
+            rootObjs.append(obj);
+        }
+    });
+    return rootObjs;
+}
+
+void IVComponentLibrary::addComponent(const QSharedPointer<Component> &component)
+{
+    for (auto id : std::as_const(component->rootIds)) {
+        d->components.insert(id, component);
+    }
+    d->watcher.addPath(component->componentPath);
+}
+
+bool IVComponentLibrary::anyLoadableIVObjects(QVector<IVObject *> objects)
+{
+    return std::any_of(objects.begin(), objects.end(),
+            [](IVObject *obj) { return (obj && obj->type() != ivm::IVObject::Type::InterfaceGroup); });
 }
 
 bool IVComponentLibrary::resetTasteENV(const QString &path)

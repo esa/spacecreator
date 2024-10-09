@@ -23,13 +23,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "componentmodel.h"
 #include "errorhub.h"
 #include "geometry.h"
-#include "graphicsviewutils.h"
 #include "interfacedocument.h"
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "ivcomponentmodel.h"
 #include "ivmodel.h"
 #include "ivxmlreader.h"
+#include "topohelper/geometry.h"
 
 #include <QApplication>
 #include <QBuffer>
@@ -115,7 +115,7 @@ void IVImporter::pasteItems(QPointF sceneDropPoint)
     ivm::IVObject::sortObjectList(objects);
     resetIds(objects);
     const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
-    for (ivm::IVObject *obj : qAsConst(objects)) {
+    for (ivm::IVObject *obj : std::as_const(objects)) {
         const EntityAttributes attrs = extAttrs.value(obj->id());
         for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
             obj->setEntityAttribute(attrIt.value());

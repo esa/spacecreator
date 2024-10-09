@@ -19,12 +19,12 @@
 
 #include "ivconnectiongroup.h"
 #include "ivfunctiontype.h"
-#include "qmakefile.h"
 
 #include <QDir>
 #include <QFileInfo>
 #include <QSharedPointer>
 #include <errorhub.h>
+#include <ivcomponentlibrary.h>
 #include <ivconnection.h>
 #include <ivmodel.h>
 #include <ivnamevalidator.h>
@@ -37,6 +37,14 @@ IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject 
     : shared::ComponentModel { modelName, parent }
     , m_type(type)
 {
+    auto path = (type == ComponentLibrary) ? shared::componentsLibraryPath() : shared::sharedTypesPath();
+    m_compLibrary = std::make_unique<ivm::IVComponentLibrary>(path, modelName);
+    connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentUpdated, [this](const shared::Id &id) {
+        if (auto item = itemById(id)) {
+            item->setData(true, UpdateRole);
+            // TODO: m_componentLibrary->reloadComponent(id); /// Check: would calling it manually be better?
+        }
+    });
 }
 
 ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
@@ -163,62 +171,26 @@ QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
 
 QStandardItem *IVComponentModel::loadComponent(const QString &path)
 {
-    if (path.isEmpty() || !QFileInfo::exists(path)) {
-        qDebug() << path << "doesn't exist";
-        return nullptr;
-    }
+    auto component = m_compLibrary->loadComponent(path);
+    if (!component.isNull()) {
+        QVector<ivm::IVObject *> objects = m_compLibrary->rootObjects(component->model->ivobjects().values());
+        ivm::IVObject::sortObjectList(objects);
 
-    shared::ErrorHub::setCurrentFile(path);
-    ivm::IVXMLReader parser;
-    if (!parser.readFile(path)) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, parser.errorString(), path);
-        shared::ErrorHub::clearCurrentFile();
-        return nullptr;
-    }
-
-    QScopedPointer<shared::VEModel> model { new ivm::IVModel(ivm::IVPropertyTemplateConfig::instance()) };
-    model->initFromObjects(parser.parsedObjects(), parser.externalAttributes());
-
-    const QHash<shared::Id, shared::VEObject *> &modelObjects = model->objects();
-    QList<shared::Id> ids;
-    QVector<ivm::IVObject *> objects;
-    std::for_each(modelObjects.constBegin(), modelObjects.constEnd(), [&objects, &ids](shared::VEObject *veObj) {
-        if (!veObj->parentObject()) {
-            objects.append(veObj->as<ivm::IVObject *>());
-            ids.append(veObj->id());
+        QList<QStandardItem *> items;
+        std::for_each(objects.constBegin(), objects.constEnd(), [this, &items](ivm::IVObject *ivObj) {
+            if (auto item = processObject(ivObj)) {
+                items << item;
+            }
+        });
+        if (items.size() == 1) {
+            return items.front();
         }
-    });
-    ivm::IVObject::sortObjectList(objects);
-    QList<QStandardItem *> items;
-    std::for_each(objects.constBegin(), objects.constEnd(), [this, &items](shared::VEObject *ivObj) {
-        if (auto item = processObject(ivObj->as<ivm::IVObject *>())) {
-            items << item;
-        }
-    });
-    shared::ErrorHub::clearCurrentFile();
-    if (items.isEmpty())
-        return nullptr;
 
-    QSharedPointer<shared::ComponentModel::Component> component { new shared::ComponentModel::Component };
-    component->componentPath = path;
-    component->rootIds = ids;
-    component->model.swap(model);
-
-    static const QStringList asn1extensions { QLatin1String("asn1"), QLatin1String("asn"), QLatin1String("acn") };
-    const QFileInfo fi(path);
-    const QDir dir = fi.absoluteDir();
-    component->asn1Files = shared::QMakeFile::readFilesList(
-            dir.absoluteFilePath(dir.dirName() + QLatin1String(".pro")), asn1extensions);
-
-    for (auto id : qAsConst(ids))
-        addComponent(component);
-
-    if (items.size() == 1)
-        return items.front();
-
-    QStandardItem *item = new QStandardItem;
-    item->appendRows(items);
-    return item;
+        QStandardItem *item = new QStandardItem;
+        item->appendRows(items);
+        return item;
+    }
+    return nullptr;
 }
 
 } // namespace ive
