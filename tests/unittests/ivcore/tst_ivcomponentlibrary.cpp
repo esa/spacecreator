@@ -23,7 +23,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <ivobject.h>
 
 const QDir libraryPath("./test_components_library");
-const QDir componentPath(libraryPath.filePath("test_component"));
+const QDir componentPath_export(libraryPath.filePath("test_export"));
+const QDir componentPath_remove(libraryPath.filePath("test_remove"));
 const QDir projectDir("./test_projectDir");
 
 class tst_IVComponentLibrary : public QObject
@@ -33,6 +34,7 @@ private Q_SLOTS:
     void initTestCase() { library = new ivm::IVComponentLibrary(libraryPath.path(), "test_model"); };
     void cleanupTestCase() { delete library; };
     void test_exportComponent();
+    void test_removeComponent();
 
 private:
     ivm::IVComponentLibrary *library;
@@ -44,8 +46,20 @@ void tst_IVComponentLibrary::test_exportComponent()
     QList<ivm::IVObject *> objects;
     objects << &obj;
     ivm::ArchetypeModel *model = new ivm::ArchetypeModel;
-    library->exportComponent(componentPath.path(), objects, projectDir.path(), {}, {}, model);
-    QVERIFY(QFile::exists(componentPath.filePath(shared::kDefaultInterfaceViewFileName)) == true);
+    library->exportComponent(componentPath_export.path(), objects, projectDir.path(), {}, {}, model);
+    QVERIFY(QFile::exists(componentPath_export.filePath(shared::kDefaultInterfaceViewFileName)) == true);
+}
+
+void tst_IVComponentLibrary::test_removeComponent()
+{
+    ivm::IVFunction obj;
+    QList<ivm::IVObject *> objects;
+    objects << &obj;
+    ivm::ArchetypeModel *model = new ivm::ArchetypeModel;
+    library->exportComponent(componentPath_remove.path(), objects, projectDir.path(), {}, {}, model);
+    QVERIFY(QFile::exists(componentPath_remove.filePath(shared::kDefaultInterfaceViewFileName)) == true);
+    library->removeComponent(obj.id());
+    QVERIFY(QFile::exists(componentPath_remove.filePath(shared::kDefaultInterfaceViewFileName)) == false);
 }
 
 QTEST_MAIN(tst_IVComponentLibrary)

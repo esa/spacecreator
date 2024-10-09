@@ -53,6 +53,13 @@ public:
     bool exportComponent(const QString &targetPath, const QList<IVObject *> objects, const QString &projectDir,
             QStringList asn1FilesPaths, QStringList externAsns, ivm::ArchetypeModel *archetypesModel);
     static bool resetTasteENV(const QString &path);
+    /*!
+     * \brief removeComponent: Uses the id to obtain a pointer to the component
+     *  With that pointer we obtain the path to remove the component in disk and
+     *  the list of rootids to remove any other ids pointing to that component in the components structure.
+     * \param id
+     */
+    void removeComponent(const shared::Id &id);
 
 private:
     struct IVComponentLibraryPrivate;

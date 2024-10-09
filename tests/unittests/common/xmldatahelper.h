@@ -96,7 +96,7 @@ public:
             }
         }
 
-        for (const Node &n: qAsConst(nodes)) {
+        for (const Node &n: std::as_const(nodes)) {
             if (excludedProperties.contains(n.type))
                 continue;
 

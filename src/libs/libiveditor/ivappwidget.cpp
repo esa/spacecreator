@@ -320,11 +320,8 @@ void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
     connect(actRemoveComponent, &QAction::triggered, this, [this, id]() {
         if (auto model = m_document->componentModel()) {
             if (auto obj = model->getObject(id)) {
-                const QFileInfo fi { model->componentPath(id) };
                 model->removeComponent(id);
-                if (fi.exists()) {
-                    fi.absoluteDir().removeRecursively();
-                }
+                m_document->removeComponent(id);
             }
         }
     });

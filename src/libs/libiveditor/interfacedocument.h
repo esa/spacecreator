@@ -88,6 +88,7 @@ public:
     bool create(const QString &path = QString());
     bool load(const QString &path);
     void loadAvailableComponents();
+    void removeComponent(const shared::Id &id);
     bool exportSelectedFunctions();
     bool exportSelectedType();
     void close();

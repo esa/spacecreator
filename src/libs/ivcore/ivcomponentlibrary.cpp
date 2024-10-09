@@ -80,11 +80,32 @@ bool IVComponentLibrary::exportComponent(const QString &targetPath, const QList<
                     shared::ErrorItem::Error, tr("Error during ASN.1 file copying: %1").arg(asnFile));
         }
     }
+    QSharedPointer<IVComponentLibrary::Component> component =
+            QSharedPointer<IVComponentLibrary::Component>(new Component);
+    component->componentPath = targetPath;
+    component->asn1Files = asn1FilesPaths;
+    for (const auto obj : objects) {
+        component->rootIds.append(obj->id());
+        d->components.insert(obj->id(), component);
+    }
+    d->watcher.addPath(component->componentPath);
 
     copyImplementation(ivDir, targetDir, objects);
     shared::QMakeFile::createProFileForDirectory(targetPath, asn1FilesPathsExternal);
 
     return resetTasteENV(targetPath);
+}
+
+void IVComponentLibrary::removeComponent(const shared::Id &id)
+{
+    auto component = d->components.value(id);
+    for (auto id : component->rootIds) {
+        d->components.remove(id);
+    }
+    d->watcher.removePath(component->componentPath);
+
+    QDir dir(component->componentPath);
+    dir.removeRecursively();
 }
 
 bool IVComponentLibrary::resetTasteENV(const QString &path)

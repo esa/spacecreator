@@ -66,7 +66,7 @@ QList<DVFunction *> DVPartition::functions() const
 QStringList DVPartition::functionsNames() const
 {
     QStringList names;
-    for (DVFunction *fn : qAsConst(d->functions)) {
+    for (DVFunction *fn : std::as_const(d->functions)) {
         names.append(fn->title());
     }
     return names;

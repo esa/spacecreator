@@ -139,7 +139,7 @@ void PropertiesViewBase::moveCurrentRowUp()
     if (m_model) {
         QModelIndexList idxs = ui->tableView->selectionModel()->selectedRows();
         QList<int> rows;
-        for (const QModelIndex &idx : qAsConst(idxs))
+        for (const QModelIndex &idx : std::as_const(idxs))
             rows.append(idx.row() - 1);
 
         std::sort(idxs.begin(), idxs.end(),
@@ -149,7 +149,7 @@ void PropertiesViewBase::moveCurrentRowUp()
         }
 
         ui->tableView->selectionModel()->clearSelection();
-        for (int row : qAsConst(rows)) {
+        for (int row : std::as_const(rows)) {
             const QItemSelection selection(m_model->index(row, 0), m_model->index(row, m_model->columnCount() - 1));
             ui->tableView->selectionModel()->select(
                     selection, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
@@ -183,7 +183,7 @@ void PropertiesViewBase::moveCurrentRowDown()
 void PropertiesViewBase::rowsInserted(const QModelIndex &parent, int first, int last)
 {
     for (int idx = first; idx <= last; ++idx) {
-        for (const int column : qAsConst(m_delegatesColumns)) {
+        for (const int column : std::as_const(m_delegatesColumns)) {
             const QModelIndex index = m_model->index(idx, column, parent);
             if (index.isValid()) {
                 tableView()->openPersistentEditor(index);

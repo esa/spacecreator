@@ -104,7 +104,7 @@ void IVFunction::restoreInternals()
         d->m_fnType->forgetInstance(this);
 
     if (m_originalFields.collected()) {
-        for (const EntityAttribute &attr : qAsConst(m_originalFields.implementations)) {
+        for (const EntityAttribute &attr : std::as_const(m_originalFields.implementations)) {
             if (!hasImplementationName(attr.name())) {
                 addImplementation(attr.name(), attr.value<QString>());
             }

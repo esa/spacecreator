@@ -301,6 +301,11 @@ void InterfaceDocument::loadAvailableComponents()
         d->sharedTypesModel->load(shared::sharedTypesPath());
 }
 
+void InterfaceDocument::removeComponent(const shared::Id &id)
+{
+    d->componentLibrary->removeComponent(id);
+}
+
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
 {
     QString name = exportNames.join(QLatin1Char('_'));
