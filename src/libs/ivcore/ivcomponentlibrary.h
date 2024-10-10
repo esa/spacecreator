@@ -76,6 +76,7 @@ public:
     QVector<IVObject *> rootObjects(QVector<IVObject *> objects);
 Q_SIGNALS:
     void componentUpdated(const shared::Id &id);
+    void componentsToBeLoaded(QSet<QString> componentsPaths);
 
 private:
     bool anyLoadableIVObjects(QVector<ivm::IVObject *> objects);

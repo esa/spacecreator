@@ -42,14 +42,38 @@ IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject 
     connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentUpdated, [this](const shared::Id &id) {
         if (auto item = itemById(id)) {
             item->setData(true, UpdateRole);
-            // TODO: m_componentLibrary->reloadComponent(id); /// Check: would calling it manually be better?
+            reloadComponent(id);
         }
     });
+    connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentsToBeLoaded,
+            [this](const QSet<QString> &componentsPaths) {
+                for (const QString &path : std::as_const(componentsPaths)) {
+                    if (auto item = loadComponent(path)) {
+                        appendRow(item);
+                    }
+                }
+            });
+
+    connect(this, &QAbstractItemModel::rowsAboutToBeRemoved, this,
+            [this](const QModelIndex &parent, int first, int last) {
+                if (parent == indexFromItem(invisibleRootItem())) {
+                    for (auto idx = first; idx <= last; ++idx) {
+                        const shared::Id id = index(idx, 0, parent).data(IdRole).toUuid();
+                        m_compLibrary->removeComponent(id);
+                    }
+                }
+            });
 }
 
 ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
 {
     return qobject_cast<ivm::IVObject *>(shared::ComponentModel::getObject(id));
+}
+
+void IVComponentModel::removeComponent(const shared::Id &id)
+{
+    shared::ComponentModel::removeComponent(id);
+    m_compLibrary->removeComponent(id);
 }
 
 QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)

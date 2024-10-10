@@ -38,72 +38,6 @@ ComponentModel::ComponentModel(const QString &modelName, QObject *parent)
     : QStandardItemModel(parent)
     , d(new ComponentModelPrivate)
 {
-    d->modelName = modelName;
-    connect(&d->watcher, &QFileSystemWatcher::directoryChanged, this, [this](const QString &path) {
-        if (path != d->libraryPath)
-            return;
-
-        /// Get all interfaceview paths from fs
-        const QDir libDir(d->libraryPath);
-        const QStringList entries = libDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-        QSet<QString> componentsPaths;
-        for (const QString &name : qAsConst(entries)) {
-            const QString relInterfaceviewPath = name + QDir::separator() + shared::kDefaultInterfaceViewFileName;
-            if (libDir.exists(relInterfaceviewPath)) {
-                componentsPaths.insert(libDir.absoluteFilePath(relInterfaceviewPath));
-            }
-        }
-
-        /// Get all loaded components with removing them in previously loaded paths
-        QSet<QString> existingComponents;
-        for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
-            if (!componentsPaths.remove(it.value()->componentPath))
-                existingComponents.insert(it.value()->componentPath);
-        }
-
-        /// Remove from the model non-existing in fs component
-        QList<Id> idsToRemove;
-        for (const QString &path : qAsConst(existingComponents)) {
-            for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
-                if (it.value()->componentPath == path) {
-                    idsToRemove << it.key();
-                    break;
-                }
-            }
-        }
-        for (const Id &id : qAsConst(idsToRemove)) {
-            removeComponent(id);
-        }
-
-        /// Add to the model new components
-        for (const QString &path : qAsConst(componentsPaths)) {
-            if (auto item = loadComponent(path)) {
-                appendRow(item);
-                d->watcher.addPath(path);
-            }
-        }
-    });
-    connect(&d->watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
-        for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
-            if ((*it)->componentPath == path) {
-                if (auto item = itemById(it.key())) {
-                    item->setData(true, UpdateRole);
-                    reloadComponent(it.key()); /// Check: would calling it manually be better?
-                }
-                break;
-            }
-        }
-    });
-    connect(this, &QAbstractItemModel::rowsAboutToBeRemoved, this,
-            [this](const QModelIndex &parent, int first, int last) {
-                if (parent == indexFromItem(invisibleRootItem())) {
-                    for (auto idx = first; idx <= last; ++idx) {
-                        const Id id = index(idx, 0, parent).data(IdRole).toUuid();
-                        auto component = d->components.take(id);
-                        d->watcher.removePath(component->componentPath);
-                    }
-                }
-            });
 }
 
 ComponentModel::~ComponentModel() { }
@@ -183,7 +117,7 @@ void ComponentModel::reloadComponent(const Id &id)
     const int row = item->index().row();
     const QString path = d->components.value(id)->componentPath;
     removeComponent(id);
-    if (item = loadComponent(path)) {
+    if ((item = loadComponent(path))) {
         insertRow(row, item);
     } else {
         d->watcher.removePath(path);

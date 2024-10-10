@@ -31,6 +31,56 @@ IVComponentLibrary::IVComponentLibrary(const QString &path, const QString &model
 {
     d->libraryPath = path;
     d->modelName = modelName;
+
+    d->modelName = modelName;
+    connect(&d->watcher, &QFileSystemWatcher::directoryChanged, this, [this](const QString &path) {
+        if (path != d->libraryPath)
+            return;
+
+        /// Get all interfaceview paths from fs
+        const QDir libDir(d->libraryPath);
+        const QStringList entries = libDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        QSet<QString> componentsPaths;
+        for (const QString &name : std::as_const(entries)) {
+            const QString relInterfaceviewPath = name + QDir::separator() + shared::kDefaultInterfaceViewFileName;
+            if (libDir.exists(relInterfaceviewPath)) {
+                componentsPaths.insert(libDir.absoluteFilePath(relInterfaceviewPath));
+            }
+        }
+
+        /// Get all loaded components with removing them in previously loaded paths
+        QSet<QString> existingComponents;
+        for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
+            if (!componentsPaths.remove(it.value()->componentPath))
+                existingComponents.insert(it.value()->componentPath);
+        }
+
+        /// Remove from the model non-existing in fs component
+        QList<shared::Id> idsToRemove;
+        for (const QString &path : std::as_const(existingComponents)) {
+            for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
+                if (it.value()->componentPath == path) {
+                    idsToRemove << it.key();
+                    break;
+                }
+            }
+        }
+        for (const shared::Id &id : std::as_const(idsToRemove)) {
+            removeComponent(id);
+        }
+
+        /// Add to the model new components
+        Q_EMIT componentsToBeLoaded(componentsPaths);
+    });
+
+    connect(&d->watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
+        for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
+            if ((*it)->componentPath == path) {
+                Q_EMIT componentUpdated(it.key());
+                break;
+            }
+        }
+    });
 }
 
 QString IVComponentLibrary::libraryPath() const

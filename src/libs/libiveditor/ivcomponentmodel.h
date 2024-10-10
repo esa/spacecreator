@@ -35,6 +35,7 @@ public:
     explicit IVComponentModel(Type type, const QString &modelName, QObject *parent = nullptr);
 
     ivm::IVObject *getObject(const shared::Id &id) override;
+    void removeComponent(const shared::Id &id);
 
 protected:
     QStandardItem *loadComponent(const QString &path) override;
