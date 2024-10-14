@@ -38,66 +38,10 @@ ComponentModel::ComponentModel(const QString &modelName, QObject *parent)
     : QStandardItemModel(parent)
     , d(new ComponentModelPrivate)
 {
+    d->modelName = modelName;
 }
 
 ComponentModel::~ComponentModel() { }
-
-QStringList ComponentModel::asn1Files(const Id &id) const
-{
-    auto it = d->components.constFind(id);
-    if (it != d->components.constEnd())
-        return (*it)->asn1Files;
-
-    return {};
-}
-
-QString ComponentModel::componentPath(const shared::Id &id) const
-{
-    auto it = d->components.constFind(id);
-    if (it != d->components.constEnd())
-        return (*it)->componentPath;
-
-    return {};
-}
-
-QString ComponentModel::libraryPath() const
-{
-    return d->libraryPath;
-}
-
-VEObject *ComponentModel::getObject(const shared::Id &id)
-{
-    auto it = d->components.constFind(id);
-    if (it != d->components.constEnd()) {
-        auto objIt = std::find((*it)->rootIds.constBegin(), (*it)->rootIds.constEnd(), id);
-        if (objIt != (*it)->rootIds.constEnd())
-            return (*it)->model->getObject(id);
-    }
-    return nullptr;
-}
-
-void ComponentModel::load(const QString &path)
-{
-    clear();
-    if (path.isEmpty())
-        return;
-
-    d->libraryPath = path;
-    shared::ensureDirExists(d->libraryPath);
-
-    auto headerItem = new QStandardItem(d->modelName);
-    headerItem->setTextAlignment(Qt::AlignCenter);
-    setHorizontalHeaderItem(0, headerItem);
-
-    QDirIterator importableIt(path, QDir::Dirs | QDir::NoDotAndDotDot);
-    while (importableIt.hasNext()) {
-        if (auto item = loadComponent(
-                    importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName)) {
-            appendRow(item);
-        }
-    }
-    d->watcher.addPath(path);
-}
 
 void ComponentModel::removeComponent(const Id &id)
 {

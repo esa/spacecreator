@@ -51,11 +51,7 @@ public:
     explicit ComponentModel(const QString &modelName, QObject *parent = nullptr);
     ~ComponentModel() override;
 
-    QStringList asn1Files(const shared::Id &id) const;
-    QString componentPath(const shared::Id &id) const;
-    QString libraryPath() const;
-    virtual VEObject *getObject(const shared::Id &id);
-    void load(const QString &path);
+    virtual VEObject *getObject(const shared::Id &id) = 0;
 
     void removeComponent(const shared::Id &id);
     void reloadComponent(const shared::Id &id);

@@ -74,9 +74,32 @@ public:
      * \return
      */
     QVector<IVObject *> rootObjects(QVector<IVObject *> objects);
+    /*!
+     * \brief component: get a component given an ID
+     * \param id
+     * \return QSharedPointer<ivm::IVComponentLibrary::Component>
+     */
+    QSharedPointer<ivm::IVComponentLibrary::Component> component(const shared::Id &id) const;
+    /*!
+     * \brief asn1Files: returns asn1Files associated with that component
+     * \param id
+     * \return
+     */
+    QStringList asn1Files(const shared::Id &id) const;
+    /*!
+     * \brief componentPath: returns the component's path given his Id
+     * \param id
+     * \return
+     */
+    QString componentPath(const shared::Id &id) const;
+
+    QString modelName() const;
+
+    void unWatchComponent(const QString &componentPath);
 Q_SIGNALS:
     void componentUpdated(const shared::Id &id);
     void componentsToBeLoaded(QSet<QString> componentsPaths);
+    void componentExported(const QString &filePath, bool ok);
 
 private:
     bool anyLoadableIVObjects(QVector<ivm::IVObject *> objects);

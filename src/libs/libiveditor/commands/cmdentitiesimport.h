@@ -32,6 +32,7 @@ class IVFunctionType;
 }
 
 namespace ive {
+class IVComponentModel;
 namespace cmd {
 
 class CmdEntitiesImport : public ComponentImportHelper, public QUndoCommand
@@ -39,7 +40,7 @@ class CmdEntitiesImport : public ComponentImportHelper, public QUndoCommand
     Q_OBJECT
 public:
     explicit CmdEntitiesImport(const QList<ivm::IVObject *> &entities, ivm::IVFunctionType *parent, ivm::IVModel *model,
-            shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos);
+            IVComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos);
     ~CmdEntitiesImport() override;
 
     void redo() override;

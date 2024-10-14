@@ -23,8 +23,8 @@
 
 #include <QPointer>
 
-namespace shared {
-class ComponentModel;
+namespace ive {
+class IVComponentModel;
 }
 
 namespace Asn1Acn {
@@ -49,7 +49,7 @@ public:
             shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs);
     ~CmdFunctionAttrChange() override;
 
-    void setComponentModel(shared::ComponentModel *componentModel);
+    void setComponentModel(ive::IVComponentModel *componentModel);
     void setAsn1SystemChecks(Asn1Acn::Asn1SystemChecks *asn1Checks);
 
     void redo() override;

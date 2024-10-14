@@ -21,7 +21,6 @@
 #include "asn1reader.h"
 #include "asn1systemchecks.h"
 #include "common.h"
-#include "componentmodel.h"
 #include "diskutils.h"
 #include "errorhub.h"
 #include "ivobject.h"
@@ -34,12 +33,13 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QTemporaryDir>
+#include <ivcomponentmodel.h>
 
 namespace ive {
 namespace cmd {
 
 ComponentImportHelper::ComponentImportHelper(
-        shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent)
+        IVComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent)
     : QObject(parent)
     , m_model(componentModel)
     , m_asn1Checks(asn1Checks)
@@ -48,7 +48,7 @@ ComponentImportHelper::ComponentImportHelper(
 }
 
 ComponentImportHelper::ComponentImportHelper(
-        shared::ComponentModel *componentModel, const QString &projectPath, QObject *parent)
+        IVComponentModel *componentModel, const QString &projectPath, QObject *parent)
     : QObject(parent)
     , m_model(componentModel)
     , m_asn1Checks(nullptr)
@@ -58,7 +58,7 @@ ComponentImportHelper::ComponentImportHelper(
 
 ComponentImportHelper::~ComponentImportHelper() { }
 
-void ComponentImportHelper::setComponentModel(shared::ComponentModel *componentModel)
+void ComponentImportHelper::setComponentModel(IVComponentModel *componentModel)
 {
     m_model = componentModel;
 }
@@ -91,7 +91,6 @@ void ComponentImportHelper::redoSourcesCloning(const QList<ivm::IVObject *> &obj
     for (ivm::IVObject *obj : objects) {
         if (obj->type() != ivm::IVObject::Type::Function && obj->type() != ivm::IVObject::Type::FunctionType)
             continue;
-
         const shared::VEObject *rootObj = obj->rootObject();
         const QString componentPath = m_model->componentPath(rootObj->id());
         if (componentPath.isEmpty())

@@ -36,6 +36,15 @@ public:
 
     ivm::IVObject *getObject(const shared::Id &id) override;
     void removeComponent(const shared::Id &id);
+    QString componentPath(const shared::Id &id);
+    QStringList asn1Files(const shared::Id &id) const;
+    QString libraryPath() const;
+    void loadAvailableComponents();
+    bool exportComponent(const QString &targetPath, const QList<ivm::IVObject *> objects, const QString &projectDir,
+            QStringList asn1FilesPaths, QStringList externAsns, ivm::ArchetypeModel *archetypesModel);
+
+    void reloadComponent(const shared::Id &id);
+    void unWatchComponentPath(const QString &componentPath);
 
 protected:
     QStandardItem *loadComponent(const QString &path) override;

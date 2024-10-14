@@ -20,7 +20,7 @@
 #include "ivconnectiongroup.h"
 #include "ivfunctiontype.h"
 
-#include <QDir>
+#include <QDirIterator>
 #include <QFileInfo>
 #include <QSharedPointer>
 #include <errorhub.h>
@@ -63,11 +63,25 @@ IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject 
                     }
                 }
             });
+    connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentExported, [this](const QString &filepath, bool ok) {
+        if (ok) {
+            if (auto item = loadComponent(filepath)) {
+                appendRow(item);
+            }
+        }
+    });
 }
 
 ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
 {
-    return qobject_cast<ivm::IVObject *>(shared::ComponentModel::getObject(id));
+    auto comp = m_compLibrary->component(id);
+
+    if (!comp.isNull()) {
+        auto objIt = std::find(comp->rootIds.constBegin(), comp->rootIds.constEnd(), id);
+        if (!objIt->isNull() && objIt != comp->rootIds.constEnd())
+            return comp->model->getObject(id);
+    }
+    return nullptr;
 }
 
 void IVComponentModel::removeComponent(const shared::Id &id)
@@ -76,10 +90,72 @@ void IVComponentModel::removeComponent(const shared::Id &id)
     m_compLibrary->removeComponent(id);
 }
 
+QString IVComponentModel::componentPath(const shared::Id &id)
+{
+    return m_compLibrary->componentPath(id);
+}
+
+QStringList IVComponentModel::asn1Files(const shared::Id &id) const
+{
+    return m_compLibrary->asn1Files(id);
+}
+
+QString IVComponentModel::libraryPath() const
+{
+    return m_compLibrary->libraryPath();
+}
+
+void IVComponentModel::loadAvailableComponents()
+{
+    clear();
+
+    auto headerItem = new QStandardItem(m_compLibrary->modelName());
+    headerItem->setTextAlignment(Qt::AlignCenter);
+    setHorizontalHeaderItem(0, headerItem);
+
+    QDirIterator importableIt(m_compLibrary->libraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    while (importableIt.hasNext()) {
+        if (auto item = loadComponent(
+                    importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName)) {
+            appendRow(item);
+        }
+    }
+}
+
+bool IVComponentModel::exportComponent(const QString &targetPath, const QList<ivm::IVObject *> objects,
+        const QString &projectDir, QStringList asn1FilesPaths, QStringList externAsns,
+        ivm::ArchetypeModel *archetypesModel)
+{
+    return m_compLibrary->exportComponent(targetPath, objects, projectDir, asn1FilesPaths, externAsns, archetypesModel);
+}
+
+void IVComponentModel::reloadComponent(const shared::Id &id)
+{
+    auto item = itemById(id);
+    if (!item)
+        return;
+
+    if (!item->index().isValid())
+        return;
+
+    const int row = item->index().row();
+    const QString path = m_compLibrary->componentPath(id);
+    removeComponent(id);
+    if ((item = loadComponent(path))) {
+        insertRow(row, item);
+    }
+}
+
+void IVComponentModel::unWatchComponentPath(const QString &componentPath)
+{
+    m_compLibrary->unWatchComponent(componentPath);
+}
+
 QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
 {
-    if (!ivObject || ivObject->type() == ivm::IVObject::Type::InterfaceGroup)
+    if (!ivObject || ivObject->type() == ivm::IVObject::Type::InterfaceGroup) {
         return nullptr;
+    }
 
     QStandardItem *item = new QStandardItem;
     item->setEditable(false);

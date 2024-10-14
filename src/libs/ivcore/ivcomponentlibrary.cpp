@@ -32,7 +32,6 @@ IVComponentLibrary::IVComponentLibrary(const QString &path, const QString &model
     d->libraryPath = path;
     d->modelName = modelName;
 
-    d->modelName = modelName;
     connect(&d->watcher, &QFileSystemWatcher::directoryChanged, this, [this](const QString &path) {
         if (path != d->libraryPath)
             return;
@@ -113,6 +112,7 @@ bool IVComponentLibrary::exportComponent(const QString &targetPath, const QList<
 
     QDir targetDir(targetPath);
     IVXMLWriter exporter;
+    connect(&exporter, &IVXMLWriter::exported, this, &IVComponentLibrary::componentExported);
     if (!exporter.exportObjectsSilently(objects, targetDir.filePath(shared::kDefaultInterfaceViewFileName),
                 archetypesModel, exporter.templatePath(QLatin1String("interfaceview.ui")))) {
         return false;
@@ -150,14 +150,16 @@ bool IVComponentLibrary::exportComponent(const QString &targetPath, const QList<
 
 void IVComponentLibrary::removeComponent(const shared::Id &id)
 {
-    auto component = d->components.value(id);
-    for (auto id : component->rootIds) {
-        d->components.remove(id);
-    }
-    d->watcher.removePath(component->componentPath);
+    auto component = d->components.take(id);
+    if (!component.isNull()) {
+        for (auto id : component->rootIds) {
+            d->components.remove(id);
+        }
+        d->watcher.removePath(component->componentPath);
 
-    QDir dir(component->componentPath);
-    dir.removeRecursively();
+        QDir dir(QFileInfo(component->componentPath).absolutePath());
+        dir.removeRecursively();
+    }
 }
 
 QSharedPointer<ivm::IVComponentLibrary::Component> IVComponentLibrary::loadComponent(const QString &path)
@@ -220,6 +222,39 @@ QVector<IVObject *> IVComponentLibrary::rootObjects(QVector<IVObject *> objects)
     return rootObjs;
 }
 
+QSharedPointer<IVComponentLibrary::Component> IVComponentLibrary::component(const shared::Id &id) const
+{
+    auto it = d->components.constFind(id);
+    if (it != d->components.constEnd()) {
+        return (*it);
+    }
+    return nullptr;
+}
+
+QStringList IVComponentLibrary::asn1Files(const shared::Id &id) const
+{
+    return component(id)->asn1Files;
+}
+
+QString IVComponentLibrary::componentPath(const shared::Id &id) const
+{
+    auto comp = component(id);
+    if (!comp.isNull()) {
+        return component(id)->componentPath;
+    }
+    return QString();
+}
+
+QString IVComponentLibrary::modelName() const
+{
+    return d->modelName;
+}
+
+void IVComponentLibrary::unWatchComponent(const QString &componentPath)
+{
+    d->watcher.removePath(componentPath);
+}
+
 void IVComponentLibrary::addComponent(const QSharedPointer<Component> &component)
 {
     for (auto id : std::as_const(component->rootIds)) {
@@ -230,8 +265,10 @@ void IVComponentLibrary::addComponent(const QSharedPointer<Component> &component
 
 bool IVComponentLibrary::anyLoadableIVObjects(QVector<IVObject *> objects)
 {
-    return std::any_of(objects.begin(), objects.end(),
-            [](IVObject *obj) { return (obj && obj->type() != ivm::IVObject::Type::InterfaceGroup); });
+    return std::any_of(objects.begin(), objects.end(), [](IVObject *obj) {
+        auto type = obj->type();
+        return (type != ivm::IVObject::Type::InterfaceGroup);
+    });
 }
 
 bool IVComponentLibrary::resetTasteENV(const QString &path)
