@@ -339,6 +339,9 @@ QList<ivm::IVObject *> InterfaceDocument::prepareSelectedObjectsForExport(QStrin
             objects.append(object);
         }
     }
+    if (objects.empty()) {
+        return objects;
+    }
 
     name = silent ? exportNames.join(QLatin1Char('_')) : getComponentName(exportNames);
     name = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::Function, name);
@@ -438,6 +441,10 @@ bool InterfaceDocument::exportSelectedFunctions()
     QString name;
     const QList<ivm::IVObject *> objects = prepareSelectedObjectsForExport(name);
     if (name.isEmpty()) {
+        return false;
+    }
+
+    if (objects.empty()) {
         return false;
     }
 

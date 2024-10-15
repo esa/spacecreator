@@ -43,11 +43,12 @@ public:
     bool exportComponent(const QString &targetPath, const QList<ivm::IVObject *> objects, const QString &projectDir,
             QStringList asn1FilesPaths, QStringList externAsns, ivm::ArchetypeModel *archetypesModel);
 
-    void reloadComponent(const shared::Id &id);
     void unWatchComponentPath(const QString &componentPath);
+    QSharedPointer<ivm::IVComponentLibrary::Component> component(const shared::Id &id) const;
 
 protected:
     QStandardItem *loadComponent(const QString &path) override;
+    QStandardItem *itemFromComponent(QSharedPointer<ivm::IVComponentLibrary::Component> component);
 
 private:
     QStandardItem *processObject(ivm::IVObject *ivObject);

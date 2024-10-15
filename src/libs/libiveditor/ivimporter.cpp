@@ -152,7 +152,7 @@ void IVImporter::importEntity(const shared::Id &id, QPointF sceneDropPoint)
     }
 
     QList<ivm::IVObject *> objects;
-    QSharedPointer<shared::ComponentModel::Component> component = m_document->componentModel()->component(id);
+    QSharedPointer<ivm::IVComponentLibrary::Component> component = m_document->componentModel()->component(id);
     ivm::IVXMLReader parser;
     if (!parser.readFile(component->componentPath)) {
         return;
@@ -222,7 +222,7 @@ void IVImporter::linkEntity(const shared::Id &id, QPointF sceneDropPoint)
     }
 
     QList<ivm::IVObject *> objects;
-    QSharedPointer<shared::ComponentModel::Component> component = m_document->componentModel()->component(id);
+    QSharedPointer<ivm::IVComponentLibrary::Component> component = m_document->componentModel()->component(id);
 
     ivm::IVXMLReader parser;
     if (!parser.readFile(component->componentPath)) {

@@ -73,11 +73,6 @@ QList<Id> ComponentModel::componentIDs() const
     return d->components.keys();
 }
 
-QSharedPointer<ComponentModel::Component> ComponentModel::component(const Id &id) const
-{
-    return d->components.value(id);
-}
-
 void ComponentModel::addComponent(QSharedPointer<Component> component)
 {
     for (auto id : qAsConst(component->rootIds))

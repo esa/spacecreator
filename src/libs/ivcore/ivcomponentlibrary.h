@@ -96,6 +96,8 @@ public:
     QString modelName() const;
 
     void unWatchComponent(const QString &componentPath);
+
+    QSharedPointer<ivm::IVComponentLibrary::Component> componentFromPath(const QString &path);
 Q_SIGNALS:
     void componentUpdated(const shared::Id &id);
     void componentsToBeLoaded(QSet<QString> componentsPaths);

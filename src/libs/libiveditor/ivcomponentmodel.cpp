@@ -65,7 +65,7 @@ IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject 
             });
     connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentExported, [this](const QString &filepath, bool ok) {
         if (ok) {
-            if (auto item = loadComponent(filepath)) {
+            if (auto item = itemFromComponent(m_compLibrary->componentFromPath(filepath))) {
                 appendRow(item);
             }
         }
@@ -128,27 +128,14 @@ bool IVComponentModel::exportComponent(const QString &targetPath, const QList<iv
 {
     return m_compLibrary->exportComponent(targetPath, objects, projectDir, asn1FilesPaths, externAsns, archetypesModel);
 }
-
-void IVComponentModel::reloadComponent(const shared::Id &id)
-{
-    auto item = itemById(id);
-    if (!item)
-        return;
-
-    if (!item->index().isValid())
-        return;
-
-    const int row = item->index().row();
-    const QString path = m_compLibrary->componentPath(id);
-    removeComponent(id);
-    if ((item = loadComponent(path))) {
-        insertRow(row, item);
-    }
-}
-
 void IVComponentModel::unWatchComponentPath(const QString &componentPath)
 {
     m_compLibrary->unWatchComponent(componentPath);
+}
+
+QSharedPointer<ivm::IVComponentLibrary::Component> IVComponentModel::component(const shared::Id &id) const
+{
+    return m_compLibrary->component(id);
 }
 
 QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
@@ -268,10 +255,8 @@ QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
     }
     return item;
 }
-
-QStandardItem *IVComponentModel::loadComponent(const QString &path)
+QStandardItem *IVComponentModel::itemFromComponent(QSharedPointer<ivm::IVComponentLibrary::Component> component)
 {
-    auto component = m_compLibrary->loadComponent(path);
     if (!component.isNull()) {
         QVector<ivm::IVObject *> objects = m_compLibrary->rootObjects(component->model->ivobjects().values());
         ivm::IVObject::sortObjectList(objects);
@@ -291,6 +276,11 @@ QStandardItem *IVComponentModel::loadComponent(const QString &path)
         return item;
     }
     return nullptr;
+}
+QStandardItem *IVComponentModel::loadComponent(const QString &path)
+{
+    auto component = m_compLibrary->loadComponent(path);
+    return itemFromComponent(component);
 }
 
 } // namespace ive
