@@ -491,7 +491,7 @@ bool InterfaceDocument::exportSelectedType()
 
     QString targetPath = shared::sharedTypesPath() + QDir::separator() + rootType->title();
 
-    if (d->componentsModel->exportComponent(
+    if (d->sharedTypesModel->exportComponent(
                 targetPath, { rootType }, path(), asn1FilesPaths(), asn1FilesPathsExternal(), d->archetypesModel)) {
         d->objectsModel->removeObject(rootType);
         d->objectsSelectionModel->clearSelection();

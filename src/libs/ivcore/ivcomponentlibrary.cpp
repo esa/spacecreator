@@ -255,16 +255,6 @@ void IVComponentLibrary::unWatchComponent(const QString &componentPath)
     d->watcher.removePath(componentPath);
 }
 
-QSharedPointer<IVComponentLibrary::Component> IVComponentLibrary::componentFromPath(const QString &path)
-{
-    auto it = std::find_if(d->components.begin(), d->components.end(),
-            [&path](const auto &component) { return component->componentPath == path; });
-    if (it != d->components.end()) {
-        return it.value();
-    }
-    return nullptr;
-}
-
 void IVComponentLibrary::addComponent(const QSharedPointer<Component> &component)
 {
     for (auto id : std::as_const(component->rootIds)) {

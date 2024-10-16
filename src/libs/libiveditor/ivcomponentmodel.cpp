@@ -65,7 +65,7 @@ IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject 
             });
     connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentExported, [this](const QString &filepath, bool ok) {
         if (ok) {
-            if (auto item = itemFromComponent(m_compLibrary->componentFromPath(filepath))) {
+            if (auto item = loadComponent(filepath)) {
                 appendRow(item);
             }
         }
