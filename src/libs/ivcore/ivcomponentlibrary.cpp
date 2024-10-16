@@ -233,14 +233,18 @@ QSharedPointer<IVComponentLibrary::Component> IVComponentLibrary::component(cons
 
 QStringList IVComponentLibrary::asn1Files(const shared::Id &id) const
 {
-    return component(id)->asn1Files;
+    auto comp = component(id);
+    if (!comp.isNull()) {
+        return comp->asn1Files;
+    }
+    return QStringList();
 }
 
 QString IVComponentLibrary::componentPath(const shared::Id &id) const
 {
     auto comp = component(id);
     if (!comp.isNull()) {
-        return component(id)->componentPath;
+        return comp->componentPath;
     }
     return QString();
 }
@@ -248,6 +252,11 @@ QString IVComponentLibrary::componentPath(const shared::Id &id) const
 QString IVComponentLibrary::modelName() const
 {
     return d->modelName;
+}
+
+QList<shared::Id> IVComponentLibrary::componentsIds()
+{
+    return d->components.keys();
 }
 
 void IVComponentLibrary::unWatchComponent(const QString &componentPath)

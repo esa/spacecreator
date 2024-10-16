@@ -53,8 +53,6 @@ target_sources(${LIB_NAME} PRIVATE
     commandsstackbase.h
     common.cpp
     common.h
-    componentmodel.cpp
-    componentmodel.h
     componentreviewsproxymodel.h componentreviewsproxymodel.cpp
     datamodel.cpp
     datamodel.h

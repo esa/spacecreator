@@ -63,6 +63,16 @@ static const QString kFontWeight = QLatin1String("Style::Font::weight");
 static const QString kNonCurrentImplementationPath { "implem" };
 static const QString kRootImplementationPath { "work" };
 
+enum ComponentRoles
+{
+    IdRole = Qt::UserRole + 1,
+    TypeRole,
+    CursorPixmapRole,
+    DropRole,
+    PathRole,
+    UpdateRole,
+};
+
 class DropData : public QMimeData
 {
     Q_OBJECT

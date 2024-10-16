@@ -94,7 +94,7 @@ public:
     QString componentPath(const shared::Id &id) const;
 
     QString modelName() const;
-
+    QList<shared::Id> componentsIds();
     void unWatchComponent(const QString &componentPath);
 Q_SIGNALS:
     void componentUpdated(const shared::Id &id);

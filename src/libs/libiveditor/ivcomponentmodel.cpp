@@ -34,14 +34,13 @@
 namespace ive {
 
 IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject *parent)
-    : shared::ComponentModel { modelName, parent }
-    , m_type(type)
+    : m_type(type)
 {
     auto path = (type == ComponentLibrary) ? shared::componentsLibraryPath() : shared::sharedTypesPath();
     m_compLibrary = std::make_unique<ivm::IVComponentLibrary>(path, modelName);
     connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentUpdated, [this](const shared::Id &id) {
         if (auto item = itemById(id)) {
-            item->setData(true, UpdateRole);
+            item->setData(true, shared::ComponentRoles::UpdateRole);
             reloadComponent(id);
         }
     });
@@ -58,7 +57,7 @@ IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject 
             [this](const QModelIndex &parent, int first, int last) {
                 if (parent == indexFromItem(invisibleRootItem())) {
                     for (auto idx = first; idx <= last; ++idx) {
-                        const shared::Id id = index(idx, 0, parent).data(IdRole).toUuid();
+                        const shared::Id id = index(idx, 0, parent).data(shared::ComponentRoles::IdRole).toUuid();
                         m_compLibrary->removeComponent(id);
                     }
                 }
@@ -86,8 +85,10 @@ ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
 
 void IVComponentModel::removeComponent(const shared::Id &id)
 {
-    shared::ComponentModel::removeComponent(id);
     m_compLibrary->removeComponent(id);
+    if (auto item = itemById(id)) {
+        removeRow(item->row());
+    }
 }
 
 QString IVComponentModel::componentPath(const shared::Id &id)
@@ -138,6 +139,11 @@ QSharedPointer<ivm::IVComponentLibrary::Component> IVComponentModel::component(c
     return m_compLibrary->component(id);
 }
 
+QList<shared::Id> IVComponentModel::componentIDs() const
+{
+    return m_compLibrary->componentsIds();
+}
+
 QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
 {
     if (!ivObject || ivObject->type() == ivm::IVObject::Type::InterfaceGroup) {
@@ -147,13 +153,13 @@ QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
     QStandardItem *item = new QStandardItem;
     item->setEditable(false);
     item->setDragEnabled(true);
-    item->setData(ivObject->id(), shared::ComponentModel::IdRole);
-    item->setData(QVariant::fromValue(ivObject->type()), shared::ComponentModel::TypeRole);
+    item->setData(ivObject->id(), shared::ComponentRoles::IdRole);
+    item->setData(QVariant::fromValue(ivObject->type()), shared::ComponentRoles::TypeRole);
     if (m_type == IVComponentModel::Type::ComponentLibrary) {
-        item->setData(QVariant::fromValue(shared::DropData::Type::ImportableType), shared::ComponentModel::DropRole);
+        item->setData(QVariant::fromValue(shared::DropData::Type::ImportableType), shared::ComponentRoles::DropRole);
     } else if (m_type == IVComponentModel::Type::SharedTypesLibrary) {
         item->setData(
-                QVariant::fromValue(shared::DropData::Type::InstantiatableType), shared::ComponentModel::DropRole);
+                QVariant::fromValue(shared::DropData::Type::InstantiatableType), shared::ComponentRoles::DropRole);
     }
 
     QString title = ivm::IVNameValidator::decodeName(ivObject->type(), ivObject->title());
@@ -233,7 +239,7 @@ QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
     } else {
         color = QColor(Qt::black);
     }
-    item->setData(dragPix, shared::ComponentModel::CursorPixmapRole);
+    item->setData(dragPix, shared::ComponentRoles::CursorPixmapRole);
     item->setData(color, Qt::ForegroundRole);
     item->setData(font, Qt::FontRole);
     item->setData(title, Qt::DisplayRole);
@@ -276,6 +282,33 @@ QStandardItem *IVComponentModel::itemFromComponent(QSharedPointer<ivm::IVCompone
         return item;
     }
     return nullptr;
+}
+
+QStandardItem *IVComponentModel::itemById(const shared::Id &id)
+{
+    for (int idx = 0; idx < rowCount(); ++idx) {
+        if (item(idx)->data(shared::ComponentRoles::IdRole) == id) {
+            return item(idx);
+        }
+    }
+    return nullptr;
+}
+
+void IVComponentModel::reloadComponent(const shared::Id &id)
+{
+    auto item = itemById(id);
+    if (!item)
+        return;
+
+    if (!item->index().isValid())
+        return;
+
+    const int row = item->index().row();
+    const QString path = m_compLibrary->componentPath(id);
+    removeComponent(id);
+    if ((item = loadComponent(path))) {
+        insertRow(row, item);
+    }
 }
 QStandardItem *IVComponentModel::loadComponent(const QString &path)
 {
