@@ -20,7 +20,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
 #include "commandsstack.h"
-#include "componentmodel.h"
 #include "errorhub.h"
 #include "geometry.h"
 #include "interfacedocument.h"

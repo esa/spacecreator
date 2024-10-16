@@ -16,8 +16,7 @@
 */
 
 #pragma once
-
-#include <componentmodel.h>
+#include <QStandardItemModel>
 #include <ivcomponentlibrary.h>
 #include <ivobject.h>
 
