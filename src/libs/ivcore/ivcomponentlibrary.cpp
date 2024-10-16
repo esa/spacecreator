@@ -152,11 +152,12 @@ void IVComponentLibrary::removeComponent(const shared::Id &id)
 {
     auto component = d->components.take(id);
     if (!component.isNull()) {
-        for (auto id : component->rootIds) {
-            d->components.remove(id);
-        }
+        auto idsToRemove = component->rootIds;
+        d->components.removeIf(
+                [&idsToRemove](QHash<shared::Id, QSharedPointer<IVComponentLibrary::Component>>::Iterator it) {
+                    return idsToRemove.contains(it.key());
+                });
         d->watcher.removePath(component->componentPath);
-
         QDir dir(QFileInfo(component->componentPath).absolutePath());
         dir.removeRecursively();
     }
