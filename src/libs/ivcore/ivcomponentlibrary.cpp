@@ -132,10 +132,16 @@ bool IVComponentLibrary::exportComponent(const QString &targetPath, const QList<
                     shared::ErrorItem::Error, tr("Error during ASN.1 file copying: %1").arg(asnFile));
         }
     }
+
+    std::unique_ptr<ivm::IVModel> model { new ivm::IVModel(ivm::IVPropertyTemplateConfig::instance()) };
+    model->initFromObjects(objects);
+
     QSharedPointer<IVComponentLibrary::Component> component =
             QSharedPointer<IVComponentLibrary::Component>(new Component);
     component->componentPath = targetPath;
     component->asn1Files = asn1FilesPaths;
+    component->model.swap(model);
+
     for (const auto obj : objects) {
         component->rootIds.append(obj->id());
         d->components.insert(obj->id(), component);
