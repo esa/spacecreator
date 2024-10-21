@@ -85,10 +85,10 @@ ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
 
 void IVComponentModel::removeComponent(const shared::Id &id)
 {
-    m_compLibrary->removeComponent(id);
     if (auto item = itemById(id)) {
         removeRow(item->row());
     }
+    m_compLibrary->removeComponent(id);
 }
 
 QString IVComponentModel::componentPath(const shared::Id &id)

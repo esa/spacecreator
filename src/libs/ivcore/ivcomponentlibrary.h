@@ -37,7 +37,7 @@ public:
         QStringList asn1Files;
         QList<shared::Id> rootIds;
         QString componentPath;
-        std::unique_ptr<IVModel> model;
+        QSharedPointer<IVModel> model;
     };
 
     IVComponentLibrary(const QString &path, const QString &modelName);
@@ -104,6 +104,8 @@ Q_SIGNALS:
 private:
     bool anyLoadableIVObjects(QVector<ivm::IVObject *> objects);
     QList<shared::Id> rootIds(QVector<ivm::IVObject *> objects);
+    QSharedPointer<Component> createComponent(const QString &componentPath, const QStringList &asn1Files,
+            const QList<shared::Id> &rootIds, QSharedPointer<IVModel> model);
 
 private:
     struct IVComponentLibraryPrivate;

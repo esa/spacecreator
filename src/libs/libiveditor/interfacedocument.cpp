@@ -448,7 +448,7 @@ bool InterfaceDocument::exportSelectedFunctions()
         return false;
     }
 
-    QString targetPath = d->componentsModel->libraryPath() + "/" + name;
+    QString targetPath = d->componentsModel->libraryPath() + name;
 
     if (QFile::exists(QDir(targetPath).filePath(shared::kDefaultInterfaceViewFileName))) {
         d->componentsModel->unWatchComponentPath(QDir(targetPath).filePath(shared::kDefaultInterfaceViewFileName));

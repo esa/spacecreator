@@ -133,20 +133,11 @@ bool IVComponentLibrary::exportComponent(const QString &targetPath, const QList<
         }
     }
 
-    std::unique_ptr<ivm::IVModel> model { new ivm::IVModel(ivm::IVPropertyTemplateConfig::instance()) };
+    QSharedPointer<ivm::IVModel> model { new ivm::IVModel(ivm::IVPropertyTemplateConfig::instance()) };
     model->initFromObjects(objects);
-
-    QSharedPointer<IVComponentLibrary::Component> component =
-            QSharedPointer<IVComponentLibrary::Component>(new Component);
-    component->componentPath = targetPath;
-    component->asn1Files = asn1FilesPaths;
-    component->model.swap(model);
-
-    for (const auto obj : objects) {
-        component->rootIds.append(obj->id());
-        d->components.insert(obj->id(), component);
-    }
-    d->watcher.addPath(component->componentPath);
+    auto component = createComponent(
+            targetDir.filePath(shared::kDefaultInterfaceViewFileName), asn1FilesPaths, rootIds(objects), model);
+    addComponent(component);
 
     copyImplementation(ivDir, targetDir, objects);
     shared::QMakeFile::createProFileForDirectory(targetPath, asn1FilesPathsExternal);
@@ -164,8 +155,8 @@ void IVComponentLibrary::removeComponent(const shared::Id &id)
                     return idsToRemove.contains(it.key());
                 });
         d->watcher.removePath(component->componentPath);
-        QDir dir(QFileInfo(component->componentPath).absolutePath());
-        dir.removeRecursively();
+        // QDir dir(QFileInfo(component->componentPath).absolutePath());
+        // dir.removeRecursively();
     }
 }
 
@@ -184,7 +175,7 @@ QSharedPointer<ivm::IVComponentLibrary::Component> IVComponentLibrary::loadCompo
         return nullptr;
     }
 
-    std::unique_ptr<ivm::IVModel> model { new ivm::IVModel(ivm::IVPropertyTemplateConfig::instance()) };
+    QSharedPointer<ivm::IVModel> model { new ivm::IVModel(ivm::IVPropertyTemplateConfig::instance()) };
     model->initFromObjects(parser.parsedObjects(), parser.externalAttributes());
 
     shared::ErrorHub::clearCurrentFile();
@@ -192,17 +183,13 @@ QSharedPointer<ivm::IVComponentLibrary::Component> IVComponentLibrary::loadCompo
         return nullptr;
     }
 
-    QSharedPointer<ivm::IVComponentLibrary::Component> component { new ivm::IVComponentLibrary::Component };
-    component->componentPath = path;
-    component->rootIds = rootIds(model->ivobjects().values());
-    component->model.swap(model);
-
     static const QStringList asn1extensions { QLatin1String("asn1"), QLatin1String("asn"), QLatin1String("acn") };
     const QFileInfo fi(path);
     const QDir dir = fi.absoluteDir();
-    component->asn1Files = shared::QMakeFile::readFilesList(
+    auto asn1Files = shared::QMakeFile::readFilesList(
             dir.absoluteFilePath(dir.dirName() + QLatin1String(".pro")), asn1extensions);
 
+    auto component = createComponent(path, asn1Files, rootIds(model->ivobjects().values()), model);
     addComponent(component);
     return component;
 }
@@ -216,6 +203,17 @@ QList<shared::Id> IVComponentLibrary::rootIds(QVector<IVObject *> objects)
         }
     });
     return ids;
+}
+
+QSharedPointer<IVComponentLibrary::Component> IVComponentLibrary::createComponent(const QString &componentPath,
+        const QStringList &asn1Files, const QList<shared::Id> &rootIds, QSharedPointer<IVModel> model)
+{
+    QSharedPointer<ivm::IVComponentLibrary::Component> component { new ivm::IVComponentLibrary::Component };
+    component->componentPath = componentPath;
+    component->asn1Files = asn1Files;
+    component->rootIds = rootIds;
+    component->model.swap(model);
+    return component;
 }
 
 QVector<IVObject *> IVComponentLibrary::rootObjects(QVector<IVObject *> objects)
