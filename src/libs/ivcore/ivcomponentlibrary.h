@@ -100,6 +100,7 @@ Q_SIGNALS:
     void componentUpdated(const shared::Id &id);
     void componentsToBeLoaded(QSet<QString> componentsPaths);
     void componentExported(const QString &filePath, bool ok);
+    void componentsToBeRemovedFromModel(QList<shared::Id> idsToRemove);
 
 private:
     bool anyLoadableIVObjects(QVector<ivm::IVObject *> objects);

@@ -52,6 +52,7 @@ protected:
     QStandardItem *itemFromComponent(QSharedPointer<ivm::IVComponentLibrary::Component> component);
     QStandardItem *itemById(const shared::Id &id);
     void reloadComponent(const shared::Id &id);
+    void removeComponentFromModel(const shared::Id &id);
 
 private:
     QStandardItem *processObject(ivm::IVObject *ivObject);

@@ -52,7 +52,12 @@ IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject 
                     }
                 }
             });
-
+    connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentsToBeRemovedFromModel,
+            [this](const QList<shared::Id> &componentsPaths) {
+                for (const shared::Id &id : std::as_const(componentsPaths)) {
+                    removeComponentFromModel(id);
+                }
+            });
     connect(this, &QAbstractItemModel::rowsAboutToBeRemoved, this,
             [this](const QModelIndex &parent, int first, int last) {
                 if (parent == indexFromItem(invisibleRootItem())) {
@@ -85,9 +90,7 @@ ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
 
 void IVComponentModel::removeComponent(const shared::Id &id)
 {
-    if (auto item = itemById(id)) {
-        removeRow(item->row());
-    }
+    removeComponentFromModel(id);
     m_compLibrary->removeComponent(id);
 }
 
@@ -308,6 +311,13 @@ void IVComponentModel::reloadComponent(const shared::Id &id)
     removeComponent(id);
     if ((item = loadComponent(path))) {
         insertRow(row, item);
+    }
+}
+
+void IVComponentModel::removeComponentFromModel(const shared::Id &id)
+{
+    if (auto item = itemById(id)) {
+        removeRow(item->row());
     }
 }
 QStandardItem *IVComponentModel::loadComponent(const QString &path)

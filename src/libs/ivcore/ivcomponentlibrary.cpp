@@ -50,8 +50,9 @@ IVComponentLibrary::IVComponentLibrary(const QString &path, const QString &model
         /// Get all loaded components with removing them in previously loaded paths
         QSet<QString> existingComponents;
         for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
-            if (!componentsPaths.remove(it.value()->componentPath))
+            if (!componentsPaths.remove(it.value()->componentPath)) {
                 existingComponents.insert(it.value()->componentPath);
+            }
         }
 
         /// Remove from the model non-existing in fs component
@@ -60,13 +61,12 @@ IVComponentLibrary::IVComponentLibrary(const QString &path, const QString &model
             for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
                 if (it.value()->componentPath == path) {
                     idsToRemove << it.key();
+                    removeComponent(it.key());
                     break;
                 }
             }
         }
-        for (const shared::Id &id : std::as_const(idsToRemove)) {
-            removeComponent(id);
-        }
+        Q_EMIT componentsToBeRemovedFromModel(idsToRemove);
 
         /// Add to the model new components
         Q_EMIT componentsToBeLoaded(componentsPaths);
@@ -148,8 +148,11 @@ void IVComponentLibrary::removeComponent(const shared::Id &id)
                     return idsToRemove.contains(it.key());
                 });
         d->watcher.removePath(component->componentPath);
+
         QDir dir(QFileInfo(component->componentPath).absolutePath());
-        dir.removeRecursively();
+        if (dir.exists()) {
+            dir.removeRecursively();
+        }
     }
 }
 
