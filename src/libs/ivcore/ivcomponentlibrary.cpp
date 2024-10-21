@@ -132,13 +132,6 @@ bool IVComponentLibrary::exportComponent(const QString &targetPath, const QList<
                     shared::ErrorItem::Error, tr("Error during ASN.1 file copying: %1").arg(asnFile));
         }
     }
-
-    QSharedPointer<ivm::IVModel> model { new ivm::IVModel(ivm::IVPropertyTemplateConfig::instance()) };
-    model->initFromObjects(objects);
-    auto component = createComponent(
-            targetDir.filePath(shared::kDefaultInterfaceViewFileName), asn1FilesPaths, rootIds(objects), model);
-    addComponent(component);
-
     copyImplementation(ivDir, targetDir, objects);
     shared::QMakeFile::createProFileForDirectory(targetPath, asn1FilesPathsExternal);
 
@@ -155,8 +148,8 @@ void IVComponentLibrary::removeComponent(const shared::Id &id)
                     return idsToRemove.contains(it.key());
                 });
         d->watcher.removePath(component->componentPath);
-        // QDir dir(QFileInfo(component->componentPath).absolutePath());
-        // dir.removeRecursively();
+        QDir dir(QFileInfo(component->componentPath).absolutePath());
+        dir.removeRecursively();
     }
 }
 
