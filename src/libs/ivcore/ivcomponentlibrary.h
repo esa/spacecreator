@@ -107,6 +107,7 @@ private:
     QList<shared::Id> rootIds(QVector<ivm::IVObject *> objects);
     QSharedPointer<Component> createComponent(const QString &componentPath, const QStringList &asn1Files,
             const QList<shared::Id> &rootIds, QSharedPointer<IVModel> model);
+    void processComponentsDeletedinFS(const QString &path);
 
 private:
     struct IVComponentLibraryPrivate;

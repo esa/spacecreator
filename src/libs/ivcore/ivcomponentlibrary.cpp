@@ -33,43 +33,8 @@ IVComponentLibrary::IVComponentLibrary(const QString &path, const QString &model
     d->modelName = modelName;
 
     connect(&d->watcher, &QFileSystemWatcher::directoryChanged, this, [this](const QString &path) {
-        if (path != d->libraryPath)
-            return;
-
-        /// Get all interfaceview paths from fs
-        const QDir libDir(d->libraryPath);
-        const QStringList entries = libDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-        QSet<QString> componentsPaths;
-        for (const QString &name : std::as_const(entries)) {
-            const QString relInterfaceviewPath = name + QDir::separator() + shared::kDefaultInterfaceViewFileName;
-            if (libDir.exists(relInterfaceviewPath)) {
-                componentsPaths.insert(libDir.absoluteFilePath(relInterfaceviewPath));
-            }
-        }
-
-        /// Get all loaded components with removing them in previously loaded paths
-        QSet<QString> existingComponents;
-        for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
-            if (!componentsPaths.remove(it.value()->componentPath)) {
-                existingComponents.insert(it.value()->componentPath);
-            }
-        }
-
-        /// Remove from the model non-existing in fs component
-        QList<shared::Id> idsToRemove;
-        for (const QString &path : std::as_const(existingComponents)) {
-            for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
-                if (it.value()->componentPath == path) {
-                    idsToRemove << it.key();
-                    removeComponent(it.key());
-                    break;
-                }
-            }
-        }
-        Q_EMIT componentsToBeRemovedFromModel(idsToRemove);
-
-        /// Add to the model new components
-        Q_EMIT componentsToBeLoaded(componentsPaths);
+        /// Removed components which FS folder has been removed
+        processComponentsDeletedinFS(path);
     });
 
     connect(&d->watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
@@ -210,6 +175,46 @@ QSharedPointer<IVComponentLibrary::Component> IVComponentLibrary::createComponen
     component->rootIds = rootIds;
     component->model.swap(model);
     return component;
+}
+
+void IVComponentLibrary::processComponentsDeletedinFS(const QString &path)
+{
+    if (path != d->libraryPath)
+        return;
+
+    /// Get all interfaceview paths from fs
+    const QDir libDir(d->libraryPath);
+    const QStringList entries = libDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    QSet<QString> componentsPaths;
+    for (const QString &name : std::as_const(entries)) {
+        const QString relInterfaceviewPath = name + QDir::separator() + shared::kDefaultInterfaceViewFileName;
+        if (libDir.exists(relInterfaceviewPath)) {
+            componentsPaths.insert(libDir.absoluteFilePath(relInterfaceviewPath));
+        }
+    }
+
+    /// Get all loaded components with removing them in previously loaded paths
+    QSet<QString> existingComponents;
+    for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
+        if (!componentsPaths.remove(it.value()->componentPath)) {
+            existingComponents.insert(it.value()->componentPath);
+        }
+    }
+
+    /// Remove from the model non-existing in fs component
+    QList<shared::Id> idsToRemove;
+    for (const QString &path : std::as_const(existingComponents)) {
+        for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
+            if (it.value()->componentPath == path) {
+                idsToRemove << it.key();
+                removeComponent(it.key());
+                break;
+            }
+        }
+    }
+    Q_EMIT componentsToBeRemovedFromModel(idsToRemove);
+    /// Add to the model new components
+    Q_EMIT componentsToBeLoaded(componentsPaths);
 }
 
 QVector<IVObject *> IVComponentLibrary::rootObjects(QVector<IVObject *> objects)
