@@ -114,7 +114,6 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QStringList asnFilesNames;
     IVComponentModel *componentsModel;
     IVComponentModel *sharedTypesModel;
-    ivm::IVComponentLibrary *componentLibrary;
 };
 
 void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
@@ -179,7 +178,6 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
 
     d->dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     d->dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
-    d->componentLibrary = new ivm::IVComponentLibrary(shared::componentsLibraryPath(), tr("Components"));
     d->componentsModel = new IVComponentModel(IVComponentModel::Type::ComponentLibrary, tr("Components"), this);
     d->sharedTypesModel = new IVComponentModel(IVComponentModel::Type::SharedTypesLibrary, tr("Shared Types"), this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, this);
@@ -295,15 +293,13 @@ bool InterfaceDocument::load(const QString &path)
  */
 void InterfaceDocument::loadAvailableComponents()
 {
-    if (d->componentsModel->libraryPath().isEmpty())
-        d->componentsModel->load(shared::componentsLibraryPath());
-    if (d->sharedTypesModel->libraryPath().isEmpty())
-        d->sharedTypesModel->load(shared::sharedTypesPath());
+    d->componentsModel->loadAvailableComponents();
+    d->sharedTypesModel->loadAvailableComponents();
 }
 
 void InterfaceDocument::removeComponent(const shared::Id &id)
 {
-    d->componentLibrary->removeComponent(id);
+    d->componentsModel->removeComponent(id);
 }
 
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
@@ -342,6 +338,9 @@ QList<ivm::IVObject *> InterfaceDocument::prepareSelectedObjectsForExport(QStrin
             }
             objects.append(object);
         }
+    }
+    if (objects.empty()) {
+        return objects;
     }
 
     name = silent ? exportNames.join(QLatin1Char('_')) : getComponentName(exportNames);
@@ -444,15 +443,21 @@ bool InterfaceDocument::exportSelectedFunctions()
     if (name.isEmpty()) {
         return false;
     }
-    QString targetPath = d->componentLibrary->libraryPath() + "/" + name;
+
+    if (objects.empty()) {
+        return false;
+    }
+
+    QString targetPath = d->componentsModel->libraryPath() + name;
 
     if (QFile::exists(QDir(targetPath).filePath(shared::kDefaultInterfaceViewFileName))) {
+        d->componentsModel->unWatchComponentPath(QDir(targetPath).filePath(shared::kDefaultInterfaceViewFileName));
         if (!resolveNameConflict(targetPath, nullptr)) {
             return false;
         }
     }
 
-    if (d->componentLibrary->exportComponent(
+    if (d->componentsModel->exportComponent(
                 targetPath, objects, path(), asn1FilesPaths(), asn1FilesPathsExternal(), d->archetypesModel)) {
         d->objectsSelectionModel->clearSelection();
         return true;
@@ -486,7 +491,7 @@ bool InterfaceDocument::exportSelectedType()
 
     QString targetPath = shared::sharedTypesPath() + QDir::separator() + rootType->title();
 
-    if (d->componentLibrary->exportComponent(
+    if (d->sharedTypesModel->exportComponent(
                 targetPath, { rootType }, path(), asn1FilesPaths(), asn1FilesPathsExternal(), d->archetypesModel)) {
         d->objectsModel->removeObject(rootType);
         d->objectsSelectionModel->clearSelection();

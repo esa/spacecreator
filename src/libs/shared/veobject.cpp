@@ -46,6 +46,9 @@ VEObject::VEObject(const shared::Id &id, QObject *parent)
         setModel(parentObject->model());
     else if (VEModel *model = qobject_cast<VEModel *>(parent))
         setModel(model);
+    else {
+        qDebug() << " model not established";
+    }
 }
 
 VEObject::~VEObject() { }

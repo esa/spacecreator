@@ -52,6 +52,9 @@ IVObject::IVObject(const IVObject::Type t, QObject *parent, const shared::Id &id
         setModel(parentObject->model());
     else if (IVModel *model = qobject_cast<IVModel *>(parent))
         setModel(model);
+    else {
+        qDebug() << " model not established";
+    }
 }
 
 IVObject::~IVObject() { }
@@ -409,7 +412,8 @@ QList<EntityAttribute> IVObject::sortedAttributesValues(const EntityAttributes &
 
 IVModel *IVObject::model() const
 {
-    return qobject_cast<IVModel *>(shared::VEObject::model());
+    auto vemodel = shared::VEObject::model();
+    return qobject_cast<IVModel *>(vemodel);
 }
 
 bool IVObject::isRootObject() const

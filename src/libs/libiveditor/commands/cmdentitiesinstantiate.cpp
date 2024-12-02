@@ -51,7 +51,7 @@ namespace ive {
 namespace cmd {
 
 CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm::IVFunctionType *parent,
-        ivm::IVModel *model, shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks,
+        ivm::IVModel *model, IVComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks,
         const QPointF &pos)
     : ComponentImportHelper(componentModel, asn1Checks)
     , QUndoCommand()
