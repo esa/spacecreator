@@ -16,13 +16,13 @@
 */
 
 #pragma once
-
-#include <componentmodel.h>
+#include <QStandardItemModel>
+#include <ivcomponentlibrary.h>
 #include <ivobject.h>
 
 namespace ive {
 
-class IVComponentModel : public shared::ComponentModel
+class IVComponentModel : public QStandardItemModel
 {
     Q_OBJECT
 public:
@@ -31,17 +31,34 @@ public:
         ComponentLibrary,
         SharedTypesLibrary,
     };
+
     explicit IVComponentModel(Type type, const QString &modelName, QObject *parent = nullptr);
 
-    ivm::IVObject *getObject(const shared::Id &id) override;
+    ivm::IVObject *getObject(const shared::Id &id);
+    void removeComponent(const shared::Id &id);
+    QString componentPath(const shared::Id &id);
+    QStringList asn1Files(const shared::Id &id) const;
+    QString libraryPath() const;
+    void loadAvailableComponents();
+    bool exportComponent(const QString &targetPath, const QList<ivm::IVObject *> objects, const QString &projectDir,
+            QStringList asn1FilesPaths, QStringList externAsns, ivm::ArchetypeModel *archetypesModel);
+
+    void unWatchComponentPath(const QString &componentPath);
+    QSharedPointer<ivm::IVComponentLibrary::Component> component(const shared::Id &id) const;
+    QList<shared::Id> componentIDs() const;
 
 protected:
-    QStandardItem *loadComponent(const QString &path) override;
+    QStandardItem *loadComponent(const QString &path);
+    QStandardItem *itemFromComponent(QSharedPointer<ivm::IVComponentLibrary::Component> component);
+    QStandardItem *itemById(const shared::Id &id);
+    void reloadComponent(const shared::Id &id);
+    void removeComponentFromModel(const shared::Id &id);
 
 private:
     QStandardItem *processObject(ivm::IVObject *ivObject);
 
 private:
+    std::unique_ptr<ivm::IVComponentLibrary> m_compLibrary;
     Type m_type;
 };
 

@@ -19,7 +19,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include <QObject>
 #include <common.h>
-#include <vemodel.h>
+#include <ivmodel.h>
 
 namespace ivm {
 
@@ -37,7 +37,7 @@ public:
         QStringList asn1Files;
         QList<shared::Id> rootIds;
         QString componentPath;
-        std::unique_ptr<shared::VEModel> model;
+        QSharedPointer<IVModel> model;
     };
 
     IVComponentLibrary(const QString &path, const QString &modelName);
@@ -60,9 +60,58 @@ public:
      * \param id
      */
     void removeComponent(const shared::Id &id);
+    /*!
+     * \brief loadComponent tries to load the component taking into account that at least one of the objects in the
+     * model is not of type ivm::IVObject::Type::InterfaceGroup
+     * \param path to the interfaceview.xml file in the
+     * components library
+     * \return return a QSharePointer to a component
+     */
+    QSharedPointer<ivm::IVComponentLibrary::Component> loadComponent(const QString &path);
+    /*!
+     * \brief rootObjects: objects that doesn't have a parentObject
+     * \param objects: list of IVObjects to be filtered
+     * \return
+     */
+    QVector<IVObject *> rootObjects(QVector<IVObject *> objects);
+    /*!
+     * \brief component: get a component given an ID
+     * \param id
+     * \return QSharedPointer<ivm::IVComponentLibrary::Component>
+     */
+    QSharedPointer<ivm::IVComponentLibrary::Component> component(const shared::Id &id) const;
+    /*!
+     * \brief asn1Files: returns asn1Files associated with that component
+     * \param id
+     * \return
+     */
+    QStringList asn1Files(const shared::Id &id) const;
+    /*!
+     * \brief componentPath: returns the component's path given his Id
+     * \param id
+     * \return
+     */
+    QString componentPath(const shared::Id &id) const;
+
+    QString modelName() const;
+    QList<shared::Id> componentsIds();
+    void unWatchComponent(const QString &componentPath);
+Q_SIGNALS:
+    void componentUpdated(const shared::Id &id);
+    void componentsToBeLoaded(QSet<QString> componentsPaths);
+    void componentExported(const QString &filePath, bool ok);
+    void componentsToBeRemovedFromModel(QList<shared::Id> idsToRemove);
+
+private:
+    bool anyLoadableIVObjects(QVector<ivm::IVObject *> objects);
+    QList<shared::Id> rootIds(QVector<ivm::IVObject *> objects);
+    QSharedPointer<Component> createComponent(const QString &componentPath, const QStringList &asn1Files,
+            const QList<shared::Id> &rootIds, QSharedPointer<IVModel> model);
+    void processComponentsDeletedinFS(const QString &path);
 
 private:
     struct IVComponentLibraryPrivate;
     IVComponentLibraryPrivate *d;
+    void addComponent(const QSharedPointer<Component> &component);
 };
 } // ivm

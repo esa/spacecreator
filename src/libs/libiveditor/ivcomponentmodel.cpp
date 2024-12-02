@@ -19,12 +19,12 @@
 
 #include "ivconnectiongroup.h"
 #include "ivfunctiontype.h"
-#include "qmakefile.h"
 
-#include <QDir>
+#include <QDirIterator>
 #include <QFileInfo>
 #include <QSharedPointer>
 #include <errorhub.h>
+#include <ivcomponentlibrary.h>
 #include <ivconnection.h>
 #include <ivmodel.h>
 #include <ivnamevalidator.h>
@@ -34,31 +34,135 @@
 namespace ive {
 
 IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject *parent)
-    : shared::ComponentModel { modelName, parent }
-    , m_type(type)
+    : m_type(type)
 {
+    auto path = (type == ComponentLibrary) ? shared::componentsLibraryPath() : shared::sharedTypesPath();
+    m_compLibrary = std::make_unique<ivm::IVComponentLibrary>(path, modelName);
+    connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentUpdated, [this](const shared::Id &id) {
+        if (auto item = itemById(id)) {
+            item->setData(true, shared::ComponentRoles::UpdateRole);
+            reloadComponent(id);
+        }
+    });
+    connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentsToBeLoaded,
+            [this](const QSet<QString> &componentsPaths) {
+                for (const QString &path : std::as_const(componentsPaths)) {
+                    if (auto item = loadComponent(path)) {
+                        appendRow(item);
+                    }
+                }
+            });
+    connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentsToBeRemovedFromModel,
+            [this](const QList<shared::Id> &componentsPaths) {
+                for (const shared::Id &id : std::as_const(componentsPaths)) {
+                    removeComponentFromModel(id);
+                }
+            });
+    connect(this, &QAbstractItemModel::rowsAboutToBeRemoved, this,
+            [this](const QModelIndex &parent, int first, int last) {
+                if (parent == indexFromItem(invisibleRootItem())) {
+                    for (auto idx = first; idx <= last; ++idx) {
+                        const shared::Id id = index(idx, 0, parent).data(shared::ComponentRoles::IdRole).toUuid();
+                        m_compLibrary->removeComponent(id);
+                    }
+                }
+            });
+    connect(m_compLibrary.get(), &ivm::IVComponentLibrary::componentExported, [this](const QString &filepath, bool ok) {
+        if (ok) {
+            if (auto item = loadComponent(filepath)) {
+                appendRow(item);
+            }
+        }
+    });
 }
 
 ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
 {
-    return qobject_cast<ivm::IVObject *>(shared::ComponentModel::getObject(id));
+    auto comp = m_compLibrary->component(id);
+
+    if (!comp.isNull()) {
+        auto objIt = std::find(comp->rootIds.constBegin(), comp->rootIds.constEnd(), id);
+        if (!objIt->isNull() && objIt != comp->rootIds.constEnd())
+            return comp->model->getObject(id);
+    }
+    return nullptr;
+}
+
+void IVComponentModel::removeComponent(const shared::Id &id)
+{
+    removeComponentFromModel(id);
+    m_compLibrary->removeComponent(id);
+}
+
+QString IVComponentModel::componentPath(const shared::Id &id)
+{
+    return m_compLibrary->componentPath(id);
+}
+
+QStringList IVComponentModel::asn1Files(const shared::Id &id) const
+{
+    return m_compLibrary->asn1Files(id);
+}
+
+QString IVComponentModel::libraryPath() const
+{
+    return m_compLibrary->libraryPath();
+}
+
+void IVComponentModel::loadAvailableComponents()
+{
+    clear();
+
+    auto headerItem = new QStandardItem(m_compLibrary->modelName());
+    headerItem->setTextAlignment(Qt::AlignCenter);
+    setHorizontalHeaderItem(0, headerItem);
+
+    QDirIterator importableIt(m_compLibrary->libraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    while (importableIt.hasNext()) {
+        if (auto item = loadComponent(
+                    importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName)) {
+            appendRow(item);
+        }
+    }
+}
+
+bool IVComponentModel::exportComponent(const QString &targetPath, const QList<ivm::IVObject *> objects,
+        const QString &projectDir, QStringList asn1FilesPaths, QStringList externAsns,
+        ivm::ArchetypeModel *archetypesModel)
+{
+    return m_compLibrary->exportComponent(targetPath, objects, projectDir, asn1FilesPaths, externAsns, archetypesModel);
+}
+void IVComponentModel::unWatchComponentPath(const QString &componentPath)
+{
+    m_compLibrary->unWatchComponent(componentPath);
+}
+
+QSharedPointer<ivm::IVComponentLibrary::Component> IVComponentModel::component(const shared::Id &id) const
+{
+    return m_compLibrary->component(id);
+}
+
+QList<shared::Id> IVComponentModel::componentIDs() const
+{
+    return m_compLibrary->componentsIds();
 }
 
 QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
 {
-    if (!ivObject || ivObject->type() == ivm::IVObject::Type::InterfaceGroup)
+    if (!ivObject || ivObject->type() == ivm::IVObject::Type::InterfaceGroup) {
         return nullptr;
+    }
 
     QStandardItem *item = new QStandardItem;
     item->setEditable(false);
     item->setDragEnabled(true);
-    item->setData(ivObject->id(), shared::ComponentModel::IdRole);
-    item->setData(QVariant::fromValue(ivObject->type()), shared::ComponentModel::TypeRole);
+    item->setData(ivObject->id(), shared::ComponentRoles::IdRole);
+    item->setData(QVariant::fromValue(ivObject->type()), shared::ComponentRoles::TypeRole);
     if (m_type == IVComponentModel::Type::ComponentLibrary) {
-        item->setData(QVariant::fromValue(shared::DropData::Type::ImportableType), shared::ComponentModel::DropRole);
+        item->setData(QVariant::fromValue(shared::DropData::Type::ImportableType), shared::ComponentRoles::DropRole);
     } else if (m_type == IVComponentModel::Type::SharedTypesLibrary) {
         item->setData(
-                QVariant::fromValue(shared::DropData::Type::InstantiatableType), shared::ComponentModel::DropRole);
+                QVariant::fromValue(shared::DropData::Type::InstantiatableType), shared::ComponentRoles::DropRole);
     }
 
     QString title = ivm::IVNameValidator::decodeName(ivObject->type(), ivObject->title());
@@ -138,7 +242,7 @@ QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
     } else {
         color = QColor(Qt::black);
     }
-    item->setData(dragPix, shared::ComponentModel::CursorPixmapRole);
+    item->setData(dragPix, shared::ComponentRoles::CursorPixmapRole);
     item->setData(color, Qt::ForegroundRole);
     item->setData(font, Qt::FontRole);
     item->setData(title, Qt::DisplayRole);
@@ -160,65 +264,66 @@ QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
     }
     return item;
 }
+QStandardItem *IVComponentModel::itemFromComponent(QSharedPointer<ivm::IVComponentLibrary::Component> component)
+{
+    if (!component.isNull()) {
+        QVector<ivm::IVObject *> objects = m_compLibrary->rootObjects(component->model->ivobjects().values());
+        ivm::IVObject::sortObjectList(objects);
 
+        QList<QStandardItem *> items;
+        std::for_each(objects.constBegin(), objects.constEnd(), [this, &items](ivm::IVObject *ivObj) {
+            if (auto item = processObject(ivObj)) {
+                items << item;
+            }
+        });
+        if (items.size() == 1) {
+            return items.front();
+        }
+
+        QStandardItem *item = new QStandardItem;
+        item->appendRows(items);
+        return item;
+    }
+    return nullptr;
+}
+
+QStandardItem *IVComponentModel::itemById(const shared::Id &id)
+{
+    for (int idx = 0; idx < rowCount(); ++idx) {
+        if (item(idx)->data(shared::ComponentRoles::IdRole) == id) {
+            return item(idx);
+        }
+    }
+    return nullptr;
+}
+
+void IVComponentModel::reloadComponent(const shared::Id &id)
+{
+    auto item = itemById(id);
+    if (!item)
+        return;
+
+    if (!item->index().isValid())
+        return;
+
+    const int row = item->index().row();
+    const QString path = m_compLibrary->componentPath(id);
+    removeComponent(id);
+    if ((item = loadComponent(path))) {
+        insertRow(row, item);
+    }
+}
+
+void IVComponentModel::removeComponentFromModel(const shared::Id &id)
+{
+    if (auto item = itemById(id)) {
+        removeRow(item->row());
+    }
+}
 QStandardItem *IVComponentModel::loadComponent(const QString &path)
 {
-    if (path.isEmpty() || !QFileInfo::exists(path)) {
-        qDebug() << path << "doesn't exist";
-        return nullptr;
-    }
-
-    shared::ErrorHub::setCurrentFile(path);
-    ivm::IVXMLReader parser;
-    if (!parser.readFile(path)) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, parser.errorString(), path);
-        shared::ErrorHub::clearCurrentFile();
-        return nullptr;
-    }
-
-    QScopedPointer<shared::VEModel> model { new ivm::IVModel(ivm::IVPropertyTemplateConfig::instance()) };
-    model->initFromObjects(parser.parsedObjects(), parser.externalAttributes());
-
-    const QHash<shared::Id, shared::VEObject *> &modelObjects = model->objects();
-    QList<shared::Id> ids;
-    QVector<ivm::IVObject *> objects;
-    std::for_each(modelObjects.constBegin(), modelObjects.constEnd(), [&objects, &ids](shared::VEObject *veObj) {
-        if (!veObj->parentObject()) {
-            objects.append(veObj->as<ivm::IVObject *>());
-            ids.append(veObj->id());
-        }
-    });
-    ivm::IVObject::sortObjectList(objects);
-    QList<QStandardItem *> items;
-    std::for_each(objects.constBegin(), objects.constEnd(), [this, &items](shared::VEObject *ivObj) {
-        if (auto item = processObject(ivObj->as<ivm::IVObject *>())) {
-            items << item;
-        }
-    });
-    shared::ErrorHub::clearCurrentFile();
-    if (items.isEmpty())
-        return nullptr;
-
-    QSharedPointer<shared::ComponentModel::Component> component { new shared::ComponentModel::Component };
-    component->componentPath = path;
-    component->rootIds = ids;
-    component->model.swap(model);
-
-    static const QStringList asn1extensions { QLatin1String("asn1"), QLatin1String("asn"), QLatin1String("acn") };
-    const QFileInfo fi(path);
-    const QDir dir = fi.absoluteDir();
-    component->asn1Files = shared::QMakeFile::readFilesList(
-            dir.absoluteFilePath(dir.dirName() + QLatin1String(".pro")), asn1extensions);
-
-    for (auto id : qAsConst(ids))
-        addComponent(component);
-
-    if (items.size() == 1)
-        return items.front();
-
-    QStandardItem *item = new QStandardItem;
-    item->appendRows(items);
-    return item;
+    auto component = m_compLibrary->loadComponent(path);
+    return itemFromComponent(component);
 }
 
 } // namespace ive

@@ -22,23 +22,32 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <ivfunction.h>
 #include <ivobject.h>
 
-const QDir libraryPath("./test_components_library");
-const QDir componentPath_export(libraryPath.filePath("test_export"));
-const QDir componentPath_remove(libraryPath.filePath("test_remove"));
-const QDir projectDir("./test_projectDir");
-
 class tst_IVComponentLibrary : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
-    void initTestCase() { library = new ivm::IVComponentLibrary(libraryPath.path(), "test_model"); };
+    void initTestCase();
     void cleanupTestCase() { delete library; };
     void test_exportComponent();
     void test_removeComponent();
 
 private:
     ivm::IVComponentLibrary *library;
+    QDir componentPath_export;
+    QDir componentPath_remove;
+    QDir projectDir;
 };
+
+void tst_IVComponentLibrary::initTestCase()
+{
+    library = new ivm::IVComponentLibrary(QDir::currentPath(), "test_model");
+    componentPath_export = QDir::currentPath();
+    componentPath_export = componentPath_export.filePath("test_export");
+    componentPath_remove = QDir::currentPath();
+    componentPath_remove = componentPath_remove.filePath("test_remove");
+    projectDir = QDir::currentPath();
+    projectDir = projectDir.filePath("./test_projectDir");
+}
 
 void tst_IVComponentLibrary::test_exportComponent()
 {
@@ -58,7 +67,8 @@ void tst_IVComponentLibrary::test_removeComponent()
     ivm::ArchetypeModel *model = new ivm::ArchetypeModel;
     library->exportComponent(componentPath_remove.path(), objects, projectDir.path(), {}, {}, model);
     QVERIFY(QFile::exists(componentPath_remove.filePath(shared::kDefaultInterfaceViewFileName)) == true);
-    library->removeComponent(obj.id());
+    auto component = library->loadComponent(componentPath_remove.filePath(shared::kDefaultInterfaceViewFileName));
+    library->removeComponent(component->rootIds.first());
     QVERIFY(QFile::exists(componentPath_remove.filePath(shared::kDefaultInterfaceViewFileName)) == false);
 }
 

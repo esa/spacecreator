@@ -17,7 +17,7 @@
 
 #include "componenttreeview.h"
 
-#include "componentmodel.h"
+#include "common.h"
 
 #include <QApplication>
 #include <QDrag>
@@ -53,11 +53,11 @@ void ComponentTreeView::mouseMoveEvent(QMouseEvent *event)
 
                 QDrag *drag = new QDrag(this);
                 DropData *mimeData = new DropData;
-                mimeData->entityId = index.data(ComponentModel::IdRole).toUuid();
-                const int dropType = index.data(ComponentModel::DropRole).toInt();
+                mimeData->entityId = index.data(ComponentRoles::IdRole).toUuid();
+                const int dropType = index.data(ComponentRoles::DropRole).toInt();
                 mimeData->dropType = static_cast<DropData::Type>(dropType);
                 drag->setMimeData(mimeData);
-                const QPixmap pix = index.data(ComponentModel::CursorPixmapRole).value<QPixmap>();
+                const QPixmap pix = index.data(ComponentRoles::CursorPixmapRole).value<QPixmap>();
                 drag->setDragCursor(pix, Qt::DropAction::CopyAction);
                 drag->exec(Qt::DropAction::CopyAction);
                 setState(NoState);

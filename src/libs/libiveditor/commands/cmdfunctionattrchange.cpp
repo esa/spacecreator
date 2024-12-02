@@ -74,7 +74,7 @@ CmdFunctionAttrChange::~CmdFunctionAttrChange()
         qDeleteAll(cmds);
 }
 
-void CmdFunctionAttrChange::setComponentModel(shared::ComponentModel *componentModel)
+void CmdFunctionAttrChange::setComponentModel(IVComponentModel *componentModel)
 {
     m_asn1Importer->setComponentModel(componentModel);
 }

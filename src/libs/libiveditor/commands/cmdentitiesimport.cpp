@@ -71,7 +71,7 @@ QSet<QString> fnTypeNames(const QVector<ivm::IVObject *> &objects)
 }
 
 CmdEntitiesImport::CmdEntitiesImport(const QList<ivm::IVObject *> &objects, ivm::IVFunctionType *parent,
-        ivm::IVModel *model, shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks,
+        ivm::IVModel *model, IVComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks,
         const QPointF &pos)
     : ComponentImportHelper(componentModel, asn1Checks)
     , QUndoCommand()

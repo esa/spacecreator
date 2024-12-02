@@ -27,8 +27,8 @@ namespace ivm {
 class IVObject;
 }
 
-namespace shared {
-class ComponentModel;
+namespace ive {
+class IVComponentModel;
 }
 
 namespace Asn1Acn {
@@ -43,13 +43,13 @@ class ComponentImportHelper : public QObject
     Q_OBJECT
 public:
     explicit ComponentImportHelper(
-            shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent = nullptr);
+            IVComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent = nullptr);
     explicit ComponentImportHelper(
-            shared::ComponentModel *componentModel, const QString &projectPath, QObject *parent = nullptr);
+            IVComponentModel *componentModel, const QString &projectPath, QObject *parent = nullptr);
     ~ComponentImportHelper() override;
 
 public:
-    void setComponentModel(shared::ComponentModel *componentModel);
+    void setComponentModel(IVComponentModel *componentModel);
     void setAsn1SystemChecks(Asn1Acn::Asn1SystemChecks *asn1Checks);
     bool isValid() const;
 
@@ -68,7 +68,7 @@ public:
     static QStringList asn1ModuleDuplication(Asn1Acn::Asn1SystemChecks *asn1Checks, QVector<QFileInfo> &asn1FileInfos);
 
 protected:
-    shared::ComponentModel *m_model;
+    ive::IVComponentModel *m_model;
     Asn1Acn::Asn1SystemChecks *m_asn1Checks;
     QString m_destPath;
     QScopedPointer<QTemporaryDir> m_tempDir;

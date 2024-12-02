@@ -40,7 +40,7 @@ CommandsStack::CommandsStack(QObject *parent)
 {
 }
 
-void CommandsStack::setComponentModel(shared::ComponentModel *componentModel)
+void CommandsStack::setComponentModel(IVComponentModel *componentModel)
 {
     m_componentModel = componentModel;
 }
