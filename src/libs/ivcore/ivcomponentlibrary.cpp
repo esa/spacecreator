@@ -114,10 +114,7 @@ void IVComponentLibrary::removeComponent(const shared::Id &id)
                 });
         d->watcher.removePath(component->componentPath);
 
-        QDir dir(QFileInfo(component->componentPath).absolutePath());
-        if (dir.exists()) {
-            dir.removeRecursively();
-        }
+        removeComponentDir(component->componentPath);
     }
 }
 
@@ -278,6 +275,50 @@ void IVComponentLibrary::addComponent(const QSharedPointer<Component> &component
     d->watcher.addPath(component->componentPath);
 }
 
+bool IVComponentLibrary::removeComponentDir(const QString &componentDir)
+{
+    QDir dir(QFileInfo(componentDir).absolutePath());
+    if (dir.exists()) {
+        dir.removeRecursively();
+        return true;
+    }
+    return false;
+}
+
+bool IVComponentLibrary::renameComponentDir(const QString &oldPath, const QString &newPath)
+{
+    QDir dir;
+    return dir.rename(oldPath, newPath);
+}
+
+bool IVComponentLibrary::renameComponentFiles(
+        const QString &componentPath, const QString &oldName, const QString &newName)
+{
+    QDir dir(componentPath);
+    dir.setNameFilters({ "*" + oldName + "*" });
+    QFileInfoList list = dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot, QDir::DirsFirst);
+
+    bool success = true;
+
+    for (const QFileInfo &fileInfo : list) {
+        if (fileInfo.isDir()) {
+            success &= renameComponentFiles(fileInfo.filePath(), oldName, newName);
+        } else {
+            QString fileName = fileInfo.fileName();
+            if (fileName.contains(oldName, Qt::CaseInsensitive)) {
+                QString newFileName = fileName.replace(oldName, newName, Qt::CaseInsensitive);
+                if (QFile::rename(fileInfo.filePath(), fileInfo.path() + "/" + newFileName)) {
+                    qDebug() << "Renamed:" << fileName << "to" << newFileName;
+                } else {
+                    qWarning() << "Failed to rename:" << fileName << "to" << newFileName;
+                    success = false;
+                }
+            }
+        }
+    }
+
+    return success;
+}
 bool IVComponentLibrary::anyLoadableIVObjects(QVector<IVObject *> objects)
 {
     return std::any_of(objects.begin(), objects.end(), [](IVObject *obj) {
@@ -297,4 +338,19 @@ bool IVComponentLibrary::resetTasteENV(const QString &path)
     return !(initTASTECallerProcess->exitCode() != 0 || initTASTECallerProcess->exitStatus() != QProcess::NormalExit);
 }
 
+bool IVComponentLibrary::renameComponent(const QString &newName, const shared::Id &id)
+{
+
+    QSharedPointer<IVComponentLibrary::Component> oldComponent = d->components.value(id);
+    QString oldName = oldComponent->model->ivobjects().values().first()->title();
+    QString componentOldPath = QFileInfo(oldComponent->componentPath).absolutePath();
+    QString componentNewPath = libraryPath() + "/" + newName;
+    d->watcher.removePath(componentOldPath);
+
+    renameComponentDir(componentOldPath, componentNewPath);
+    renameComponentFiles(componentNewPath, oldName, newName);
+
+    d->watcher.addPath(componentNewPath);
+    return true;
+}
 }

@@ -53,6 +53,16 @@ public:
     bool exportComponent(const QString &targetPath, const QList<IVObject *> objects, const QString &projectDir,
             QStringList asn1FilesPaths, QStringList externAsns, ivm::ArchetypeModel *archetypesModel);
     static bool resetTasteENV(const QString &path);
+
+    /*!
+     * \brief renameComponent: Moves the directory to the newName component as well as changing files names
+     *                         and mentions of component's name to new name inside the files
+     * \param newName
+     * \param id: Id of the component
+     * \return true if rename was succesful.
+     */
+    bool renameComponent(const QString &newName, const shared::Id &id);
+
     /*!
      * \brief removeComponent: Uses the id to obtain a pointer to the component
      *  With that pointer we obtain the path to remove the component in disk and
@@ -60,6 +70,7 @@ public:
      * \param id
      */
     void removeComponent(const shared::Id &id);
+
     /*!
      * \brief loadComponent tries to load the component taking into account that at least one of the objects in the
      * model is not of type ivm::IVObject::Type::InterfaceGroup
@@ -113,5 +124,12 @@ private:
     struct IVComponentLibraryPrivate;
     IVComponentLibraryPrivate *d;
     void addComponent(const QSharedPointer<Component> &component);
+    bool removeComponentDir(const QString &componentDir);
+    bool renameComponentDir(const QString &oldPath, const QString &newPath);
+    /*!
+     * \brief renameComponentFiles: Change those files in the component folder that has the name of the component (i.e:
+     * .pro file) \param oldName \param newName \return true if the rename was succesful
+     */
+    bool renameComponentFiles(const QString &componentPath, const QString &oldName, const QString &newName);
 };
 } // ivm

@@ -35,6 +35,7 @@ public:
     explicit IVComponentModel(Type type, const QString &modelName, QObject *parent = nullptr);
 
     ivm::IVObject *getObject(const shared::Id &id);
+    void renameComponent(const QString &newName, const shared::Id &id);
     void removeComponent(const shared::Id &id);
     QString componentPath(const shared::Id &id);
     QStringList asn1Files(const shared::Id &id) const;

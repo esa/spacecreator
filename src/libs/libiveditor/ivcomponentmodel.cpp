@@ -88,6 +88,11 @@ ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
     return nullptr;
 }
 
+void IVComponentModel::renameComponent(const QString &newName, const shared::Id &id)
+{
+    m_compLibrary->renameComponent(newName, id);
+}
+
 void IVComponentModel::removeComponent(const shared::Id &id)
 {
     removeComponentFromModel(id);

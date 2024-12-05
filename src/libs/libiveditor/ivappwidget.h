@@ -92,6 +92,8 @@ private Q_SLOTS:
     void showSelectedRows();
 
 private:
+    QString getNewComponentName(QWidget *parent = nullptr);
+
     void initGraphicsView();
     void initModelView();
     void initImportView();

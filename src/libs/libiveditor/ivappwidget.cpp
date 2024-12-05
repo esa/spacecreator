@@ -60,6 +60,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QIcon>
+#include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QMenu>
 #include <QMessageBox>
@@ -284,6 +285,17 @@ void IVAppWidget::showSelectedRows()
     }
 }
 
+QString IVAppWidget::getNewComponentName(QWidget *parent)
+{
+    bool ok;
+    QString newName = QInputDialog::getText(
+            parent, tr("Rename Component"), tr("Enter new name for the component:"), QLineEdit::Normal, "", &ok);
+    if (ok && !newName.isEmpty()) {
+        return newName;
+    }
+    return QString();
+}
+
 void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
 {
     const QModelIndex idx = ui->importView->indexAt(pos);
@@ -320,8 +332,19 @@ void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
     connect(actRemoveComponent, &QAction::triggered, this, [this, id]() {
         if (auto model = m_document->componentModel()) {
             if (auto obj = model->getObject(id)) {
-                model->removeComponent(id);
                 m_document->removeComponent(id);
+            }
+        }
+    });
+
+    QAction *actRenameComponent = menu->addAction(tr("Rename component"));
+    connect(actRenameComponent, &QAction::triggered, this, [this, id]() {
+        if (auto model = m_document->componentModel()) {
+            if (auto obj = model->getObject(id)) {
+                QString newName = getNewComponentName();
+                if (!newName.isEmpty()) {
+                    m_document->renameComponent(newName, id);
+                }
             }
         }
     });

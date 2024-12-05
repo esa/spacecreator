@@ -297,6 +297,11 @@ void InterfaceDocument::loadAvailableComponents()
     d->sharedTypesModel->loadAvailableComponents();
 }
 
+void InterfaceDocument::renameComponent(const QString &newName, const shared::Id &id)
+{
+    d->componentsModel->renameComponent(newName, id);
+}
+
 void InterfaceDocument::removeComponent(const shared::Id &id)
 {
     d->componentsModel->removeComponent(id);
